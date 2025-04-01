@@ -1,0 +1,109 @@
+If you are into GenAI, you must know these 12 Terms -
+
+
+1. LLM (Large Language Model)
+- What: Advanced AI systems trained on massive text datasets
+- Used in: ChatGPT, Claude, Gemini, Copilot
+
+- Real-world example: GitHub Copilot using LLMs for code suggestions
+
+2. Transformers
+- What: Neural network architecture that revolutionized AI
+- Used in: All modern language models (BERT, GPT, T5)
+
+- Real-world example: Google BERT powering search results understanding
+
+3. Prompt Engineering
+- What: Art of crafting effective instructions for AI models
+- Used in: 
+• Business applications
+• Content creation
+• Specialized tasks
+
+- Real-world example: Writing prompts for image generation in DALL-E
+
+4. Fine-tuning
+- What: Customizing pre-trained models for specific tasks
+- Used in:
+• Industry-specific applications
+• Custom chatbots
+• Specialized tools
+
+- Real-world example: Fine-tuning models for medical diagnosis
+
+5. Embeddings
+- What: Numerical representations of text/images
+- Used in:
+• Search engines
+• Recommendation systems
+• Document comparison
+
+- Real-world example: Pinecone using embeddings for vector search
+
+6. RAG (Retrieval Augmented Generation)
+- What: Combining external knowledge with AI generation
+- Used in:
+• Enterprise chatbots
+• Documentation tools
+• Customer support
+
+- Real-world example: Enterprise chatbots accessing company documentation
+
+7. Tokens
+- What: Units of text processing in AI models
+- Used in:
+• Model capacity planning
+• Cost calculation
+• Input/output management
+
+- Real-world example: GPT-4's 32k token context window
+
+8. Hallucination
+- What: AI generating false but plausible information
+- Impact on:
+• Business applications
+• Content generation
+• Decision support
+
+- Real-world example: ChatGPT generating incorrect historical dates
+
+9. Zero-shot Learning
+- What: AI performing tasks without specific training
+- Used in:
+• Classification tasks
+• Language understanding
+• New use cases
+
+- Real-world example: Classifying new product categories without training
+
+10. Chain-of-Thought
+- What: Step-by-step reasoning in AI responses
+- Used in:
+• Problem solving
+• Mathematical calculations
+• Logic tasks
+
+- Real-world example: Solving complex math problems step-by-step
+
+11. Context Window
+- What: Maximum text length AI can process
+- Impact on:
+• Document processing
+• Conversation length
+• Task complexity
+
+- Real-world example: Processing long legal documents
+
+12. Temperature
+- What: Controls AI output randomness
+- Used in:
+• Creative writing
+• Code generation
+• Response variation
+- Settings:
+• Low (0.0): Consistent, focused
+• High (0.7-1.0): Creative, varied
+- Real-world example: Adjusting creativity in marketing copy generation
+
+
+What other GenAI terms do you use regularly? Please share them below, and I will add them in the next iteration.
