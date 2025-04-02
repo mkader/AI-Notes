@@ -11,7 +11,6 @@
     * Multi-Agent: Agents can interact with each other in collaborative or competitive ways.
     * Human Machine: Agents can interact with humans to execute tasks more efficiently.
  
-Whare are AI Agents Really About?
-![](https://www.youtube.com/watch?v=eHEHE2fpnWQ)
+Whare are AI Agents Really About? - https://www.youtube.com/watch?v=eHEHE2fpnWQ
 
 <img src="https://substack-post-media.s3.amazonaws.com/public/images/0854344c-e671-4c21-8b25-f966772e54b5_1280x1532.gif">
