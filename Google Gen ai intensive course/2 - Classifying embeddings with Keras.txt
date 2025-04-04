@@ -1,0 +1,691 @@
+Day 2 - Classifying embeddings with Keras
+
+Overview
+	Learn to use the embeddings produced by the Gemini API to train a model that can classify newsgroup posts into the categories (the newsgroup itself) from the post contents.
+
+	This technique uses the Gemini API's embeddings as input, avoiding the need to train on text input directly, and as a result it is able to perform quite well 
+	using relatively few examples compared to training a text model from scratch.
+
+		!pip uninstall -qqy jupyterlab kfp 2>/dev/null  # Remove unused conflicting packages
+		!pip install -U -q "google-genai==1.7.0"
+
+		from google import genai
+		from google.genai import types
+
+		genai.__version__
+
+		from kaggle_secrets import UserSecretsClient
+
+		GOOGLE_API_KEY = UserSecretsClient().get_secret("GOOGLE_API_KEY")
+
+		client = genai.Client(api_key=GOOGLE_API_KEY)
+
+Dataset
+	The 20 Newsgroups Text Dataset contains 18,000 newsgroups posts on 20 topics divided into training and test sets. https://scikit-learn.org/0.19/datasets/twenty_newsgroups.html
+	The split between the training and test datasets are based on messages posted before and after a specific date. 
+	For this tutorial, you will use sampled subsets of the training and test sets, and perform some processing using Pandas.
+
+		from sklearn.datasets import fetch_20newsgroups
+
+		newsgroups_train = fetch_20newsgroups(subset="train")
+		newsgroups_test = fetch_20newsgroups(subset="test")
+
+		# View list of class names for dataset
+		newsgroups_train.target_names
+
+
+			['alt.atheism',
+			 'comp.graphics',
+ 			  ...
+			 'misc.forsale',
+			 ...
+			 'rec.sport.hockey',
+			 ...
+			 'sci.electronics',
+			 ...
+			 'talk.politics.misc',
+			 'talk.religion.misc']
+
+	Here is an example of what a record from the training set looks like.
+		
+		print(newsgroups_train.data[0])
+	
+			From: lerxst@wam.umd.edu (where's my thing)
+			Subject: WHAT car is this!?
+			Nntp-Posting-Host: rac3.wam.umd.edu
+			Organization: University of Maryland, College Park
+			Lines: 15
+
+			 I was wondering if anyone out there could enlighten me on this car I saw
+			the other day. It was a 2-door sports car, looked to be from the late 60s/
+			early 70s. It was called a Bricklin. The doors were really small. In addition,
+			the front bumper was separate from the rest of the body. This is 
+			all I know. If anyone can tellme a model name, engine specs, years
+			of production, where this car is made, history, or whatever info you
+			have on this funky looking car, please e-mail.
+
+			Thanks,
+			- IL
+			   ---- brought to you by your neighborhood Lerxst ----
+
+	Start by preprocessing the data for this tutorial in a Pandas dataframe. To remove any sensitive information like names and email addresses, 
+	you will take only the subject and body of each message. This is an optional step that transforms the input data into more generic text, rather than email posts, 
+	so that it will work in other contexts.
+
+		import email
+		import re
+
+		import pandas as pd
+
+
+		def preprocess_newsgroup_row(data):
+		    # Extract only the subject and body
+		    msg = email.message_from_string(data)
+		    text = f"{msg['Subject']}\n\n{msg.get_payload()}"
+		    # Strip any remaining email addresses
+		    text = re.sub(r"[\w\.-]+@[\w\.-]+", "", text)
+		    # Truncate each entry to 5,000 characters
+		    text = text[:5000]
+
+		    return text
+
+
+		def preprocess_newsgroup_data(newsgroup_dataset):
+		    # Put data points into dataframe
+		    df = pd.DataFrame(
+			{"Text": newsgroup_dataset.data, "Label": newsgroup_dataset.target}
+		    )
+		    # Clean up the text
+		    df["Text"] = df["Text"].apply(preprocess_newsgroup_row)
+		    # Match label to target name index
+		    df["Class Name"] = df["Label"].map(lambda l: newsgroup_dataset.target_names[l])
+
+		    return df
+
+		# Apply preprocessing function to training and test datasets
+		df_train = preprocess_newsgroup_data(newsgroups_train)
+		df_test = preprocess_newsgroup_data(newsgroups_test)
+
+		df_train.head()
+
+
+			Text	Label	Class Name
+			0	WHAT car is this!?\n\n I was wondering if anyo...	7	rec.autos
+			1	SI Clock Poll - Final Call\n\nA fair number of...	4	comp.sys.mac.hardware
+			2	PB questions...\n\nwell folks, my mac plus fin...	4	comp.sys.mac.hardware
+			3	Re: Weitek P9000 ?\n\nRobert J.C. Kyanko () wr...	1	comp.graphics
+			4	Re: Shuttle Launch Question\n\nFrom article <>...	14	sci.space
+
+	sample some of the data by taking 100 data points in the training dataset, and dropping a few of the categories to run through this tutorial. Choose the science categories to compare.
+	
+		def sample_data(df, num_samples, classes_to_keep):
+		    # Sample rows, selecting num_samples of each Label.
+		    df = (
+			df.groupby("Label")[df.columns]
+			.apply(lambda x: x.sample(num_samples))
+			.reset_index(drop=True)
+		    )
+
+		    df = df[df["Class Name"].str.contains(classes_to_keep)]
+
+		    # We have fewer categories now, so re-calibrate the label encoding.
+		    df["Class Name"] = df["Class Name"].astype("category")
+		    df["Encoded Label"] = df["Class Name"].cat.codes
+
+		    return df
+		    
+		TRAIN_NUM_SAMPLES = 100
+		TEST_NUM_SAMPLES = 25
+		# Class name should contain 'sci' to keep science categories.
+		# Try different labels from the data - see newsgroups_train.target_names
+		CLASSES_TO_KEEP = "sci"
+
+		df_train = sample_data(df_train, TRAIN_NUM_SAMPLES, CLASSES_TO_KEEP)
+		df_test = sample_data(df_test, TEST_NUM_SAMPLES, CLASSES_TO_KEEP)
+		
+		df_train.value_counts("Class Name")
+		
+			Class Name
+			sci.crypt          100
+			sci.electronics    100
+			sci.med            100
+			sci.space          100
+			Name: count, dtype: int64
+
+		df_test.value_counts("Class Name")
+		
+			Class Name
+			sci.crypt          25
+			sci.electronics    25
+			sci.med            25
+			sci.space          25
+			Name: count, dtype: int64
+
+Create the embeddings
+	generate embeddings for each piece of text using the Gemini API embeddings endpoint. To learn more about embeddings, visit the embeddings guide. 
+	https://ai.google.dev/gemini-api/docs/embeddings
+
+	NOTE: Embeddings are computed one at a time, so large sample sizes can take a long time!
+
+Task types
+	The text-embedding-004 model supports a task type parameter that generates embeddings tailored for the specific task.
+
+	Task Type		Description
+	RETRIEVAL_QUERY		Specifies the given text is a query in a search/retrieval setting.
+	RETRIEVAL_DOCUMENT	Specifies the given text is a document in a search/retrieval setting.
+	SEMANTIC_SIMILARITY	Specifies the given text will be used for Semantic Textual Similarity (STS).
+	CLASSIFICATION		Specifies that the embeddings will be used for classification.
+	CLUSTERING		Specifies that the embeddings will be used for clustering.
+	FACT_VERIFICATION	Specifies that the given text will be used for fact verification.
+	
+	For this example you will be performing classification.
+
+		from google.api_core import retry
+		import tqdm
+		from tqdm.rich import tqdm as tqdmr
+		import warnings
+
+		# Add tqdm to Pandas...
+		tqdmr.pandas()
+
+		# ...But suppress the experimental warning.
+		warnings.filterwarnings("ignore", category=tqdm.TqdmExperimentalWarning)
+
+		# Define a helper to retry when per-minute quota is reached.
+		is_retriable = lambda e: (isinstance(e, genai.errors.APIError) and e.code in {429, 503})
+
+		@retry.Retry(predicate=is_retriable, timeout=300.0)
+		def embed_fn(text: str) -> list[float]:
+		    # You will be performing classification, so set task_type accordingly.
+		    response = client.models.embed_content(
+			model="models/text-embedding-004",
+			contents=text,
+			config=types.EmbedContentConfig(
+			    task_type="classification",
+			),
+		    )
+
+		    return response.embeddings[0].values
+
+
+		def create_embeddings(df):
+		    df["Embeddings"] = df["Text"].progress_apply(embed_fn)
+		    return df
+		    
+	This code is optimised for clarity, and is not particularly fast. It is left as an exercise for the reader to implement batch or parallel/asynchronous embedding generation. 
+	Running this step will take some time.
+
+		df_train = create_embeddings(df_train)
+		df_test = create_embeddings(df_test)
+		
+			100% ????????????????????????????????????????????????????????????????????? 400/400  [ 0:07:35 < 0:00:00 , 6 it/s ]
+ 			100% ????????????????????????????????????????????????????????????????????? 100/100  [ 0:04:51 < 0:00:00 , 3 it/s ]
+ 
+		df_train.head()
+		
+			Text	Label	Class Name	Encoded Label	Embeddings
+			1100	Re: Once tapped, your code is no good any more...	11	sci.crypt	0	[-0.003271368, 0.01870351, -0.03736429, 0.0363...
+			1101	Alternate *legal* wiretaps.\n\n writes:\n[...]...	11	sci.crypt	0	[0.0017773337, 0.01561014, -0.06297495, 0.0255...
+			1102	Re: Secret algorithm [Re: Clipper Chip and cry...	11	sci.crypt	0	[0.0072341994, 0.016354589, -0.040715065, 0.03...
+			1103	A little political philosophy worth reading.\n...	11	sci.crypt	0	[-0.00529952, 0.017131273, -0.032789186, 0.024...
+			1104	Re: Pgp, PEM, and RFC's (Was: Cryptography Pat...	11	sci.crypt	0	[-0.009729882, 0.03217629, -0.035181765, 0.012...
+		
+Build a classification model
+	Here you will define a simple model that accepts the raw embedding data as input, has one hidden layer, and an output layer specifying the class probabilities. 
+	The prediction will correspond to the probability of a piece of text being a particular class of news.
+
+	When you run the model, Keras will take care of details like shuffling the data points, calculating metrics and other ML boilerplate.
+	
+		import keras
+		from keras import layers
+
+
+		def build_classification_model(input_size: int, num_classes: int) -> keras.Model:
+		    return keras.Sequential(
+			[
+			    layers.Input([input_size], name="embedding_inputs"),
+			    layers.Dense(input_size, activation="relu", name="hidden"),
+			    layers.Dense(num_classes, activation="softmax", name="output_probs"),
+			]
+		)
+		
+		# Derive the embedding size from observing the data. The embedding size can also be specified
+		# with the `output_dimensionality` parameter to `embed_content` if you need to reduce it.
+		embedding_size = len(df_train["Embeddings"].iloc[0])
+
+		classifier = build_classification_model(
+		    embedding_size, len(df_train["Class Name"].unique())
+		)
+		classifier.summary()
+
+		classifier.compile(
+		    loss=keras.losses.SparseCategoricalCrossentropy(),
+		    optimizer=keras.optimizers.Adam(learning_rate=0.001),
+		    metrics=["accuracy"],
+		)
+		
+			
+			Model: "sequential"
+			????????????????????????????????????????????????????????????????????????????
+			? Layer (type)                    ? Output Shape           ?       Param # ?
+			????????????????????????????????????????????????????????????????????????????
+			¦ hidden (Dense)                  ¦ (None, 768)            ¦       590,592 ¦
+			+---------------------------------+------------------------+---------------¦
+			¦ output_probs (Dense)            ¦ (None, 4)              ¦         3,076 ¦
+			+--------------------------------------------------------------------------+
+			 Total params: 593,668 (2.26 MB)
+			 Trainable params: 593,668 (2.26 MB)
+ 			 Non-trainable params: 0 (0.00 B)
+
+Train the model
+	Finally, you can train your model. This code uses early stopping to exit the training loop once the loss value stabilises, 
+	so the number of epoch loops executed may differ from the specified value.
+
+		import numpy as np
+
+
+		NUM_EPOCHS = 20
+		BATCH_SIZE = 32
+
+		# Split the x and y components of the train and validation subsets.
+		y_train = df_train["Encoded Label"]
+		x_train = np.stack(df_train["Embeddings"])
+		y_val = df_test["Encoded Label"]
+		x_val = np.stack(df_test["Embeddings"])
+
+		# Specify that it's OK to stop early if accuracy stabilises.
+		early_stop = keras.callbacks.EarlyStopping(monitor="accuracy", patience=3)
+
+		# Train the model for the desired number of epochs.
+		history = classifier.fit(
+		    x=x_train,
+		    y=y_train,
+		    validation_data=(x_val, y_val),
+		    callbacks=[early_stop],
+		    batch_size=BATCH_SIZE,
+		    epochs=NUM_EPOCHS,
+		)
+		
+			Epoch 1/20
+			13/13 ???????????????????? 1s 25ms/step - accuracy: 0.2900 - loss: 1.3614 - val_accuracy: 0.3200 - val_loss: 1.2674
+			Epoch 2/20
+			13/13 ???????????????????? 0s 9ms/step - accuracy: 0.5816 - loss: 1.1909 - val_accuracy: 0.6700 - val_loss: 1.1316
+			Epoch 3/20
+			13/13 ???????????????????? 0s 9ms/step - accuracy: 0.8090 - loss: 1.0176 - val_accuracy: 0.8300 - val_loss: 0.9479
+			...
+			Epoch 14/20
+			13/13 ???????????????????? 0s 10ms/step - accuracy: 0.9905 - loss: 0.1117 - val_accuracy: 0.9300 - val_loss: 0.2417
+
+Evaluate model performance
+	Use Keras Model.evaluate to calculate the loss and accuracy on the test dataset.
+
+		classifier.evaluate(x=x_val, y=y_val, return_dict=True)
+		
+			4/4 ???????????????????? 0s 4ms/step - accuracy: 0.9251 - loss: 0.2397 
+			{'accuracy': 0.9300000071525574, 'loss': 0.24172180891036987}
+
+	To learn more about training models with Keras, including how to visualise the model training metrics, read Training & evaluation with built-in methods.
+	https://www.tensorflow.org/guide/keras/training_with_built_in_methods
+
+Try a custom prediction
+	Now that you have a trained model with good evaluation metrics, you can try to make a prediction with new, hand-written data. 
+	Use the provided example or try your own data to see how the model performs.
+	
+	def make_prediction(text: str) -> list[float]:
+	    """Infer categories from the provided text."""
+	    # Remember that the model takes embeddings as input, so calculate them first.
+	    embedded = embed_fn(new_text)
+
+	    # And recall that the input must be batched, so here they are wrapped as a
+	    # list to provide a batch of 1.
+	    inp = np.array([embedded])
+
+	    # And un-batched here.
+	    [result] = classifier.predict(inp)
+	    return result
+
+	# This example avoids any space-specific terminology to see if the model avoids
+	# biases towards specific jargon.
+	new_text = """
+	First-timer looking to get out of here.
+
+	Hi, I'm writing about my interest in travelling to the outer limits!
+
+	What kind of craft can I buy? What is easiest to access from this 3rd rock?
+
+	Let me know how to do that please.
+	"""
+
+	result = make_prediction(new_text)
+
+	for idx, category in enumerate(df_test["Class Name"].cat.categories):
+	    print(f"{category}: {result[idx] * 100:0.2f}%")
+	    
+	    
+	    	1/1 ???????????????????? 0s 57ms/step
+		sci.crypt: 0.07%
+		sci.electronics: 0.87%
+		sci.med: 0.09%
+		sci.space: 98.97%
+	    
+To explore training custom models with Keras further, check out the Keras guides.
+	https://keras.io/guides/	  
+
+-------------------------------------------------------------------------------------------------------
+Day 2 - Embeddings and similarity scores
+	In this notebook you will use the Gemini API's embedding endpoint to explore similarity scores.
+
+		!pip uninstall -qqy jupyterlab kfp  # Remove unused conflicting packages
+		!pip install -U -q "google-genai==1.7.0"
+
+		from google import genai
+		from google.genai import types
+
+		genai.__version__
+
+		from kaggle_secrets import UserSecretsClient
+
+		GOOGLE_API_KEY = UserSecretsClient().get_secret("GOOGLE_API_KEY")
+
+Explore available models
+	client = genai.Client(api_key=GOOGLE_API_KEY)
+
+	for model in client.models.list():
+	  if 'embedContent' in model.supported_actions:
+	    print(model.name)
+	    
+		models/embedding-001
+		models/text-embedding-004
+		models/gemini-embedding-exp-03-07
+		models/gemini-embedding-exp
+
+Calculate similarity scores
+
+	This example embeds some variations on the pangram, The quick brown fox jumps over the lazy dog, including spelling mistakes and shortenings of the phrase. 
+	Another pangram and a somewhat unrelated phrase have been included for comparison.
+
+	In this task, you are going to use the embeddings to calculate similarity scores, so the task_type for these embeddings is semantic_similarity. 
+	Check out the API reference for the full list of tasks. https://ai.google.dev/api/embeddings#v1beta.TaskType
+
+		texts = [
+		    'The quick brown fox jumps over the lazy dog.',
+		    'The quick rbown fox jumps over the lazy dog.',
+		    'teh fast fox jumps over the slow woofer.',
+		    'a quick brown fox jmps over lazy dog.',
+		    'brown fox jumping over dog',
+		    'fox > dog',
+		    # Alternative pangram for comparison:
+		    'The five boxing wizards jump quickly.',
+		    # Unrelated text, also for comparison:
+		    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus et hendrerit massa. Sed pulvinar, nisi a lobortis sagittis, neque risus gravida dolor, in porta dui odio vel purus.',
+		]
+
+
+		response = client.models.embed_content(
+		    model='models/text-embedding-004',
+		    contents=texts,
+		    config=types.EmbedContentConfig(task_type='semantic_similarity'))
+
+	Define a short helper function that will make it easier to display longer embedding texts in our visualisation.
+
+		def truncate(t: str, limit: int = 50) -> str:
+		  """Truncate labels to fit on the chart."""
+		  if len(t) > limit:
+		    return t[:limit-3] + '...'
+		  else:
+		    return t
+
+		truncated_texts = [truncate(t) for t in texts]
+		
+	A similarity score of two embedding vectors can be obtained by calculating their inner product. If u is the first embedding vector, and v the second, this is uTv. 
+	As the API provides embedding vectors that are normalised to unit length, this is also the cosine similarity.
+
+	This score can be computed across all embeddings through the matrix self-multiplication: df @ df.T.
+
+	Note that the range from 0.0 (completely dissimilar) to 1.0 (completely similar) is depicted in the heatmap from light (0.0) to dark (1.0).
+
+		import pandas as pd
+		import seaborn as sns
+
+
+		# Set up the embeddings in a dataframe.
+		df = pd.DataFrame([e.values for e in response.embeddings], index=truncated_texts)
+		# Perform the similarity calculation
+		sim = df @ df.T
+		# Draw!
+		sns.heatmap(sim, vmin=0, vmax=1, cmap="Greens");
+		
+			day 2 - 1.png
+			
+	You can see the scores for a particular term directly by looking it up in the dataframe.
+
+		sim['The quick brown fox jumps over the lazy dog.'].sort_values(ascending=False)	
+		
+			The quick brown fox jumps over the lazy dog.          0.999999
+			The quick rbown fox jumps over the lazy dog.          0.975623
+			a quick brown fox jmps over lazy dog.                 0.939730
+			brown fox jumping over dog                            0.894507
+			teh fast fox jumps over the slow woofer.              0.842152
+			fox > dog                                             0.776455
+			The five boxing wizards jump quickly.                 0.635346
+			Lorem ipsum dolor sit amet, consectetur adipisc...    0.472174
+			Name: The quick brown fox jumps over the lazy dog., dtype: float64
+
+
+	Try exploring the embeddings of your own datasets, or explore those available in Kaggle datasets. https://www.kaggle.com/datasets
+
+Further reading
+	Explore search re-ranking using embeddings with the Wikipedia API https://github.com/google-gemini/cookbook/blob/main/examples/Search_reranking_using_embeddings.ipynb 
+	Perform anomaly detection using embeddings https://github.com/google-gemini/cookbook/blob/main/examples/Anomaly_detection_with_embeddings.ipynb
+
+-------------------------------------------------------------------------------------------------------
+Day 2 - Document Q&A with RAG using Chroma
+
+	Two big limitations of LLMs are 1) that they only "know" the information that they were trained on, and 2) that they have limited input context windows. 
+	A way to address both of these limitations is to use a technique called Retrieval Augmented Generation, or RAG. 
+	A RAG system has three stages: 1) Indexing 2) Retrieval 3) Generation
+	
+	Indexing happens ahead of time, and allows you to quickly look up relevant information at query-time. When a query comes in, you retrieve relevant documents, 
+	combine them with your instructions and the user's query, and have the LLM generate a tailored answer in natural language using the supplied information. 
+	This allows you to provide information that the model hasn't seen before, such as product-specific knowledge or live weather updates.
+
+	In this notebook you will use the Gemini API to create a vector database, retrieve answers to questions from the database and generate a final answer. 
+	You will use Chroma, an open-source vector database. With Chroma, you can store embeddings alongside metadata, embed documents and queries, and search your documents.
+	https://docs.trychroma.com/docs/overview/introduction
+
+First, install ChromaDB and the Gemini API Python SDK.
+
+	!pip uninstall -qqy jupyterlab kfp  # Remove unused conflicting packages
+	!pip install -qU "google-genai==1.7.0" "chromadb==0.6.3"
+	from google import genai
+	from google.genai import types
+
+	from IPython.display import Markdown
+
+	genai.__version__
+
+	from kaggle_secrets import UserSecretsClient
+
+	GOOGLE_API_KEY = UserSecretsClient().get_secret("GOOGLE_API_KEY")
+
+	client = genai.Client(api_key=GOOGLE_API_KEY)
+
+	for m in client.models.list():
+	    if "embedContent" in m.supported_actions:
+		print(m.name)
+		
+Data
+	Here is a small set of documents you will use to create an embedding database.
+
+		DOCUMENT1 = "Operating the Climate Control System  Your Googlecar has a climate control system that allows you to adjust the temperature and airflow in the car. To operate the climate control system, use the buttons and knobs located on the center console.  Temperature: The temperature knob controls the temperature inside the car. Turn the knob clockwise to increase the temperature or counterclockwise to decrease the temperature. Airflow: The airflow knob controls the amount of airflow inside the car. Turn the knob clockwise to increase the airflow or counterclockwise to decrease the airflow. Fan speed: The fan speed knob controls the speed of the fan. Turn the knob clockwise to increase the fan speed or counterclockwise to decrease the fan speed. Mode: The mode button allows you to select the desired mode. The available modes are: Auto: The car will automatically adjust the temperature and airflow to maintain a comfortable level. Cool: The car will blow cool air into the car. Heat: The car will blow warm air into the car. Defrost: The car will blow warm air onto the windshield to defrost it."
+		DOCUMENT2 = 'Your Googlecar has a large touchscreen display that provides access to a variety of features, including navigation, entertainment, and climate control. To use the touchscreen display, simply touch the desired icon.  For example, you can touch the "Navigation" icon to get directions to your destination or touch the "Music" icon to play your favorite songs.'
+		DOCUMENT3 = "Shifting Gears Your Googlecar has an automatic transmission. To shift gears, simply move the shift lever to the desired position.  Park: This position is used when you are parked. The wheels are locked and the car cannot move. Reverse: This position is used to back up. Neutral: This position is used when you are stopped at a light or in traffic. The car is not in gear and will not move unless you press the gas pedal. Drive: This position is used to drive forward. Low: This position is used for driving in snow or other slippery conditions."
+
+		documents = [DOCUMENT1, DOCUMENT2, DOCUMENT3]
+		
+Creating the embedding database with ChromaDB
+	Create a custom function to generate embeddings with the Gemini API. In this task, you are implementing a retrieval system, 
+	so the task_type for generating the document embeddings is retrieval_document. Later, you will use retrieval_query for the query embeddings. 
+	Check out the API reference for the full list of supported tasks. https://ai.google.dev/api/embeddings#v1beta.TaskType
+
+	Key words: Documents are the items that are in the database. They are inserted first, and later retrieved. 
+	Queries are the textual search terms and can be simple keywords or textual descriptions of the desired documents.
+
+		from chromadb import Documents, EmbeddingFunction, Embeddings
+		from google.api_core import retry
+
+		from google.genai import types
+
+
+		# Define a helper to retry when per-minute quota is reached.
+		is_retriable = lambda e: (isinstance(e, genai.errors.APIError) and e.code in {429, 503})
+
+
+		class GeminiEmbeddingFunction(EmbeddingFunction):
+		    # Specify whether to generate embeddings for documents, or queries
+		    document_mode = True
+
+		    @retry.Retry(predicate=is_retriable)
+		    def __call__(self, input: Documents) -> Embeddings:
+			if self.document_mode:
+			    embedding_task = "retrieval_document"
+			else:
+			    embedding_task = "retrieval_query"
+
+			response = client.models.embed_content(
+			    model="models/text-embedding-004",
+			    contents=input,
+			    config=types.EmbedContentConfig(
+				task_type=embedding_task,
+			    ),
+			)
+			return [e.values for e in response.embeddings]
+			
+	Now create a Chroma database client that uses the GeminiEmbeddingFunction and populate the database with the documents you defined above.
+
+		import chromadb
+
+		DB_NAME = "googlecardb"
+
+		embed_fn = GeminiEmbeddingFunction()
+		embed_fn.document_mode = True
+
+		chroma_client = chromadb.Client()
+		db = chroma_client.get_or_create_collection(name=DB_NAME, embedding_function=embed_fn)
+
+		db.add(documents=documents, ids=[str(i) for i in range(len(documents))])
+		
+	Confirm that the data was inserted by looking at the database.
+
+		db.count()
+		# You can peek at the data too.
+		# db.peek(1)
+	
+			3
+			
+Retrieval: Find relevant documents
+	To search the Chroma database, call the query method. Note that you also switch to the retrieval_query mode of embedding generation.
+
+		# Switch to query mode when generating embeddings.
+		embed_fn.document_mode = False
+
+		# Search the Chroma DB using the specified query.
+		query = "How do you use the touchscreen to play music?"
+
+		result = db.query(query_texts=[query], n_results=1)
+		[all_passages] = result["documents"]
+
+		Markdown(all_passages[0])
+		
+			Your Googlecar has a large touchscreen display that provides access to a variety of features, including navigation, entertainment, and climate control. To use the touchscreen display, simply touch the desired icon. For example, you can touch the "Navigation" icon to get directions to your destination or touch the "Music" icon to play your favorite songs.
+
+Augmented generation: Answer the question
+	Now that you have found a relevant passage from the set of documents (the retrieval step), you can now assemble a generation prompt to have the Gemini API generate a final answer. 
+	Note that in this example only a single passage was retrieved. In practice, especially when the size of your underlying data is large, you will want to retrieve more than one result 
+	and let the Gemini model determine what passages are relevant in answering the question. For this reason it's OK if some retrieved passages are 
+	not directly related to the question - this generation step should ignore them.
+
+		query_oneline = query.replace("\n", " ")
+
+		# This prompt is where you can specify any guidance on tone, or what topics the model should stick to, or avoid.
+		prompt = f"""You are a helpful and informative bot that answers questions using text from the reference passage included below. 
+		Be sure to respond in a complete sentence, being comprehensive, including all relevant background information. 
+		However, you are talking to a non-technical audience, so be sure to break down complicated concepts and 
+		strike a friendly and converstional tone. If the passage is irrelevant to the answer, you may ignore it.
+
+		QUESTION: {query_oneline}
+		"""
+
+		# Add the retrieved documents to the prompt.
+		for passage in all_passages:
+		    passage_oneline = passage.replace("\n", " ")
+		    prompt += f"PASSAGE: {passage_oneline}\n"
+
+		print(prompt)
+		
+			You are a helpful and informative bot that answers questions using text from the reference passage included below. 
+			Be sure to respond in a complete sentence, being comprehensive, including all relevant background information. 
+			However, you are talking to a non-technical audience, so be sure to break down complicated concepts and 
+			strike a friendly and converstional tone. If the passage is irrelevant to the answer, you may ignore it.
+
+			QUESTION: How do you use the touchscreen to play music?
+			PASSAGE: Your Googlecar has a large touchscreen display that provides access to a variety of features, including navigation, entertainment, and climate control. To use the touchscreen display, simply touch the desired icon.  For example, you can touch the "Navigation" icon to get directions to your destination or touch the "Music" icon to play your favorite songs.
+
+	Now use the generate_content method to to generate an answer to the question.
+
+		answer = client.models.generate_content(
+		    model="gemini-2.0-flash",
+		    contents=prompt)
+
+		Markdown(answer.text)
+		
+			To play your favorite songs on the touchscreen display in your Googlecar, simply touch the "Music" icon, which will then allow you to access your favorite songs.
+
+-------------------------------------------------------------------------------------------------------
+
+https://www.kaggle.com/whitepaper-embeddings-and-vector-stores
+
+Quesiton 1:
+	creating effective embeddings is crucial. what are the latest advancements or best practices in generating embeddings that capture nuanced semantic meaning, especially for specialized domains or multimodal data (text, image, etc.)?. how much does the choice of the embedding model impact the performance of the downstream Vector search task?
+Answer	
+	start with the advancements, it shhould integrate llms in the embedding model development stage. so llms can be used as a pre-train back bomb to initialize the embedding model and this allows the embedding model to already leverage multilingual and multim model understanding and not necessarily have the embedding model need to learn multiple languages or multiple modalities directly at the embedding training stage
+	2)2nd point about llm usage, it can help refine training data sets with data creation or by generating high quality training examples
+	3) there's technique called the matrica embedding, which is actually currently pretty popular, the idea is that if you actually have an embedding space, say a dimension of a thousand, putting some training requirement here to train embedding which require the shorter length embedding for instance the first 200 Floats or 100 floats, to be also in in the same embedding space in that you can basically trim the embedding, such that you still perform similarity measure. you can decide how big of the embedding you want to store from one training .
+	
+------------------
+Question 2
+	when integrating Vector search capabilities into existing database systems like alloy DB versus using dedicated Vector databases, what are the primary architectural tradeoffs regarding performance (latency/throughput), cost, data consistency, and ease of use for developers who are building applications like rag or semantic search
+Answer
+	alloy DB -  it is uh fully postgress compatible
+--------------------
+Question 3
+	from a strategic Viewpoint, how do you see the rapidly evolving landscape of vector embeddings and databases impacting interprise data architectures and the types of AI driven applications businesses can build? what are the key challenges (e.g., cost management, standardization, Talent gap) organizations face in adopting these Technologies at scale?
+Answer
+	db index
+--------------------
+Question 3
+	embedding models: how do I upgrade to newer and better embedding models as and when they're available? do we need to run all our data in the DB again through the new embedding models or is there a better way to do it? 
+Answer
+	bad news, you have to upgrade all of your embeddings that you've done when you switch to a new model.  bcause embedding models aren't compatible with each other. 
+--------------------
+Question 4
+	retrieval augmented generation (RAG) systems, what potential impact could arise in retrieval accuracy or the quality of llm-generated responses if different embedding models are used for documents and queries?
+Answer
+	it's very critical, beauae we use the same embedding model for document embedding and the query embedding generation. the reason behind that is the embeding models transform complex data like text image audio videos into a shared Vector spaces. however this specific mapping from like real objects to Vector spaces are different model by model. so using the same embeding model in RAG will ensure that both queries and documents are projected into the consistent embeding space this is crucial because the distances between the shared spaces. so please try to use the same embedding
+------------------------
+Question
+	how does the Precision of a single multimodal model for image/text embeddings compared to using a separate single-modal models?
+Answer
+	one of the big advantages of having a multimodel model is that you can actually search query with text and image. you would not be able to do that using single modality models.
+------------------------
+which application are embeddings not the best suited for A) retrieval augmented generation (RAG) B) simple rule based systems C) anomaly detection D) recommender systems Answer B
+
+which of the following is a major advantage of ScaNN over other approximate nearest neighbor (ANN) algorithms? A) it is open- source and widely available B) it's designed for high dimensional data, and has excellent speed/accuracy trade-offs C) ScaNN only returns exact matches D) it's based on a simple hashing technique and has low computational overhead Answer B 
+
+what are some of the major weaknesses of bag-of-words (BoW) models for generating document 
+embeddings? A) they ignore word ordering and semantic meanings B) they're computationally expensiveiive and require large amounts of data C) they cannot be used for semantic search 
+or topic Discovery D) only effective for short documents and fail to capture long range dependencies. Answer A
+
+which of the following is a common challenge when using embeddings for search and how can it be addressed? A) embeddings cannot handle large data sets, use a smaller data set B)  embeddings are always superior to traditional search, no need to address C) embeddings might not capture literal information well, combine with full text search D) embeddings change too frequently, prevent updates Answer C
+
+what is the primary advantage of using locality sensitive hashing (LSH) for Vector search? A) it guarantees finding the exact nearest neighbors B) it reduces the search Space by grouping similar items into hash buckets C) the only method that works for high-dimensional vectors D) it always provides the best trade-off between speed and accuracy Answer B
