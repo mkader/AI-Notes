@@ -128,7 +128,7 @@ Day 1 - Prompting
 			print(response.text)
 				## The Humble Olive: A Cornerstone of Modern Society ....
 				
-		My Note : output text contains 928 characters (including spaces). Approximately 180–200 tokens, Token count varies based on factors like word length and punctuation, 
+		My Note : output text contains 928 characters (including spaces). Approximately 180â€“200 tokens, Token count varies based on factors like word length and punctuation, 
 		as most tokens are around 4 characters on average in English.
 		
 			response = client.models.generate_content(
