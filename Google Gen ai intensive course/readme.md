@@ -13,5 +13,11 @@
       1. Talk to a database with function calling. https://www.kaggle.com/code/markishere/day-3-function-calling-with-the-gemini-api
       1. Build an agentic ordering system in LangGraph. https://www.kaggle.com/code/markishere/day-3-building-an-agent-with-langgraph/
   2. [Optional] Advanced 3b - <a href="https://www.kaggle.com/whitepaper-agent-companion">“Agents Companion”</a>
-  
+
+* 4 - “Domain-Specific LLMs”:
+  1. read the “Solving Domain-Specific Problems Using LLMs” whitepaper. https://www.kaggle.com/whitepaper-solving-domains-specific-problems-using-llms
+  1. Complete these codelabs on Kaggle:
+    1. Tune a Gemini model for a custom task https://www.kaggle.com/code/markishere/day-4-fine-tuning-a-custom-model
+    1. Use Google Search data in generation https://www.kaggle.com/code/markishere/day-4-google-search-grounding
+
   
