@@ -10,8 +10,8 @@
 * day 3
   1. <a href="https://www.kaggle.com/whitepaper-agents">read the “Generative AI Agents” whitepaper.</a>
   1. Complete these codelabs on Kaggle:
-    1. Talk to a database with function calling. https://www.kaggle.com/code/markishere/day-3-function-calling-with-the-gemini-api
-    1. Build an agentic ordering system in LangGraph. https://www.kaggle.com/code/markishere/day-3-building-an-agent-with-langgraph/
+      1. Talk to a database with function calling. https://www.kaggle.com/code/markishere/day-3-function-calling-with-the-gemini-api
+      1. Build an agentic ordering system in LangGraph. https://www.kaggle.com/code/markishere/day-3-building-an-agent-with-langgraph/
   2. [Optional] Advanced 3b - <a href="https://www.kaggle.com/whitepaper-agent-companion">“Agents Companion”</a>
   
   
