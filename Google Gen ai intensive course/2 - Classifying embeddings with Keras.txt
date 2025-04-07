@@ -269,9 +269,9 @@ Build a classification model
 			????????????????????????????????????????????????????????????????????????????
 			? Layer (type)                    ? Output Shape           ?       Param # ?
 			????????????????????????????????????????????????????????????????????????????
-			¦ hidden (Dense)                  ¦ (None, 768)            ¦       590,592 ¦
-			+---------------------------------+------------------------+---------------¦
-			¦ output_probs (Dense)            ¦ (None, 4)              ¦         3,076 ¦
+			Â¦ hidden (Dense)                  Â¦ (None, 768)            Â¦       590,592 Â¦
+			+---------------------------------+------------------------+---------------Â¦
+			Â¦ output_probs (Dense)            Â¦ (None, 4)              Â¦         3,076 Â¦
 			+--------------------------------------------------------------------------+
 			 Total params: 593,668 (2.26 MB)
 			 Trainable params: 593,668 (2.26 MB)
@@ -629,7 +629,7 @@ Augmented generation: Answer the question
 			strike a friendly and converstional tone. If the passage is irrelevant to the answer, you may ignore it.
 
 			QUESTION: How do you use the touchscreen to play music?
-			PASSAGE: Your Googlecar has a large touchscreen display that provides access to a variety of features, including navigation, entertainment, and climate control. To use the touchscreen display, simply touch the desired icon.  For example, you can touch the "Navigation" icon to get directions to your destination or touch the "Music" icon to play your favorite songs.
+			PASSAGE: Your Googlecar has a large touchscreen display that provides access to a variety of features, including navigation, ...
 
 	Now use the generate_content method to to generate an answer to the question.
 
@@ -639,53 +639,79 @@ Augmented generation: Answer the question
 
 		Markdown(answer.text)
 		
-			To play your favorite songs on the touchscreen display in your Googlecar, simply touch the "Music" icon, which will then allow you to access your favorite songs.
+			To play your favorite songs on the touchscreen display in your Googlecar, simply touch the "Music" icon, ....
 
 -------------------------------------------------------------------------------------------------------
 
 https://www.kaggle.com/whitepaper-embeddings-and-vector-stores
 
 Quesiton 1:
-	creating effective embeddings is crucial. what are the latest advancements or best practices in generating embeddings that capture nuanced semantic meaning, especially for specialized domains or multimodal data (text, image, etc.)?. how much does the choice of the embedding model impact the performance of the downstream Vector search task?
+	creating effective embeddings is crucial. what are the latest advancements or best practices in generating embeddings that capture nuanced 
+	semantic meaning, especially for specialized domains or multimodal data (text, image, etc.)?. how much does the choice of the embedding model 
+	impact the performance of the downstream Vector search task?
 Answer	
-	start with the advancements, it shhould integrate llms in the embedding model development stage. so llms can be used as a pre-train back bomb to initialize the embedding model and this allows the embedding model to already leverage multilingual and multim model understanding and not necessarily have the embedding model need to learn multiple languages or multiple modalities directly at the embedding training stage
+	start with the advancements, it shhould integrate llms in the embedding model development stage. so llms can be used as a pre-train back 
+        bomb to initialize the embedding model and this allows the embedding model to already leverage multilingual and multim model understanding and 
+        not necessarily have the embedding model need to learn multiple languages or multiple modalities directly at the embedding training stage
 	2)2nd point about llm usage, it can help refine training data sets with data creation or by generating high quality training examples
-	3) there's technique called the matrica embedding, which is actually currently pretty popular, the idea is that if you actually have an embedding space, say a dimension of a thousand, putting some training requirement here to train embedding which require the shorter length embedding for instance the first 200 Floats or 100 floats, to be also in in the same embedding space in that you can basically trim the embedding, such that you still perform similarity measure. you can decide how big of the embedding you want to store from one training .
+	3) there's technique called the matrica embedding, which is actually currently pretty popular, the idea is that if you actually have an 
+	   embedding space, say a dimension of a thousand, putting some training requirement here to train embedding which require the shorter 
+	   length embedding for instance the first 200 Floats or 100 floats, to be also in in the same embedding space in that you can basically
+	   trim the embedding, such that you still perform similarity measure. you can decide how big of the embedding you want to store from one training .
 	
 ------------------
 Question 2
-	when integrating Vector search capabilities into existing database systems like alloy DB versus using dedicated Vector databases, what are the primary architectural tradeoffs regarding performance (latency/throughput), cost, data consistency, and ease of use for developers who are building applications like rag or semantic search
+	when integrating Vector search capabilities into existing database systems like alloy DB versus using dedicated Vector databases, 
+	what are the primary architectural tradeoffs regarding performance (latency/throughput), cost, data consistency, and ease of use for 
+	developers who are building applications like rag or semantic search
 Answer
 	alloy DB -  it is uh fully postgress compatible
 --------------------
 Question 3
-	from a strategic Viewpoint, how do you see the rapidly evolving landscape of vector embeddings and databases impacting interprise data architectures and the types of AI driven applications businesses can build? what are the key challenges (e.g., cost management, standardization, Talent gap) organizations face in adopting these Technologies at scale?
+	from a strategic Viewpoint, how do you see the rapidly evolving landscape of vector embeddings and databases impacting interprise data 
+	architectures and the types of AI driven applications businesses can build? what are the key challenges (e.g., cost management, 
+	standardization, Talent gap) organizations face in adopting these Technologies at scale?
 Answer
 	db index
 --------------------
 Question 3
-	embedding models: how do I upgrade to newer and better embedding models as and when they're available? do we need to run all our data in the DB again through the new embedding models or is there a better way to do it? 
+	embedding models: how do I upgrade to newer and better embedding models as and when they're available? do we need to run all our data in the DB 
+	again through the new embedding models or is there a better way to do it? 
 Answer
-	bad news, you have to upgrade all of your embeddings that you've done when you switch to a new model.  bcause embedding models aren't compatible with each other. 
+	bad news, you have to upgrade all of your embeddings that you've done when you switch to a new model.  bcause embedding models aren't compatible 
+	with each other. 
 --------------------
 Question 4
-	retrieval augmented generation (RAG) systems, what potential impact could arise in retrieval accuracy or the quality of llm-generated responses if different embedding models are used for documents and queries?
+	retrieval augmented generation (RAG) systems, what potential impact could arise in retrieval accuracy or the quality of llm-generated responses 
+	if different embedding models are used for documents and queries?
 Answer
-	it's very critical, beauae we use the same embedding model for document embedding and the query embedding generation. the reason behind that is the embeding models transform complex data like text image audio videos into a shared Vector spaces. however this specific mapping from like real objects to Vector spaces are different model by model. so using the same embeding model in RAG will ensure that both queries and documents are projected into the consistent embeding space this is crucial because the distances between the shared spaces. so please try to use the same embedding
+	it's very critical, beauae we use the same embedding model for document embedding and the query embedding generation. the reason 
+	behind that is the embeding models transform complex data like text image audio videos into a shared Vector spaces. however this
+	specific mapping from like real objects to Vector spaces are different model by model. so using the same embeding model in RAG will
+	ensure that both queries and documents are projected into the consistent embeding space this is crucial because the distances between the 
+	shared spaces. so please try to use the same embedding
 ------------------------
 Question
 	how does the Precision of a single multimodal model for image/text embeddings compared to using a separate single-modal models?
 Answer
-	one of the big advantages of having a multimodel model is that you can actually search query with text and image. you would not be able to do that using single modality models.
+	one of the big advantages of having a multimodel model is that you can actually search query with text and image. you would not be 
+	able to do that using single modality models.
 ------------------------
-which application are embeddings not the best suited for A) retrieval augmented generation (RAG) B) simple rule based systems C) anomaly detection D) recommender systems Answer B
+which application are embeddings not the best suited for - Answer B 
+	A) retrieval augmented generation (RAG) B) simple rule based systems C) anomaly detection D) recommender systems
 
-which of the following is a major advantage of ScaNN over other approximate nearest neighbor (ANN) algorithms? A) it is open- source and widely available B) it's designed for high dimensional data, and has excellent speed/accuracy trade-offs C) ScaNN only returns exact matches D) it's based on a simple hashing technique and has low computational overhead Answer B 
+which of the following is a major advantage of ScaNN over other approximate nearest neighbor (ANN) algorithms?  - Answer B 
+	A) it is open- source and widely available B) it's designed for high dimensional data, and has excellent speed/accuracy trade-offs 
+	C) ScaNN only returns exact matches D) it's based on a simple hashing technique and has low computational overhead 
 
-what are some of the major weaknesses of bag-of-words (BoW) models for generating document 
-embeddings? A) they ignore word ordering and semantic meanings B) they're computationally expensiveiive and require large amounts of data C) they cannot be used for semantic search 
-or topic Discovery D) only effective for short documents and fail to capture long range dependencies. Answer A
+what are some of the major weaknesses of bag-of-words (BoW) models for generating document embeddings? Answer A
+	A) they ignore word ordering and semantic meanings B) they're computationally expensiveiive and require large amounts of data 
+	C) they cannot be used for semantic search or topic Discovery D) only effective for short documents and fail to capture long range dependencies. 
 
-which of the following is a common challenge when using embeddings for search and how can it be addressed? A) embeddings cannot handle large data sets, use a smaller data set B)  embeddings are always superior to traditional search, no need to address C) embeddings might not capture literal information well, combine with full text search D) embeddings change too frequently, prevent updates Answer C
+which of the following is a common challenge when using embeddings for search and how can it be addressed?  Answer C
+	A) embeddings cannot handle large data sets, use a smaller data set B)  embeddings are always superior to traditional search, no need to address 
+	C) embeddings might not capture literal information well, combine with full text search D) embeddings change too frequently, prevent updates 
 
-what is the primary advantage of using locality sensitive hashing (LSH) for Vector search? A) it guarantees finding the exact nearest neighbors B) it reduces the search Space by grouping similar items into hash buckets C) the only method that works for high-dimensional vectors D) it always provides the best trade-off between speed and accuracy Answer B
+what is the primary advantage of using locality sensitive hashing (LSH) for Vector search?  Answer B
+	A) it guarantees finding the exact nearest neighbors B) it reduces the search Space by grouping similar items into hash buckets 
+	C) the only method that works for high-dimensional vectors D) it always provides the best trade-off between speed and accuracy 
