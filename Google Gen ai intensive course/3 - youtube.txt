@@ -1,0 +1,104 @@
+Question:
+	building robust AI agents requires effective tools use and grounding in reliable information. how are capabilities like function calling and grounded search 
+	within Vertex AI designed to work together to enable agents to not only  plan but aslo execute complex, multi-step tasks accurately and safely? what 
+	are the key challenges in ensuring agents use these tools reliably?
+	
+Answer:
+	To build robust AI agents in Vertex AI, function calling and grounded search work together by allowing agents to: Retrieve reliable information (grounded search), 
+	Plan a sequence of actions, and Execute tasks through function calls.
+
+	This enables accurate, multi-step task execution in complex environments.
+
+	Key challenges include: Designing clear, well-scoped functions. Crafting effective prompts with few-shot examples. Minimizing hallucinations by increasing tool 
+	usage. Defining what a "good" output looks like, especially for open-ended tasks.
+
+	Together, prompt design, tool integration, and clear evaluation criteria are critical for reliable agent behavior.
+
+Question:
+	does Gemini support MCP? if so, how can we integrate MCP with Gemini in an agent-driven flow, and 
+	what benefits/drawbacks this combination may offer?
+	
+Answer: 
+	Yes, Gemini supports MCP (Model Control Protocol).
+
+	Integration in Agent-Driven Flows: You can integrate MCP with Gemini by wrapping APIs into MCP servers.
+
+	Gemini can then interact with those servers seamlessly, using the MCP standard as a lightweight, universal SDK.
+
+	Benefits: Simplifies API integration and discovery. Enables plug-and-play behavior across different tools. Growing support in the AI ecosystem (e.g., collaboration with Anthropic).
+
+	Drawbacks: Still evolving—may lack maturity for sensitive production use cases. Security and feature completeness (like OAuth) are still being developed.
+
+	Recommendation: Great for experimentation and prototyping now, with increasing potential for production use soon.
+
+Question:
+	how do AI systems assess the reliability of real-time data from multiple sources, resolve contradictions and can they recognize and correct their own incorrect 
+	decisions, or are they fixed to their intial choices?
+Answer
+	AI systems assess real-time data reliability through evaluation agents or multi-step agent workflows. These systems: Collect and compare data from multiple sources. Use a separate 
+	agent or evaluation step to resolve contradictions and select the best response. Can self-correct using critique loops—re-evaluating outputs and restarting if needed.
+	
+	However, this adds latency and cost, and success depends heavily on prompt quality and system design. They're not fixed to initial choices and can adapt dynamically.
+
+
+Question
+	what fundamental limitations and risks might persist for highly autonomous AI agents capable of creating their own tools, how can these be safely managed?
+Answer
+	Highly autonomous AI agents that can create their own tools pose risks like unintended behavior, lack of oversight, and security vulnerabilities
+
+Question
+	what are the key challenges in deploying real-time AI agents in production environments, especially regarding response time, API costs, and accuracy? how do AI agents handle conflicting instructions or ambiguous queries from users? and are there techniques to improve reasoning in such cases?
+Answer
+	Deploying real-time AI agents in production involves key challenges like: 
+		Response time: Balancing speed with accuracy and system complexity.
+		API costs: Managing computational and tool usage efficiently.
+		Accuracy: Ensuring outputs are grounded and contextually correct.
+	Solutions include:
+		Using lightweight, powerful models (e.g., Gemini 1.5 on fewer GPUs).
+		Transitioning from turn-based to real-time bidirectional streaming for more natural, human-like interaction.
+		Designing for event-based architectures that handle simultaneous inputs and tools intelligently.
+	For conflicting or ambiguous instructions, agents use:
+		Memory recall to retrieve missing context.
+		Assumptions based on user profile or defaults.
+		Clarifying questions or offering smart suggestions.
+	Improving reasoning involves:
+		Prompt tuning.
+		Multi-step evaluation loops.
+		Empathetic, product-specific user experience design.
+Question
+	what are the security and privacy considerations when integrating APIs like Gemini into applications that handle sensitive user data?
+Answer
+	When integrating APIs like Gemini into applications handling sensitive user data, key security and privacy considerations include:
+		Owning the full data flow: Know where data is stored, processed, and shared.
+		Reviewing third-party terms: Understand how APIs handle, store, or train on data.
+		Protecting edges of your system: All inputs, tools, and downstream services must be secured.
+	Best practices:
+		Follow standard DevOps and security principles.
+		Use data transformation early (e.g., turning inputs into structured formats) to isolate private info.
+		Prefer platforms (like Google Cloud) that don’t store or train on user prompts by default.
+
+Question :
+	what is a generative AI agent? Answer B
+	A) a type of ML model B) an application that can observe the world and act upon it using tools C) an LLM that can only be used for text generation D) a type of hardware for training LLMs.
+
+Question
+	what is the primary function of the orchestration layer in a generative AI agent? Answer B 
+	A) to generate creative text and images B) to manage the agent's internal reasoning and planning process c) to interact with users through a conversational interface d) to store and retrieve data from external sources
+	
+	um so everybody jot
+
+Question
+	in what scenario might the developer choose to use functions over extensions in a generative AI agent? Answer c
+	A) when the agent needs to make multiple API calls in a sequence B) when the API requires real-time interaction with the agent c) when the developer needs more control over the data flow and API execution d) when the API is easily accessible by the agents infrastructure
+
+Question
+	what is the purpose of data stores in a generative AI agent? Answer B
+	A) to store the agents configuration settings and parameters B) to provide the agent with access to dynamic and up-to-date information C) to execute complex calculations and data transformations D) to monitor and evaluate the agents performance over time
+	
+Question
+	which of the following is not a characteristic typically associated with generative AI agents? Answer C
+	A) they can create new content, such as text, images or music B) they can learn from large datasets to identify patterns and generate similar content C) they possess inherent consciousness and understanding of the content they create D) they can be used for tasks like translation summarization and content creation
+	
+Question
+	what is the mixture of agent experts approach in agent development? Answer c
+	A) combining multiple language models into a single agent B) using a variety of tools to enhance agent capabilities C) combining specialized agents each excelling in a particular domain or task D) integrating different reasoning frameworks within the orchestration layer
