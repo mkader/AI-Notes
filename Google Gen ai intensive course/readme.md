@@ -20,4 +20,6 @@
     1. Tune a Gemini model for a custom task https://www.kaggle.com/code/markishere/day-4-fine-tuning-a-custom-model
     1. Use Google Search data in generation https://www.kaggle.com/code/markishere/day-4-google-search-grounding
 
-  
+* 5 - “MLOps for Generative AI”:
+  1. read the “MLOps for Generative AI” whitepaper. https://www.kaggle.com/whitepaper-operationalizing-generative-ai-on-vertex-ai-using-mlops
+  1. code walkthrough and live demo of goo.gle/agent-starter-pack, a resource created for making MLOps for Gen AI easier and accelerating the path to production. 
