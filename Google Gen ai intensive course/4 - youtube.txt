@@ -1,0 +1,40 @@
+Quesiton 
+	from a research and Engineering perspective, what are the most effective strategies for specializing llms? is it better to fine-tune large general-purpose models, train smaller models 
+	from scratch on domain data, or use techniques like parameter-efficient fine-tuning (PEFT)? how do these choices impact performance cost, and the ability to keep the models updated?
+Answer
+	The best strategy for specializing LLMs depends on the task, data, and resource constraints. There's no one-size-fits-all answer. 
+	Options include fine-tuning large models, training smaller models from scratch, or using parameter-efficient fine-tuning (PEFT). Key points:
+		Start with prompting base models to test capabilities.
+		Specialized tasks often need customization once base models hit limitations.
+		PEFT and smaller models are more cost-effective and easier to update.
+		Complex tasks may still require full fine-tuning for optimal performance.
+		Experimentation is essential to find what works best for your use case.
+Quesiton
+	When developing llms for security domains (like SecLM), what are the biggest challenges in acquiring and using relevant, high quality data for fine-tuning, given its often sensitive or
+	proprietary nature? how do you measure success and ensure these models improve security operations without introducing new risks(e.g., generating plausible but incorrect security advice)?
+Answer
+	Developing LLMs for security domains faces key challenges with data sensitivity and variability—security data is often proprietary or context-specific. The most effective 
+	approach blends high-quality public data with runtime techniques like RAG, while using fine-tuning to generalize tasks, not memorize sensitive info.
+
+	Success is measured by accurate, context-aware responses and strong evaluation datasets. Features like citations boost user trust and reduce risk by grounding advice 
+	in verifiable sources.
+
+Question
+	Healthcare and Life Sciences (HCLS) is a domain with complex terminology, high stakes for accuracy and significant regulatory considerations. what unique challenges and opportunities arise when building or fine-tuning llms for HCLS applications (e.g., clinical documentation, drug discovery, patient interaction)? How do you ensure model reliable, safety and compliance?
+	
+Answer
+	Building LLMs for HCLS offers huge potential in personalized medicine, clinical documentation, and research acceleration. However, challenges include 
+	complex terminology, high accuracy demands, evolving knowledge, data scarcity, and strict regulations.
+
+Question
+	When grounding LLMs with real-time data streams, the main challenge is managing constant updates while maintaining relevance and accuracy. Real-time data doesn't 
+	change retrieval methods much—retrieval-augmented generation (RAG) still applies, often using updated caches or vector databases.
+Answer
+	Accuracy depends on the quality of the source—specialized, curated sources (like Mandiant threat intelligence) outperform general search grounding (e.g., Google), 
+	especially for niche terms. Key focus areas include handling temporal changes, ensuring domain-specific context, and integrating high-quality, authoritative 
+	sources to avoid incorrect or irrelevant outputs.
+
+what is the primary goal of MedLM in the medical field? Answer C
+	A) to replace doctors with AI systems for more efficient patient care B) to develop AI models capable of diagnosing and treating diseases without human intervention 
+	c) to improve health outcomes by making Advanced AI technology available to healthcare professionals 
+	D) to create a universal AI system that can answer any medical question with 100% accuracy
