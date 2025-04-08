@@ -22,4 +22,4 @@
 
 * 5 - “MLOps for Generative AI”:
   1. read the “MLOps for Generative AI” whitepaper. https://www.kaggle.com/whitepaper-operationalizing-generative-ai-on-vertex-ai-using-mlops
-  1. code walkthrough and live demo of goo.gle/agent-starter-pack, a resource created for making MLOps for Gen AI easier and accelerating the path to production. 
+  1. code walkthrough and live demo of https://github.com/GoogleCloudPlatform/agent-starter-pack, a resource created for making MLOps for Gen AI easier and accelerating the path to production. 
