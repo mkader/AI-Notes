@@ -1,0 +1,422 @@
+Day 4 - Fine tuning a custom model
+
+	use the Gemini API to fine-tune a custom, task-specific model. Fine-tuning can be used for a variety of tasks from classic NLP problems like entity 
+	extraction or summarisation, to creative tasks like stylised generation. You will fine-tune a model to classify the category a piece of text (a newsgroup post) 
+	into the category it belongs to (the newsgroup name).
+
+	This codelab walks you tuning a model with the API. AI Studio also supports creating new tuned models directly in the web UI, allowing you to quickly 
+	create and monitor models using data from Google Sheets, Drive or your own files.
+
+		!pip uninstall -qqy jupyterlab  # Remove unused conflicting packages
+		!pip install -U -q "google-genai==1.7.0"
+		from google import genai
+		from google.genai import types
+
+		genai.__version__
+
+		from kaggle_secrets import UserSecretsClient
+
+		GOOGLE_API_KEY = UserSecretsClient().get_secret("GOOGLE_API_KEY")
+
+		client = genai.Client(api_key=GOOGLE_API_KEY)
+
+		for model in client.models.list():
+		    if "createTunedModel" in model.supported_actions:
+			print(model.name)
+
+			models/gemini-1.5-flash-001-tuning
+
+Download & Prepare the dataset
+	In this activity, you will use the same newsgroups dataset that you used to train a classifier in Keras. 
+	In this example you will use a fine-tuned Gemini model to achieve the same goal.
+
+	The 20 Newsgroups Text Dataset contains 18,000 newsgroups posts on 20 topics divided into training and test sets.
+
+		from sklearn.datasets import fetch_20newsgroups
+
+		newsgroups_train = fetch_20newsgroups(subset="train")
+		newsgroups_test = fetch_20newsgroups(subset="test")
+
+		# View list of class names for dataset
+		newsgroups_train.target_names
+
+		print(newsgroups_train.data[0])
+
+		import email
+		import re
+
+		import pandas as pd
+
+
+		def preprocess_newsgroup_row(data):
+		    # Extract only the subject and body
+		    msg = email.message_from_string(data)
+		    text = f"{msg['Subject']}\n\n{msg.get_payload()}"
+		    # Strip any remaining email addresses
+		    text = re.sub(r"[\w\.-]+@[\w\.-]+", "", text)
+		    # Truncate the text to fit within the input limits
+		    text = text[:40000]
+
+		    return text
+
+
+		def preprocess_newsgroup_data(newsgroup_dataset):
+		    # Put data points into dataframe
+		    df = pd.DataFrame(
+			{"Text": newsgroup_dataset.data, "Label": newsgroup_dataset.target}
+		    )
+		    # Clean up the text
+		    df["Text"] = df["Text"].apply(preprocess_newsgroup_row)
+		    # Match label to target name index
+		    df["Class Name"] = df["Label"].map(lambda l: newsgroup_dataset.target_names[l])
+
+		    return df
+		# Apply preprocessing to training and test datasets
+		df_train = preprocess_newsgroup_data(newsgroups_train)
+		df_test = preprocess_newsgroup_data(newsgroups_test)
+
+		df_train.head()
+
+		def sample_data(df, num_samples, classes_to_keep):
+		    # Sample rows, selecting num_samples of each Label.
+		    df = (
+			df.groupby("Label")[df.columns]
+			.apply(lambda x: x.sample(num_samples))
+			.reset_index(drop=True)
+		    )
+
+		    df = df[df["Class Name"].str.contains(classes_to_keep)]
+		    df["Class Name"] = df["Class Name"].astype("category")
+
+		    return df
+
+		# Keep rec.* and sci.*
+		CLASSES_TO_KEEP = "^rec|^sci"
+
+		df_train = sample_data(df_train, TRAIN_NUM_SAMPLES, CLASSES_TO_KEEP)
+		df_test = sample_data(df_test, TEST_NUM_SAMPLES, CLASSES_TO_KEEP)
+
+Evaluate baseline performance
+	Before you start tuning a model, it's good practice to perform an evaluation on the available models to ensure you can measure how much the tuning helps.
+
+	First identify a single sample row to use for visual inspection.
+
+		sample_idx = 0
+		sample_row = preprocess_newsgroup_row(newsgroups_test.data[sample_idx])
+		sample_label = newsgroups_test.target_names[newsgroups_test.target[sample_idx]]
+
+		print(sample_row)
+		print('---')
+		print('Label:', sample_label)
+
+			Need info on 88-89 Bonneville
+
+			 I am a ...
+			 
+	Passing the text directly in as a prompt does not yield the desired results. The model will attempt to respond to the message.
+
+		response = client.models.generate_content(
+		    model="gemini-1.5-flash-001", contents=sample_row)
+		print(response.text)
+
+			You are right to be confused! Pontiac's Bonneville line in 1988-89 was a bit of a mess. Here's a breakdown: ...
+
+	You can use the prompt engineering techniques you have learned this week to induce the model to perform the desired task. 
+	Try some of your own ideas and see what is effective, or check out the following cells for different approaches. Note that they have different levels of effectiveness!
+
+		# Ask the model directly in a zero-shot prompt.
+		prompt = "From what newsgroup does the following message originate?"
+		baseline_response = client.models.generate_content(
+		    model="gemini-1.5-flash-001",
+		    contents=[prompt, sample_row])
+		print(baseline_response.text)
+
+			The message originates from the **alt.autos.pontiac** newsgroup. ...
+
+	This technique still produces quite a verbose response. You could try and parse out the relevant text, or refine the prompt even further.
+
+		from google.api_core import retry
+
+		# You can use a system instruction to do more direct prompting, and get a
+		# more succinct answer.
+
+		system_instruct = """
+		You are a classification service. You will be passed input that represents
+		a newsgroup post and you must respond with the newsgroup from which the post
+		originates.
+		"""
+
+		# Define a helper to retry when per-minute quota is reached.
+		is_retriable = lambda e: (isinstance(e, genai.errors.APIError) and e.code in {429, 503})
+
+		# If you want to evaluate your own technique, replace this body of this function
+		# with your model, prompt and other code and return the predicted answer.
+		@retry.Retry(predicate=is_retriable)
+		def predict_label(post: str) -> str:
+		    response = client.models.generate_content(
+			model="gemini-1.5-flash-001",
+			config=types.GenerateContentConfig(
+			    system_instruction=system_instruct),
+			contents=post)
+
+		    rc = response.candidates[0]
+
+		    # Any errors, filters, recitation, etc we can mark as a general error
+		    if rc.finish_reason.name != "STOP":
+			return "(error)"
+		    else:
+			# Clean up the response.
+			return response.text.strip()
+
+
+		prediction = predict_label(sample_row)
+
+		print(prediction)
+		print()
+		print("Correct!" if prediction == sample_label else "Incorrect.")
+		
+			rec.autos.misc
+
+			Incorrect.
+			
+	Now run a short evaluation using the function defined above. The test set is further sampled to ensure the experiment runs smoothly on the API's free tier. In practice you would evaluate over the whole set.
+
+		import tqdm
+		from tqdm.rich import tqdm as tqdmr
+		import warnings
+
+		# Enable tqdm features on Pandas.
+		tqdmr.pandas()
+
+		# But suppress the experimental warning
+		warnings.filterwarnings("ignore", category=tqdm.TqdmExperimentalWarning)
+
+
+		# Further sample the test data to be mindful of the free-tier quota.
+		df_baseline_eval = sample_data(df_test, 2, '.*')
+
+		# Make predictions using the sampled data.
+		df_baseline_eval['Prediction'] = df_baseline_eval['Text'].progress_apply(predict_label)
+
+		# And calculate the accuracy.
+		accuracy = (df_baseline_eval["Class Name"] == df_baseline_eval["Prediction"]).sum() / len(df_baseline_eval)
+		print(f"Accuracy: {accuracy:.2%}")
+		
+			Output()
+			Accuracy: 37.50%
+		
+	Now take a look at the dataframe to compare the predictions with the labels.
+
+		df_baseline_eval
+		
+			Text	Label	Class Name	Prediction
+			0	Re: Too fast\n\n (Dan Day) writes:\n> In artic...	7	rec.autos	rec.autos.sports.cars
+			...
+			15	Re: Why we like DC-X (was Re: Shuttle 0-Defect...	14	sci.space	misc.space
+
+Tune a custom model
+	In this example you'll use tuning to create a model that requires no prompting or system instructions and outputs succinct text from the classes you provide in the training data.
+
+	The data contains both input text (the processed posts) and output text (the category, or newsgroup), that you can use to start tuning a model.
+
+	When calling tune(), you can specify model tuning hyperparameters too:
+		epoch_count: defines how many times to loop through the data,
+		batch_size: defines how many rows to process in a single step, and
+		learning_rate: defines the scaling factor for updating model weights at each step.
+		
+	You can also choose to omit them and use the defaults. Learn more about these parameters and how they work. For this example these parameters were selected by 
+	running some tuning jobs and selecting parameters that converged efficiently.
+
+	This example will start a new tuning job, but only if one does not already exist. This allows you to leave this codelab and come back later - re-running 
+	this step will find your last model.
+
+		from collections.abc import Iterable
+		import random
+
+		# Convert the data frame into a dataset suitable for tuning.
+		input_data = {'examples': 
+		    df_train[['Text', 'Class Name']]
+		      .rename(columns={'Text': 'textInput', 'Class Name': 'output'})
+		      .to_dict(orient='records')
+		 }
+
+		# If you are re-running this lab, add your model_id here.
+		model_id = None
+
+		# Or try and find a recent tuning job.
+		if not model_id:
+		  queued_model = None
+		  # Newest models first.
+		  for m in reversed(client.tunings.list()):
+		    # Only look at newsgroup classification models.
+		    if m.name.startswith('tunedModels/newsgroup-classification-model'):
+		      # If there is a completed model, use the first (newest) one.
+		      if m.state.name == 'JOB_STATE_SUCCEEDED':
+			model_id = m.name
+			print('Found existing tuned model to reuse.')
+			break
+
+		      elif m.state.name == 'JOB_STATE_RUNNING' and not queued_model:
+			# If there's a model still queued, remember the most recent one.
+			queued_model = m.name
+		  else:
+		    if queued_model:
+		      model_id = queued_model
+		      print('Found queued model, still waiting.')
+
+		# Upload the training data and queue the tuning job.
+		if not model_id:
+		    tuning_op = client.tunings.tune(
+			base_model="models/gemini-1.5-flash-001-tuning",
+			training_dataset=input_data,
+			config=types.CreateTuningJobConfig(
+			    tuned_model_display_name="Newsgroup classification model",
+			    batch_size=16,
+			    epoch_count=2,
+			),
+		    )
+
+		    print(tuning_op.state)
+		    model_id = tuning_op.name
+
+		print(model_id)
+		
+			/tmp/ipykernel_45/3257069937.py:40: ExperimentalWarning: The SDK's tuning implementation is experimental, and may change in future versions.
+			  tuning_op = client.tunings.tune(
+			JobState.JOB_STATE_QUEUED
+			tunedModels/newsgroup-classification-model-yyxc6vlgd
+			
+	This has created a tuning job that will run in the background. To inspect the progress of the tuning job, run this cell to plot the current status and loss curve. 
+	Once the status reaches ACTIVE, tuning is complete and the model is ready to use.
+
+	Tuning jobs are queued, so it may look like no training steps have been taken initially but it will progress. Tuning can take anywhere from a few minutes to multiple hours, 
+	depending on factors like your dataset size and how busy the tuning infrastrature is. Why not treat yourself to a nice cup of tea while you wait, or come and say 
+	"Hi!" in the group Discord.
+
+	It is safe to stop this cell at any point. It will not stop the tuning job.
+
+	IMPORTANT: Due to the high volume of users doing this course, tuning jobs may be queued for many hours. Take a note of your tuned model ID above (tunedModels/...) 
+	so you can come back to it tomorrow. In the meantime, check out the Search grounding codelab. If you want to try tuning a local LLM, check out the fine-tuning guides 
+	for tuning a Gemma model.
+
+		import datetime
+		import time
+
+		MAX_WAIT = datetime.timedelta(minutes=10)
+
+		while not (tuned_model := client.tunings.get(name=model_id)).has_ended:
+
+		    print(tuned_model.state)
+		    time.sleep(60)
+
+		    # Don't wait too long. Use a public model if this is going to take a while.
+		    if datetime.datetime.now(datetime.timezone.utc) - tuned_model.create_time > MAX_WAIT:
+			print("Taking a shortcut, using a previously prepared model.")
+			model_id = "tunedModels/newsgroup-classification-model-ltenbi1b"
+			tuned_model = client.tunings.get(name=model_id)
+			break
+
+		print(f"Done! The model state is: {tuned_model.state.name}")
+
+		if not tuned_model.has_succeeded and tuned_model.error:
+		    print("Error:", tuned_model.error)
+		    
+			JobState.JOB_STATE_RUNNING
+			JobState.JOB_STATE_RUNNING
+			...
+			Done! The model state is: JOB_STATE_SUCCEEDED
+			
+Use the new model
+	Now that you have a tuned model, try it out with custom data. You use the same API as a normal Gemini API interaction, but you specify your new model as the model name,
+	which will start with tunedModels/.
+
+		new_text = """
+		First-timer looking to get out of here.
+
+		Hi, I'm writing about my interest in travelling to the outer limits!
+
+		What kind of craft can I buy? What is easiest to access from this 3rd rock?
+
+		Let me know how to do that please.
+		"""
+
+		response = client.models.generate_content(
+		    model=model_id, contents=new_text)
+
+		print(response.text)
+			
+			sci.space
+Evaluation
+	You can see that the model outputs labels that correspond to those in the training data, and without any system instructions or prompting, which is already a great improvement. 
+	Now see how well it performs on the test set.
+
+	Note that there is no parallelism in this example; classifying the test sub-set will take a few minutes.
+
+		@retry.Retry(predicate=is_retriable)
+		def classify_text(text: str) -> str:
+		    """Classify the provided text into a known newsgroup."""
+		    response = client.models.generate_content(
+			model=model_id, contents=text)
+		    rc = response.candidates[0]
+
+		    # Any errors, filters, recitation, etc we can mark as a general error
+		    if rc.finish_reason.name != "STOP":
+			return "(error)"
+		    else:
+			return rc.content.parts[0].text
+
+		# The sampling here is just to minimise your quota usage. If you can, you should
+		# evaluate the whole test set with `df_model_eval = df_test.copy()`.
+		df_model_eval = sample_data(df_test, 4, '.*')
+
+		df_model_eval["Prediction"] = df_model_eval["Text"].progress_apply(classify_text)
+
+		accuracy = (df_model_eval["Class Name"] == df_model_eval["Prediction"]).sum() / len(df_model_eval)
+		print(f"Accuracy: {accuracy:.2%}")
+
+			 100% ??????????????????????????????????????????????????????????????????????? 32/32  [ 0:00:58 < 0:00:00 , 0 it/s ]
+			Accuracy: 87.50%
+
+Compare token usage
+	AI Studio and the Gemini API provide model tuning at no cost, however normal limits and charges apply for use of a tuned model.
+
+	The size of the input prompt and other generation config like system instructions, as well as the number of generated output tokens, all contribute to the overall cost of a request.
+
+		# Calculate the *input* cost of the baseline model with system instructions.
+		sysint_tokens = client.models.count_tokens(
+		    model='gemini-1.5-flash-001', contents=[system_instruct, sample_row]
+		).total_tokens
+		print(f'System instructed baseline model: {sysint_tokens} (input)')
+
+		# Calculate the input cost of the tuned model.
+		tuned_tokens = client.models.count_tokens(model=tuned_model.base_model, contents=sample_row).total_tokens
+		print(f'Tuned model: {tuned_tokens} (input)')
+
+		savings = (sysint_tokens - tuned_tokens) / tuned_tokens
+		print(f'Token savings: {savings:.2%}')  # Note that this is only n=1.
+		
+			System instructed baseline model: 172 (input)
+			Tuned model: 136 (input)
+			Token savings: 26.47%
+			
+	The earlier verbose model also produced more output tokens than needed for this task.
+
+		baseline_token_output = baseline_response.usage_metadata.candidates_token_count
+		print('Baseline (verbose) output tokens:', baseline_token_output)
+
+		tuned_model_output = client.models.generate_content(
+		    model=model_id, contents=sample_row)
+		tuned_tokens_output = tuned_model_output.usage_metadata.candidates_token_count
+		print('Tuned output tokens:', tuned_tokens_output)
+		
+			Baseline (verbose) output tokens: 52
+			Tuned output tokens: 4
+
+Next steps
+	Now that you have tuned a classification model, try some other tasks, like tuning a model to respond with a specific tone or style using hand-written examples 
+	(or even generated examples!). Kaggle hosts a number of datasets you can try out. https://www.kaggle.com/datasets
+
+	Learn about when supervised fine-tuning is most effective. https://cloud.google.com/blog/products/ai-machine-learning/supervised-fine-tuning-for-gemini-llm
+
+	And check out the fine-tuning tutorial for another example that shows a tuned model extending beyond the training data to new, unseen inputs.
+	https://ai.google.dev/gemini-api/docs/model-tuning/tutorial?hl=en&lang=python

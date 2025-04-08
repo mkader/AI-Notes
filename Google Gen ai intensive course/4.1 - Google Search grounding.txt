@@ -1,0 +1,216 @@
+Day 4 - Google Search grounding with the Gemini API
+	
+	use Google Search results with the Gemini API in a technique called grounding, where the model is connected to verifiable sources of information. 
+	Using search grounding is similar to using the RAG system you implemented earlier in the week, but the Gemini API automates a lot of it for you. 
+	The model generates Google Search queries and invokes the searches automatically, retrieving relevant data from Google's index of the web and providing links to 
+	search suggestions that support the query, so your users can verify the sources.
+
+Use Google AI Studio
+	Use the "New chat" interface ask the question without Enable Search Grounding And ask the same question with Enable Search Groundin
+
+Use the API
+
+	# Uninstall packages from Kaggle base image that are not needed.
+	!pip uninstall -qy jupyterlab jupyterlab-lsp
+	# Install the google-genai SDK for this codelab.
+	!pip install -qU 'google-genai==1.7.0'
+
+	from google import genai
+	from google.genai import types
+	from IPython.display import Markdown, HTML, display
+	genai.__version__
+
+	from kaggle_secrets import UserSecretsClient
+	GOOGLE_API_KEY = UserSecretsClient().get_secret("GOOGLE_API_KEY")
+	client = genai.Client(api_key=GOOGLE_API_KEY)
+
+	# Define a retry policy. The model might make multiple consecutive calls automatically
+	# for a complex query, this ensures the client retries if it hits quota limits.
+	from google.api_core import retry
+	is_retriable = lambda e: (isinstance(e, genai.errors.APIError) and e.code in {429, 503})
+
+	if not hasattr(genai.models.Models.generate_content, '__wrapped__'):
+	  genai.models.Models.generate_content = retry.Retry(
+	      predicate=is_retriable)(genai.models.Models.generate_content)
+
+Use search grounding
+
+Model support
+	Search grounding is available in a limited set of models. Find a model that supports it on the models page. In this guide, you'll use gemini-2.0-flash.
+
+Make a request
+	To enable search grounding, you specify it as a tool: google_search. Like other tools, this is supplied as a parameter in GenerateContentConfig, 
+	and can be passed to generate_content calls as well as chats.create (for all chat turns) or chat.send_message (for specific turns).
+
+		# Ask for information without search grounding.
+		response = client.models.generate_content(
+		    model='gemini-2.0-flash',
+		    contents="When and where is Billie Eilish's next concert?")
+
+		Markdown(response.text)
+
+			Unfortunately, Billie Eilish doesn't have any upcoming concerts planned for 2024. ....
+
+	Now try with grounding enabled.
+
+		# And now re-run the same query with search grounding enabled.
+		config_with_search = types.GenerateContentConfig(
+		    tools=[types.Tool(google_search=types.GoogleSearch())],
+		)
+
+		def query_with_grounding():
+		    response = client.models.generate_content(
+			model='gemini-2.0-flash',
+			contents="When and where is Billie Eilish's next concert?",
+			config=config_with_search,
+		    )
+		    return response.candidates[0]
+
+
+		rc = query_with_grounding()
+		Markdown(rc.content.parts[0].text)
+		
+			Billie Eilish is currently on her "HIT ME HARD AND SOFT: THE TOUR". According to available information, her next concerts are: ...
+
+Response metadata
+	When search grounding is used, the model returns extra metadata that includes links to search suggestions, 
+	supporting documents and information on how the supporting documents were used.
+
+	Each "grounding chunk" represents information retrieved from Google Search that was used in the grounded generation request. Following the URI will take you to the source.
+
+		while not rc.grounding_metadata.grounding_supports or not rc.grounding_metadata.grounding_chunks:
+		    # If incomplete grounding data was returned, retry.
+		    rc = query_with_grounding()
+
+		chunks = rc.grounding_metadata.grounding_chunks
+		for chunk in chunks:
+		    print(f'{chunk.web.title}: {chunk.web.uri}')
+
+			ticketmaster.com: https://vertexaisearch.cloud.google.com/grounding-api-redirect/AWQVqAKeOZxsSUyYugFxkkWDj-EbsetgfMn-Ircws4BKF8UtCYZaE6_AX3DBFYefGMcpGZ1HXPEs14z9GLk78MEhQ1QbdYGeoPnbk7iQ4IFR06Z7s30wsT8oNeQ0396aEAHJdSRv5jT2jPevF9qnlpwOnDBheo8kjlDBgsfaM4A=
+
+	As part of the response, there is a standalone styled HTML content block that you use to link back to relevant search suggestions related to the generation.
+
+		HTML(rc.grounding_metadata.search_entry_point.rendered_content)
+
+	The grounding_supports in the metadata provide a way for you to correlate the grounding chunks used to the generated output text.
+
+		from pprint import pprint
+
+		supports = rc.grounding_metadata.grounding_supports
+		for support in supports:
+		    pprint(support.to_json_dict())
+		    
+			{'confidence_scores': [0.9238536, 0.63184303, 0.7186428, 0.7688701],
+			 'grounding_chunk_indices': [0, 1, 2, 3],
+			 'segment': {'end_index': 67,
+				     'text': 'Billie Eilish is currently on her "HIT ME HARD AND SOFT: '
+					     'THE TOUR".'}}
+			{'confidence_scores': [0.65632933], ...
+			
+	These supports can be used to highlight text in the response, or build tables of footnotes.
+
+		import io
+
+		markdown_buffer = io.StringIO()
+
+		# Print the text with footnote markers.
+		markdown_buffer.write("Supported text:\n\n")
+		for support in supports:
+		    markdown_buffer.write(" * ")
+		    markdown_buffer.write(
+			rc.content.parts[0].text[support.segment.start_index : support.segment.end_index]
+		    )
+
+		    for i in support.grounding_chunk_indices:
+			chunk = chunks[i].web
+			markdown_buffer.write(f"<sup>[{i+1}]</sup>")
+
+		    markdown_buffer.write("\n\n")
+
+		# And print the footnotes.
+		markdown_buffer.write("Citations:\n\n")
+		for i, chunk in enumerate(chunks, start=1):
+		    markdown_buffer.write(f"{i}. [{chunk.web.title}]({chunk.web.uri})\n")
+
+		Markdown(markdown_buffer.getvalue())
+		
+			Supported text:
+
+			Billie Eilish is currently on her "HIT ME HARD AND SOFT: THE TOUR".[1][2][3][4] ...
+
+Search with tools
+	In this example, you'll use enable the Google Search grounding tool and the code generation tool across two steps. 
+	In the first step, the model will use Google Search to find the requested information and then in the follow-up question, it generates code to plot the results.
+
+	This usage includes textual, visual and code parts, so first define a function to help visualise these.
+
+		from IPython.display import display, Image, Markdown
+
+		def show_response(response):
+		    for p in response.candidates[0].content.parts:
+			if p.text:
+			    display(Markdown(p.text))
+			elif p.inline_data:
+			    display(Image(p.inline_data.data))
+			else:
+			    print(p.to_json_dict())
+
+			display(Markdown('----'))
+
+	Now start a chat asking for some information. Here you provide the Google Search tool so that the model can look up data from Google's Search index.
+
+		config_with_search = types.GenerateContentConfig(
+		    tools=[types.Tool(google_search=types.GoogleSearch())],
+		    temperature=0.0,
+		)
+
+		chat = client.chats.create(model='gemini-2.0-flash')
+
+		response = chat.send_message(
+		    message="What were the medal tallies, by top-10 countries, for the 2024 olympics?",
+		    config=config_with_search,
+		)
+
+		show_response(response)
+		
+			The top 10 countries in the medal tally for the 2024 Paris Olympics were:
+
+			United States: 40 Gold, 44 Silver, 42 Bronze (126 total)
+			China: 40 Gold, 27 Silver, 24 Bronze (91 total)
+			Japan: 20 Gold, 12 Silver, 13 Bronze (45 total) ...
+			
+	Continuing the chat, now ask the model to convert the data into a chart. The code_execution tool is able to generate code to draw charts, 
+	execute that code and return the image. You can see the executed code in the executable_code part of the response.
+
+	Combining results from Google Search with tools like live plotting can enable very powerful use cases that require very little code to run.
+
+		config_with_code = types.GenerateContentConfig(
+		    tools=[types.Tool(code_execution=types.ToolCodeExecution())],
+		    temperature=0.0,
+		)
+
+		response = chat.send_message(
+		    message="Now plot this as a seaborn chart. Break out the medals too.",
+		    config=config_with_code,
+		)
+
+		show_response(response)
+
+			Okay, I can create a Seaborn chart visualizing the medal tallies for the top 10 countries in the 2024 Olympics. I'll break out the gold, silver, and bronze medals for each country.
+
+			{'executable_code': {'code': "import pandas as pd\nimport seaborn as sns\nimport matplotlib.pyplot as plt...
+			
+			4.1 - gold medel.png
+			
+			The chart displays the medal distribution (Gold, Silver, and Bronze) for the top 10 countries at the 2024 Olympics. 
+			The United States and China lead in Gold medals. Great Britain has a high number of Bronze medals. The chart effectively visualizes the breakdown of medals for each country.
+
+Further reading
+	When using search grounding, there are some specific requirements that you must follow, including when and how to show search suggestions, 
+	and how to use the grounding links. Be sure to read and follow the details in the search grounding capability guide and the search suggestions guide.
+	https://ai.google.dev/gemini-api/docs/grounding?lang=python https://ai.google.dev/gemini-api/docs/grounding/search-suggestions
+
+	Also check out some more compelling examples of using search grounding with the Live API in the cookbook, like this example that uses Google Maps 
+	to plot Search results on a map in an audio conversation, or this example that builds a comprehensive research report.
+	https://github.com/google-gemini/cookbook/ https://github.com/google-gemini/cookbook/blob/main/examples/LiveAPI_plotting_and_mapping.ipynb
+	https://github.com/google-gemini/cookbook/blob/main/examples/Search_grounding_for_research_report.ipynb
