@@ -2,28 +2,28 @@
 
 * Real starter pack: 
   1. ➡️Pick your framework wisely
-    * Agent SDK
-    * CrewAI
-    * LangGraph
-    * Autogen
+      * Agent SDK
+      * CrewAI
+      * LangGraph
+      * Autogen
 
   2. ➡️Integrate with purpose
-    * Use APIs for diversity. 
-    * Use MCP servers for orchestration.
-    * Don’t DIY everything.
+      * Use APIs for diversity. 
+      * Use MCP servers for orchestration.
+      * Don’t DIY everything.
 
   3. ➡️Implement reasoning frameworks
-    * Logic is not optional. It’s the brain, not just the face.
+      * Logic is not optional. It’s the brain, not just the face.
 
   4. ➡️Get memory right
-    * Short-term: Real-time context
-    * Long-term: Knowledge that sticks
-    * Tools to try: Zep, MemGPT, Letta
+      * Short-term: Real-time context
+      * Long-term: Knowledge that sticks
+      * Tools to try: Zep, MemGPT, Letta
 
   5. ➡️Choose your knowledge base
-    * Vector DB
-    * Graph DB
-    * Knowledge Graph DB (if your use case really needs it)
+      * Vector DB
+      * Graph DB
+      * Knowledge Graph DB (if your use case really needs it)
 
 * This isn’t theoretical. It’s what teams are doing to move from demo to deploy.
 
