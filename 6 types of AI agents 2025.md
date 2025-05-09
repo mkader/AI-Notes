@@ -19,4 +19,4 @@
 6️. Voice interaction agents
   * These power voice-based products: call centers, voice UIs, and even real-time translators. They're evolving fast thanks to better speech-to-text and memory systems.
 
-<img src="https://media.licdn.com/dms/image/v2/D4D10AQH7zWNfV8GXig/image-shrink_800/B4DZa1JIImGYAc-/0/1746795796146?e=1747404000&v=beta&t=Oi9brtD1_3oRXTllbwbgu_RYRgCN_EsrWuYFn2XwqhY"/>
+<img src="6 type of ai agents 2025.gif"/>
