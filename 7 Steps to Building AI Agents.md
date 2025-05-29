@@ -1,6 +1,5 @@
 * 7 Steps to Building AI Agents That Actually Work
 * Here’s a real-world cheat sheet to build agents that go beyond the demo:
-
     1️. Pick the right LLM - Choose one that handles reasoning and gives consistent answers. Llama, Claude Opus, and Mistral are great open-weight options.
     2️. Design the agent’s logic - Should it reflect before answering? Plan steps? Use tools when it gets stuck?
     3️. Write clear operating instructions - Define response formats, tool triggers, and how it should behave in different scenarios.
