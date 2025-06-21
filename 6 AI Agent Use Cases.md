@@ -12,4 +12,4 @@
 
 6️. Voice Agents - Sales. Support. Onboarding. They're answering the phone now—fluent, fast, and 24/7. ElevenLabs and Vapi are leading the charge.
 
-<img src="https://media.licdn.com/dms/image/v2/D4D10AQGI7cq-je_pjQ/image-shrink_1280/B4DZbI.sZ5HQAM-/0/1747128603322?e=1747753200&v=beta&t=cxjE_IqnEe-ungvDh6CenDBDIQBzFUocT_ebeeVQPNM"/>
+<img src="https://github.com/mkader/AI-Notes/blob/main/6%20AI%20Agent%20Use%20Cases.gif"/>
