@@ -24,4 +24,4 @@
 
 * Whether you’re building in LangChain, CrewAI, or OpenAI Functions, these blueprints work across the stack.
 
-<img src="https://media.licdn.com/dms/image/v2/D4D10AQHx-Jpbi6bjCg/image-shrink_800/B4DZa2C4lAGwAc-/0/1746810936572?e=1747418400&v=beta&t=1cp__BV-_omprutfR67x2A8QkZjf_HxAw-DUk5UtgY8"/>
+<img src="https://github.com/mkader/AI-Notes/blob/main/5%20Agentic%20LLM%20Patterns.gif"/>
