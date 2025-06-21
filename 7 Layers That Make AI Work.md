@@ -9,4 +9,4 @@
 * 6️⃣Representation – Converts raw input into formats AI can use.
 * 7️⃣Deployment – The interface: chatbots, copilots, assistants, etc.
 
-<img src="https://media.licdn.com/dms/image/v2/D4D10AQF-h0AOfmPvJA/image-shrink_800/B4DZavWEUnGwAc-/0/1746698521129?e=1747328400&v=beta&t=EtCvPQHccZoh95vOXmgjLnuxtoXAmKACC2exY5q1J4c"/>
+<img src="https://github.com/mkader/AI-Notes/blob/main/7%20Layers%20That%20Make%20AI%20Work.jpg"/>
