@@ -18,4 +18,4 @@
   * Want to code with agents? This is your CLI toolkit for Claude-powered automation: PR reviews, test writing, even infrastructure workflows.
   * 📌 Focus: Developer tools and workflows for agent-augmented engineering
 
-<img src="https://media.licdn.com/dms/image/v2/D4D10AQH1ZciwXHXJcw/image-shrink_800/B4DZabRi21HEAg-/0/1746361790673?e=1747065600&v=beta&t=XnnpCoyZ43nAfVb8bR4ioZQplCXKpajz0y9iEvPVlhw"/>
+<img src="https://github.com/mkader/AI-Notes/blob/main/4%20Free%20Reports%20Deploying%20AI%20Agents.jpg"/>
