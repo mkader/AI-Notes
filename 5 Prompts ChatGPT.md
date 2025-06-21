@@ -23,4 +23,4 @@
 
 * What’s your go-to framework when you need ChatGPT to actually deliver?
 
-<img src = "https://media.licdn.com/dms/image/v2/D4D10AQGwqooGgxWAWA/image-shrink_800/B4DZaVmKXxGgAc-/0/1746266536426?e=1747065600&v=beta&t=nScn60g_XPRxweJJGghFsDENxlG9-bm6S2cIoUdew4A"/>
+<img src = "https://github.com/mkader/AI-Notes/blob/main/5%20Prompts%20ChatGPT.gif"/>
