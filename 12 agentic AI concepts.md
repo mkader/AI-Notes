@@ -21,4 +21,4 @@
 
 * These aren’t just concepts—they’re levers you can pull to design smarter, more capable systems.
 
-  <img src="https://media.licdn.com/dms/image/v2/D4D10AQGVlwOli-RP-w/image-shrink_800/B4DZagjGUKHEAg-/0/1746450279141?e=1747065600&v=beta&t=Litr3-0uacI7Yzqra3RV7qen6Njeh4Y9OhDo250Kc68"/>
+  <img src="https://github.com/mkader/AI-Notes/blob/main/12%20agentic%20AI%20concepts.jpg"/>
