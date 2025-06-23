@@ -1,10 +1,9 @@
 * 8 AI Career Paths You Should Know in 2025 (And What to Learn for Each)
 
 * Want to break into AI or level up fast? Here's just what hiring managers and builders actually care about:
-  
-    1️. AI/ML Engineer: Build and deploy intelligent systems
-    1. Data Scientist: Find insights and make predictions
-    1. AI Researcher: Push boundaries with new models
+  1️. AI/ML Engineer: Build and deploy intelligent systems
+  1. Data Scientist: Find insights and make predictions
+  1. AI Researcher: Push boundaries with new models
     1. NLP Engineer: Power language apps like chatbots and summarizers
     1. AI Automation Specialist: Connect tools and workflows with minimal code
     1. Computer Vision Engineer: Work on image/video AI
