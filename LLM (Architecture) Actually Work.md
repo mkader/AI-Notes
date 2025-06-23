@@ -15,4 +15,4 @@
 
 🔹 6. Prediction :  Finally, the model generates output by assigning probabilities to possible next tokens. Softmax, temperature, and sampling strategies come into play.
 
-<img src="https://github.com/mkader/AI-Notes/blob/main/How%20Do%20Large%20Language%20Models%20Actually%20Work.gif">
+<img src="https://github.com/mkader/AI-Notes/blob/main/LLM%20(Architecture)%20Actually%20Work.gif">
