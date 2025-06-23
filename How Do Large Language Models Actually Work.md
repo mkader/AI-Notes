@@ -18,4 +18,4 @@
 
 💭 In your opinion: Which step contributes most to model hallucinations?
 
-<img src="https://media.licdn.com/dms/image/v2/D4D22AQGTOlMbCArYvQ/feedshare-shrink_1280/B4DZYQd_uaHIAs-/0/1744033023383?e=1746662400&v=beta&t=GNNWDYzQsAmAoSZ7bYnW9q058vXYtds5MYMP0IAk7JA">
+<img src="https://github.com/mkader/AI-Notes/blob/main/How%20Do%20Large%20Language%20Models%20Actually%20Work.gif">
