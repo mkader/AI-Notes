@@ -24,4 +24,4 @@
 
 * MCP is a big step toward smarter, more integrated AI agents. It opens the door to more advanced behaviors—and helps standardize how LLMs plug into real-world systems.
 
-<img src="https://media.licdn.com/dms/image/v2/D4D22AQF2oHWlpzuJyQ/feedshare-shrink_800/B4DZY959LtG4Ag-/0/1744795325738?e=1747872000&v=beta&t=dbIKFeilh3YeKuIM-c9qM8JClsFdD7GfqfVVEGUPVdI">
+<img src="https://github.com/mkader/AI-Notes/blob/main/MCP_What%20is%20MCP%202.jpg">
