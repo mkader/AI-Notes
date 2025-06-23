@@ -10,4 +10,4 @@
 
 * This roadmap keeps your focus on building agents that are reliable, useful, and scalable.
 
-<img src="https://media.licdn.com/dms/image/v2/D4D10AQHQPowiRbbzHQ/image-shrink_1280/B4DZcVvo7eIEAM-/0/1748416503613?e=1749052800&v=beta&t=wk-kFhEBdQszNRXkgm0myszsQTKKXvn50FvdGuFek0s">
+<img src="https://github.com/mkader/AI-Notes/blob/main/7%20Steps%20to%20Building%20AI%20Agents.gif">
