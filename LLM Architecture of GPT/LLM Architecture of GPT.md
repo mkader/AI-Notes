@@ -11,16 +11,16 @@
 
 * Stage 2 - MultiHead Attention (first understand Self-Attention) :
   1. Transformer Blocks (n_layers):
-      1 Attention Scores [query * key]
-      2 Masked Attention scores (Only allow earlier tokens in the calculation)
-      3 Attention weights (softmax masked attention scores)
-      4 Dropout Layer (mitigate overfitting) [attention_weights * value]
+      1. Attention Scores [query * key]
+      2. Masked Attention scores (Only allow earlier tokens in the calculation)
+      3. Attention weights (softmax masked attention scores)
+      4. Dropout Layer (mitigate overfitting) [attention_weights * value]
   2. Residual Connection (mitigate vanishing gradients)
   3. Layer Normalization (first understand batch normalization)[scale and shift]
   4. Feed Forward (Add GELU as activation layer)
-    1. Linear Layer
-    2. GELU
-    3. Linear Layer
+      1. Linear Layer
+      2. GELU
+      3. Linear Layer
   5. Dropout Layer (mitigate overfitting)
 
 * Stage 3 - Output Layers
@@ -39,10 +39,10 @@
   2. Generate the next index 
   3. Add the generated index to the prompt and continue generation upto max_new_tokens
   4. Generation Configurations:
-      1 Using torch.argmax() is greedy approach of generation.
-      2 Utilize the torch.multinomial() to add randomness to generated text
-      3 Temperature Sampling - change the prob distribution of the vocabs.
-      4 Top-k Sampling - sample from the top k highest probs or logits.
-      5 Top-p Sampling - sample from the highest probs summed to p.
+      1. Using torch.argmax() is greedy approach of generation.
+      2. Utilize the torch.multinomial() to add randomness to generated text
+      3. Temperature Sampling - change the prob distribution of the vocabs.
+      4. Top-k Sampling - sample from the top k highest probs or logits.
+      5. Top-p Sampling - sample from the highest probs summed to p.
 
 <a href="LLM Architecture from scratch - GPT-2 [124M].pdf">LLM Architecture from scratch - GPT-2 [124M].pdf</a>
