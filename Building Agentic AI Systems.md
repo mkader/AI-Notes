@@ -17,4 +17,4 @@
 5. Essential Tools for Building Agentic AI
    * Successful agents rely on LLMs, memory systems, orchestrators, integration tools, guardrails, and monitoring platforms to operate smartly.
 
-<img src="https://media.licdn.com/dms/image/v2/D4E22AQEqDjZtNSLAWg/feedshare-shrink_800/B4EZZ7u.clGYAg-/0/1745832637525?e=1749686400&v=beta&t=rsFs6L8rXoPinPTSOIeYRvKz24S4f_WXB5eTbSd_Vs4"/>
+<img src="https://github.com/mkader/AI-Notes/blob/main/Building%20Agentic%20AI%20Systems.jpg"/>
