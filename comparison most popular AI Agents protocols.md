@@ -30,4 +30,4 @@
   1. Agents are discovered through a centralised registry.
   1. Use-case: Automate workflows across departments with MCP Style communication with structured and multi-model messages.
 
-<img src="https://media.licdn.com/dms/image/v2/D5622AQHBahtdy2BEXQ/feedshare-shrink_800/B56Zaq0JlYGkAg-/0/1746622529482?e=1749686400&v=beta&t=UvdcPRfuStHpY090TCIf3HqpALq_lAtjkb_L43v9jJc"/>
+<img src="https://github.com/mkader/AI-Notes/blob/main/comparison%20most%20popular%20AI%20Agents%20protocols.gif"/>
