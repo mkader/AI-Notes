@@ -34,4 +34,4 @@
   2. Agora and A2A are better suited for dynamic, real-world applications where requests are messy and context-heavy.
   3. MCP is more suited for internal tasks.
  
-  <img src="https://media.licdn.com/dms/image/v2/D4D10AQFYl7n9orP1dA/image-shrink_800/B4DZaR9FvYHQAg-/0/1746205440519?e=1746813600&v=beta&t=RdaTNGQDbPyAXD8cj4IZIDebxavlihh9k3NYF8Bpwvw"/>
+  <img src="https://github.com/mkader/AI-Notes/blob/main/4%20different%20agent%20frameworks.gif"/>
