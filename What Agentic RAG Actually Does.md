@@ -20,4 +20,4 @@
 
 * Research paper: https://hubs.li/Q03pFVZv0
 
-  <img src="https://media.licdn.com/dms/image/v2/D4D10AQEWGWCWh_9vpA/image-shrink_1280/B4DZcbZC0SGUAQ-/0/1748511241103?e=1749142800&v=beta&t=hzE-5mlnqvNQSkYx9hQ6b7PCuoN0MYyoRlvmdoLe_V8">
+  <img src="https://github.com/mkader/AI-Notes/blob/main/What%20Agentic%20RAG%20Actually%20Does.gif">
