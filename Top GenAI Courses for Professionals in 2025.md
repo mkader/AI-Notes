@@ -4,4 +4,4 @@
   3. Prefer academic structure? Vanderbilt’s 18-hour series blends theory + ChatGPT application.
   4. Already code? AWS’s 16-hour LLM course is perfect for Python users who want to build smarter. 
 
-<img src="https://media.licdn.com/dms/image/v2/D4D10AQFq3EXBwiBDXQ/image-shrink_800/B4DZaGJjQmHwAg-/0/1746007373905?e=1746630000&v=beta&t=CEGfRueT9EOMvQJGfxWHbxWVjedMit_PqBYB9wN9cdU">
+<img src="https://github.com/mkader/AI-Notes/blob/main/Top%20GenAI%20Courses%20for%20Professionals%20in%202025.jpg">
