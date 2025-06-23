@@ -29,4 +29,4 @@
 
 <img src="https://github.com/mkader/AI-Notes/blob/main/Build%20A%20Scalable%20AI%20Agent_0.gif"/>
 
-<img src="https://github.com/mkader/AI-Notes/blob/main/Build%20A%20Scalable%20AI%20Agent_1.gif"/>
+<img src="https://github.com/mkader/AI-Notes/blob/main/Build%20A%20Scalable%20AI%20Agent_1.jpg"/>
