@@ -18,4 +18,4 @@
 
 * It’s long. It’s nerdy. And it might just be your new secret weapon.
 
-<img src="https://media.licdn.com/dms/image/v2/D4D10AQH2OzHCSN4xYA/image-shrink_800/B4DZbD1MK4G8Ag-/0/1747042223296?e=1747760400&v=beta&t=YaPitiUbDmfp3ZaVzGn6tyAM0CSrXOPn1Gw475PZFco"/>
+<img src="https://github.com/mkader/AI-Notes/blob/main/AI%20prompt%20Reddit.jpg"/>
