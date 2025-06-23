@@ -18,9 +18,9 @@
   2. Residual Connection (mitigate vanishing gradients)
   3. Layer Normalization (first understand batch normalization)[scale and shift]
   4. Feed Forward (Add GELU as activation layer)
-      1 Linear Layer
-      2 GELU
-      3 Linear Layer
+    1. Linear Layer
+    2. GELU
+    3. Linear Layer
   5. Dropout Layer (mitigate overfitting)
 
 * Stage 3 - Output Layers
