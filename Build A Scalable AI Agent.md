@@ -27,4 +27,6 @@
 
 * This isn’t theoretical. It’s what teams are doing to move from demo to deploy.
 
-<img src="https://media.licdn.com/dms/image/v2/D4D10AQF2Slj0QJiuMw/image-shrink_800/B4DZapAl03GcAc-/0/1746592230213?e=1747249200&v=beta&t=4ROAysaeaZRd9CYlxigJzBy4cplHwi2vFgHasfbHQuc"/>
+<img src="https://github.com/mkader/AI-Notes/blob/main/Build%20A%20Scalable%20AI%20Agent_0.gif"/>
+
+<img src="https://github.com/mkader/AI-Notes/blob/main/Build%20A%20Scalable%20AI%20Agent_1.gif"/>
