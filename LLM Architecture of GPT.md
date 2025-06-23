@@ -45,4 +45,4 @@
       4. Top-k Sampling - sample from the top k highest probs or logits.
       5. Top-p Sampling - sample from the highest probs summed to p.
 
-<a href="LLM Architecture from scratch - GPT-2 [124M].pdf">LLM Architecture from scratch - GPT-2 [124M].pdf</a>
+<a href="https://github.com/mkader/AI-Notes/blob/main/LLM%20Architecture%20from%20scratch%20-%20GPT-2%20%5B124M%5D.pdf">LLM Architecture from scratch - GPT-2 [124M].pdf</a>
