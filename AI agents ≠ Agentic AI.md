@@ -15,4 +15,4 @@
         * AI teams helping doctors make faster decisions
         * Cybersecurity systems coordinating threat responses
 
-<img src="https://media.licdn.com/dms/image/v2/D4D10AQGvD2lWnuIsYw/image-shrink_800/B4DZb2tZ84GgAc-/0/1747895822485?e=1748534400&v=beta&t=l5L51tT3klLp4eLnkBC56Z7UASxVXlk8PdAkTdMKeIA"/>
+<img src="https://github.com/mkader/AI-Notes/blob/main/AI%20agents%20%E2%89%A0%20Agentic%20AI.gif"/>
