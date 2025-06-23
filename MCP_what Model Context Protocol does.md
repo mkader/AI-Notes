@@ -15,4 +15,4 @@
 
 * Browse or register your server now → <a href="https://lnkd.in/dFyvc_st">MCP Server Directory</a>
 
-<img src="https://media.licdn.com/dms/image/v2/D4D22AQE1r-QHhx8vtw/feedshare-shrink_800/B4DZZElM6KH4Ag-/0/1744907326698?e=1747872000&v=beta&t=ZwLGvO-XUHoZac-ArVc1gncKm3SiKEim5_VOOqZGBnw">
+<img src="https://github.com/mkader/AI-Notes/blob/main/MCP_what%20Model%20Context%20Protocol%20does.gif">
