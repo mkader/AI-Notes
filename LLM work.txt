@@ -12,10 +12,8 @@ When you enter a prompt, the LLM processes your input, predicts the most likely 
 
 Before deployment, LLMs go through safety filters to remove bias and harmful content. They are also optimized using techniques like quantization and pruning, making them efficient for cloud-based and on-device AI.
 
-???????? ?????? ?????? ?????????????????????
-
 LLMs face issues like hallucinations (false outputs), bias, and high computational costs. Engineers optimize them using RAG, speculative decoding, hybrid cloud-edge deployment and other solutions.
 
 LLMs aren’t magic—they’re pattern-recognition machines built with techniques that are continually evolving. 
 
-?? What is your favorite LLM powered application? ??
+What is your favorite LLM powered application?
