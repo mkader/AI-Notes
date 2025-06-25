@@ -28,3 +28,5 @@ Purpose: “[in which context you need it]”
 
 <img src="https://github.com/mkader/AI-Notes/blob/main/the%20power%20of%20ChatGPTs%20memory.jpg">
 
+<img src="https://github.com/mkader/AI-Notes/blob/main/the%20power%20of%20ChatGPTs%20memory.png">
+
