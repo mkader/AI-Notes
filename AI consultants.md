@@ -21,4 +21,6 @@ Gamma builds a clean 8-slide deck in under 2 minutes summarized and backed by da
 Consultants charge $20K for this.
 You built it in 5 minutes.
 
+Mixture Variants:
+
 https://github.com/mkader/AI-Notes/blob/main/AI%20consultants.mp4
