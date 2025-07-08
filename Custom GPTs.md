@@ -12,4 +12,13 @@ Here are 10 standout GPTs you can try for free:
 9. The Negotiator: Sharpen your skills with AI-powered negotiation practice
 10. Slide Maker GPT: Turn bullet points into full presentations—yes, really
 
+How to go from a bad prompt to a good prompt. 
+
+1. Go to ChatGPT.
+2. On the left menu > click on “GPTs”.
+3. Search for "Prompt Maker".
+4. Type your bad prompt (= what you want).
+5. The Prompt Maker will generate a better version.
+https://github.com/mkader/AI-Notes/blob/main/Custom%20GPTs1.mp4
+
 <img src="https://github.com/mkader/AI-Notes/blob/main/Custom%20GPTs.jpg">
