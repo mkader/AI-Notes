@@ -1,6 +1,10 @@
-For LLMs, tokens are the fundamental units of text that the model processes. When you type 'Hello world!' to ChatGPT, it doesn't see two words and punctuation, but rather it sees perhaps four distinct tokens: ['Hello', ' world', '!', '\n'].
+For LLMs, tokens are the fundamental units of text that the model processes. 
+
+'Hello world!' to ChatGPT, it doesn't see 2 words and punctuation, but it sees 4 distinct tokens: ['Hello', ' world', '!', '\n'].
 
 Tokens are what rule the world of LLMs. You send tokens to models, you pay by the token, and models read, understand, and breathe tokens.
+
+<img src="https://github.com/mkader/AI-Notes/blob/e709b24f1ba19df6dd4cf6f80f9ee11f795a5561/llm/How%20LLMs%20See%20the%20World_1.jpg">
 
 ### What Are Tokens?
 Tokens are the fundamental units of text that an LLM processes.
@@ -13,20 +17,20 @@ However, tokens are not always equivalent to words. Depending on the tokenizatio
 * Special symbols
 * Whitespace characters
 
-For example, the sentence "I love machine learning!" might be tokenized as: ["I", "love", "machine", "learning", "!"] or ["I", " love", " machine", " learn", "ing", "!"] depending on the tokenization method.
+For example, "I love machine learning!" might be tokenized as: ["I", "love", "machine", "learning", "!"] or ["I", " love", " machine", " learn", "ing", "!"] depending on the tokenization method.
 
-Why Tokenization Matters
+### Why Tokenization Matters
 Tokenization is very important for several reasons:
 
-Vocabulary Management: LLMs have finite vocabularies (typically between 30K-100K tokens). Tokenization allows these finite vocabularies to express an open-ended language space. By breaking rare or complex words into reusable subword units (e.g., "extraordinary" → "extra" + "ordinary"), the model avoids needing a separate token for every possible word in every language.
+* Vocabulary Management: LLMs have finite vocabularies (typically between 30K-100K tokens). Tokenization allows these finite vocabularies to express an open-ended language space. By breaking rare or complex words into reusable subword units (e.g., "extraordinary" → "extra" + "ordinary"), the model avoids needing a separate token for every possible word in every language.
 
-Handling Unknown Words: Good tokenization strategies can break down unfamiliar words into familiar subword units, enabling models to handle words they've never seen before. For example, a model that has never seen the word “biocatalyst” might still recognize “bio” and “catalyst” as separate tokens and draw useful meaning from them.
+* Handling Unknown Words: Good tokenization strategies can break down unfamiliar words into familiar subword units, enabling models to handle words they've never seen before. For example, a model that has never seen the word “biocatalyst” might still recognize “bio” and “catalyst” as separate tokens and draw useful meaning from them.
 
-Efficiency: The length of text sequences directly impacts computational requirements. Efficient tokenization reduces the number of tokens needed to represent text.
+* Efficiency: The length of text sequences directly impacts computational requirements. Efficient tokenization reduces the number of tokens needed to represent text.
 
-Model Performance: The quality of tokenization affects how well LLMs understand and generate text, especially for non-English languages or specialized domains. Poorly tokenized input can fragment meaning or distort structure.
+* Model Performance: The quality of tokenization affects how well LLMs understand and generate text, especially for non-English languages or specialized domains. Poorly tokenized input can fragment meaning or distort structure.
 
-How Tokens are Read By LLMs
+### How Tokens are Read By LLMs
 Once text is tokenized, there is one more step that transforms these symbolic tokens into something the neural network can actually process: numerical representation. Each token in the vocabulary is assigned a unique integer ID (called a token ID). For example.
 
 "Hello" → token ID 15496
