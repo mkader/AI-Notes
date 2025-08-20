@@ -1,6 +1,6 @@
 Step-by-Step Example
 Let's run the BPE algorithm on a small corpus.
-1. Initial Setup
+## 1. Initial Setup
 Corpus (with word frequencies):
 low (5 times)
 lower (2 times)
@@ -20,9 +20,11 @@ Code
 }
 Initial Vocabulary (all individual characters):
 { l, o, w, </w>, e, r, n, s, t, i, d } - (11 tokens so far)
-2. The Iterative Process
+
+## 2. The Iterative Process
 We will now find the most frequent adjacent pair of symbols and merge them.
-Iteration 1
+
+### Iteration 1
 Count Pairs: We count the occurrences of all adjacent pairs in our corpus, keeping word frequencies in mind.
 (e, s): 6 times in "newest" + 3 in "widest" = 9
 (s, t): 6 times in "newest" + 3 in "widest" = 9
@@ -40,7 +42,8 @@ Code
   'n e w es t </w>': 6,  // <-- changed
   'w i d es t </w>': 3   // <-- changed
 }
-Iteration 2
+
+### Iteration 2
 Count Pairs (in the updated corpus):
 (es, t): 6 times in "newest" + 3 in "widest" = 9
 (l, o): 5 in "low" + 2 in "lower" = 7
@@ -59,7 +62,8 @@ Code
   'n e w est </w>': 6,  // <-- changed
   'w i d est </w>': 3   // <-- changed
 }
-Iteration 3
+
+### Iteration 3
 Count Pairs:
 (l, o): 5 in "low" + 2 in "lower" = 7
 (o, w): 5 in "low" + 2 in "lower" = 7
@@ -83,7 +87,8 @@ Code
   'n e w est </w>': 6,
   'w i d est </w>': 3
 }
-Iteration 4
+
+### Iteration 4
 Count Pairs:
 (lo, w): 5 in "low" + 2 in "lower" = 7
 ...
@@ -101,7 +106,8 @@ Code
   'w i d est </w>': 3
 }
 We have reached our target vocabulary size of 15, so we stop.
-3. The Final Result
+
+## 3. The Final Result
 Learned Merges (in order):
 e + s -> es
 es + t -> est
@@ -109,20 +115,22 @@ l + o -> lo
 lo + w -> low
 Final Vocabulary:
 { l, o, w, </w>, e, r, n, s, t, i, d, es, est, lo, low }
-4. How to Tokenize a New Word
+
+## 4. How to Tokenize a New Word
 Now, the most important part: how do we use this to tokenize a new, unseen word? We apply the learned merge rules in the order they were learned.
-Example: Tokenize the word "lowest"
-Start with the characters: l o w e s t </w>
-Apply Rule #1 (e + s -> es): l o w es t </w>
-Apply Rule #2 (es + t -> est): l o w est </w>
-Apply Rule #3 (l + o -> lo): lo w est </w>
-Apply Rule #4 (lo + w -> low): low est </w>
-The final tokenization for "lowest" is: ["low", "est", "</w>"].
-Example: Tokenize the out-of-vocabulary word "slower"
-Start with the characters: s l o w e r </w>
-Apply Rule #1 (e + s -> es): No (e, s) pair exists.
-Apply Rule #2 (es + t -> est): No (es, t) pair exists.
-Apply Rule #3 (l + o -> lo): s lo w e r </w>
-Apply Rule #4 (lo + w -> low): s low e r </w>
-The final tokenization for "slower" is: ["s", "low", "e", "r", "</w>"].
-This perfectly demonstrates how BPE can tokenize new words using the subword units it learned from the training corpus.
+
+## Example: Tokenize the word "lowest"
+* Start with the characters: l o w e s t </w>
+* Apply Rule #1 (e + s -> es): l o w es t </w>
+* Apply Rule #2 (es + t -> est): l o w est </w>
+* Apply Rule #3 (l + o -> lo): lo w est </w>
+* Apply Rule #4 (lo + w -> low): low est </w>
+* The final tokenization for "lowest" is: ["low", "est", "</w>"].
+
+## Example: Tokenize the out-of-vocabulary word "slower"
+* Start with the characters: s l o w e r </w>
+* Apply Rule #1 (e + s -> es): No (e, s) pair exists.
+* Apply Rule #2 (es + t -> est): No (es, t) pair exists.
+* Apply Rule #3 (l + o -> lo): s lo w e r </w>
+* Apply Rule #4 (lo + w -> low): s low e r </w>
+* The final tokenization for "slower" is: ["s", "low", "e", "r", "</w>"].
