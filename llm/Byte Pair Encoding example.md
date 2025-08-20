@@ -1,23 +1,29 @@
 Step-by-Step Example
 Let's run the BPE algorithm on a small corpus.
+
 ## 1. Initial Setup
+
 Corpus (with word frequencies):
-low (5 times)
-lower (2 times)
-newest (6 times)
-widest (3 times)
+* low (5 times)
+* lower (2 times)
+* newest (6 times)
+* widest (3 times)
+
 Goal: Create a vocabulary with a size of 15 tokens (we'll stop after a few merges).
-Pre-processing:
-First, we represent each word as a sequence of characters and add a special end-of-word symbol, like </w>, to distinguish between a subword inside a word (like er in lower) and at the end of a word (like er in runner). We also include the frequencies.
+
+Pre-processing: First, we represent each word as a sequence of characters and add a special end-of-word symbol, like </w>, to distinguish between a subword inside a word (like er in lower) and at the end of a word (like er in runner). We also include the frequencies.
+
 Our corpus becomes a "word-frequency dictionary":
-code
-Code
+
+<code>
 {
   'l o w </w>': 5,
   'l o w e r </w>': 2,
   'n e w e s t </w>': 6,
   'w i d e s t </w>': 3
 }
+</code>
+
 Initial Vocabulary (all individual characters):
 { l, o, w, </w>, e, r, n, s, t, i, d } - (11 tokens so far)
 
@@ -25,17 +31,21 @@ Initial Vocabulary (all individual characters):
 We will now find the most frequent adjacent pair of symbols and merge them.
 
 ### Iteration 1
+
 Count Pairs: We count the occurrences of all adjacent pairs in our corpus, keeping word frequencies in mind.
-(e, s): 6 times in "newest" + 3 in "widest" = 9
-(s, t): 6 times in "newest" + 3 in "widest" = 9
+* (e, s): 6 times in "newest" + 3 in "widest" = 9
+* (s, t): 6 times in "newest" + 3 in "widest" = 9
 ... (Let's assume (e, s) comes first alphabetically if there's a tie)
+
 Find Most Frequent Pair: The most frequent pair is (e, s) with a frequency of 9.
+
 Merge: We create a new token "es" and add it to our vocabulary.
+
 Merge Rule #1: (e, s) -> es
+
 New Vocabulary: { l, o, w, </w>, e, r, n, s, t, i, d, es } (12 tokens)
+
 Update Corpus: We replace all e s pairs with our new es token.
-code
-Code
 {
   'l o w </w>': 5,
   'l o w e r </w>': 2,
@@ -44,17 +54,23 @@ Code
 }
 
 ### Iteration 2
+
 Count Pairs (in the updated corpus):
-(es, t): 6 times in "newest" + 3 in "widest" = 9
-(l, o): 5 in "low" + 2 in "lower" = 7
-(o, w): 5 in "low" + 2 in "lower" = 7
-...
+* (es, t): 6 times in "newest" + 3 in "widest" = 9
+* (l, o): 5 in "low" + 2 in "lower" = 7
+* (o, w): 5 in "low" + 2 in "lower" = 7
+* ...
+
 Find Most Frequent Pair: The most frequent pair is now (es, t) with a frequency of 9.
+
 Merge:
+
 Merge Rule #2: (es, t) -> est
+
 New Vocabulary: { l, o, w, </w>, e, r, n, s, t, i, d, es, est } (13 tokens)
+
 Update Corpus:
-code
+
 Code
 {
   'l o w </w>': 5,
@@ -64,22 +80,29 @@ Code
 }
 
 ### Iteration 3
+
 Count Pairs:
-(l, o): 5 in "low" + 2 in "lower" = 7
-(o, w): 5 in "low" + 2 in "lower" = 7
-(w, est): 6 in "newest" + 3 in "widest" = 9 ... wait, no. The pair (w, est) is not in widest. Let's re-count carefully.
-n, e: 6
-e, w: 6
-w, est: 6
-l, o: 7
-o, w: 7
+* (l, o): 5 in "low" + 2 in "lower" = 7
+* (o, w): 5 in "low" + 2 in "lower" = 7
+* (w, est): 6 in "newest" + 3 in "widest" = 9 ... wait, no. The pair (w, est) is not in widest. Let's re-count carefully.
+* n, e: 6
+* e, w: 6
+* w, est: 6
+* l, o: 7
+* o, w: 7
+
 The most frequent pairs are (l, o) and (o, w). Let's pick (l, o).
+
 Find Most Frequent Pair: (l, o) with a frequency of 7.
+
 Merge:
+
 Merge Rule #3: (l, o) -> lo
+
 New Vocabulary: { ..., es, est, lo } (14 tokens)
+
 Update Corpus:
-code
+
 Code
 {
   'lo w </w>': 5,      // <-- changed
@@ -89,15 +112,21 @@ Code
 }
 
 ### Iteration 4
+
 Count Pairs:
-(lo, w): 5 in "low" + 2 in "lower" = 7
-...
+* (lo, w): 5 in "low" + 2 in "lower" = 7
+* ...
+
 Find Most Frequent Pair: (lo, w) with a frequency of 7.
+
 Merge:
+
 Merge Rule #4: (lo, w) -> low
+
 New Vocabulary: { ..., est, lo, low } (15 tokens)
+
 Update Corpus:
-code
+
 Code
 {
   'low </w>': 5,       // <-- changed
@@ -105,14 +134,17 @@ Code
   'n e w est </w>': 6,
   'w i d est </w>': 3
 }
+
 We have reached our target vocabulary size of 15, so we stop.
 
 ## 3. The Final Result
+
 Learned Merges (in order):
-e + s -> es
-es + t -> est
-l + o -> lo
-lo + w -> low
+* e + s -> es
+* es + t -> est
+* l + o -> lo
+* lo + w -> low
+
 Final Vocabulary:
 { l, o, w, </w>, e, r, n, s, t, i, d, es, est, lo, low }
 
