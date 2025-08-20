@@ -6,7 +6,7 @@ Tokens are what rule the world of LLMs. You send tokens to models, you pay by th
 
 <img src="https://github.com/mkader/AI-Notes/blob/e709b24f1ba19df6dd4cf6f80f9ee11f795a5561/llm/How%20LLMs%20See%20the%20World_1.jpg">
 
-### What Are Tokens?
+## What Are Tokens?
 Tokens are the fundamental units of text that an LLM processes.
 
 However, tokens are not always equivalent to words. Depending on the tokenization approach used, a token could represent:
@@ -19,7 +19,7 @@ However, tokens are not always equivalent to words. Depending on the tokenizatio
 
 For example, "I love machine learning!" might be tokenized as: ["I", "love", "machine", "learning", "!"] or ["I", " love", " machine", " learn", "ing", "!"] depending on the tokenization method.
 
-### Why Tokenization Matters
+## Why Tokenization Matters
 Tokenization is very important for several reasons:
 
 * Vocabulary Management: LLMs have finite vocabularies (typically between 30K-100K tokens). Tokenization allows these finite vocabularies to express an open-ended language space. By breaking rare or complex words into reusable subword units (e.g., "extraordinary" → "extra" + "ordinary"), the model avoids needing a separate token for every possible word in every language.
@@ -31,18 +31,18 @@ Tokenization is very important for several reasons:
 * Model Performance: The quality of tokenization affects how well LLMs understand and generate text, especially for non-English languages or specialized domains. Poorly tokenized input can fragment meaning or distort structure.
 
 ### How Tokens are Read By LLMs
-Once text is tokenized, there is one more step that transforms these symbolic tokens into something the neural network can actually process: numerical representation. Each token in the vocabulary is assigned a unique integer ID (called a token ID). For example.
+Once text is tokenized, next step that transforms these tokens into something the neural network(NN) can actually process: numerical representation. Each token is assigned a unique integer ID (token ID). For example.
 
 "Hello" → token ID 15496
 
 " world" → token ID 995
 
-These token IDs are then converted into high-dimensional numerical vectors called embeddings through an embedding layer. Each token ID maps to a dense vector of real numbers (typically 512, 1024, or more dimensions). For instance, the token "Hello" might become a vector like [0.23, -0.45, 0.78, ...].
+These token IDs are then converted into high-dimensional numerical vectors called <u>embeddings</u> through an embedding layer. Each token ID maps to a dense vector of real numbers (typically 512, 1024, or more dimensions). For instance, the token "Hello" might become a vector like [0.23, -0.45, 0.78, ...].
 
-This numerical transformation is necessary because neural networks can only perform mathematical operations on numbers, not on text symbols. The embedding vectors capture semantic relationships between tokens, where similar tokens have similar vector representations in this high-dimensional space. This is how models "understand" that "king" and "queen" are related, or that "run" and "running" share meaning.
+This numerical transformation is necessary because NNs can only perform mathematical operations on numbers, not on text symbols. The embedding vectors capture semantic relationships between tokens, where similar tokens have similar vector representations in this high-dimensional space. This is how models "understand" that "king" and "queen" are related, or that "run" and "running" share meaning.
 
-Common Tokenization Methods
-1. Byte Pair Encoding (BPE)
+## Common Tokenization Methods
+## 1. Byte Pair Encoding (BPE)
 BPE is one of the most widely used tokenization methods in modern LLMs, used by models like GPT-2, GPT-3, and GPT-4.
 
 How it works:
