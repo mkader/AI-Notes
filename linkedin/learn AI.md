@@ -71,3 +71,41 @@ https://lnkd.in/g5CykhcH
 
 • Red-Teaming LLM Applications
 https://lnkd.in/gNjcb4Kd
+
+---------------------------------------------
+
+1️⃣ LinkedIn: GenAI Literacy & Prototyping
+↳ Learn GenAI basics and start building prototypes.
+ https://lnkd.in/gzGeFpDf
+
+2️⃣ AWS: Foundations of Prompt Engineering
+↳ Write effective prompts that get reliable results.
+https://lnkd.in/gB2mE476
+
+3️⃣ OpenAI: Prompting for Developers
+↳ Build tools using GPT APIs, function calls, and prompts.
+https://lnkd.in/g6kgf3Bp
+
+4️⃣ DeepLearning.ai: Context Engineering and MCP
+↳ Add memory, examples, and search to your prompts.
+https://lnkd.in/g-GH2yfp
+
+5️⃣ DeepLearning.ai + Cohere: RAG for Developers
+↳ Ground your LLMs in external data with vector search.
+https://lnkd.in/gahCaYNJ
+
+6️⃣ FastAI: Practical Deep Learning for Coders
+↳ Train & deploy AI models using PyTorch + FastAI.
+ https://course.fast.ai/
+
+7️⃣ OpenAI: Agent Architecture
+↳  Build autonomous agents that act, plan, and use tools.
+https://lnkd.in/gzxWG5_7
+
+8️⃣ LangChain: LLM Orchestration Frameworks
+↳ Use LangChain to connect tools, memory & APIs.
+ https://www.langchain.com/
+
+9️⃣ Google Cloud: LLM Deployment (LLMOps)
+↳ Fine-tune & deploy LLMs with Google Cloud tools.
+https://lnkd.in/gDuGsmWy
