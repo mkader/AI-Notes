@@ -2,15 +2,15 @@ Here’s your roadmap
 
 𝟬. 𝗙𝘂𝗻𝗱𝗮𝗺𝗲𝗻𝘁𝗮𝗹𝘀 (Weeks 1–3) - Understand the moving pieces before you connect them.
 
-  • Karpathy – “LLMs in an Hour”  - Good explanation - https://lnkd.in/gJg77fqt
+  1. Karpathy – “LLMs in an Hour”  - Good explanation - https://lnkd.in/gJg77fqt
   
-  • How GPTs Are Born: Internet Feeding + Training Loops - https://lnkd.in/g2pXsyHn
+  1. How GPTs Are Born: Internet Feeding + Training Loops - https://lnkd.in/g2pXsyHn
   
-  • How GPTs Learn to Be Helpful - https://lnkd.in/gPimp6mv
+  1. How GPTs Learn to Be Helpful - https://lnkd.in/gPimp6mv
   
-  • Stanford CS229 Lecture - https://lnkd.in/g-HCdnAm
+  1. Stanford CS229 Lecture - https://lnkd.in/g-HCdnAm
   
-  • “Attention Is All You Need” - https://lnkd.in/gXUccydp
+  1. “Attention Is All You Need” - https://lnkd.in/gXUccydp
 
 𝟭. 𝗣𝗿𝗼𝗺𝗽𝘁 𝗖𝗿𝗮𝗳𝘁 (Weeks 4–5) - If you can’t guide the model, nothing else matters.
 
