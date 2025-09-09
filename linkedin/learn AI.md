@@ -92,8 +92,26 @@ FREE MCP Course by Microsoft for Beginners
 
 10. MCP development best practices - https://lnkd.in/gw7QByYt
 
-11. MCP in action: Real-world case studies
-https://lnkd.in/gtwfnDTw
+11. MCP in action: Real-world case studies - https://lnkd.in/gtwfnDTw
 
-12. Build AI agents in VS Code: 4 hands-on labs with MCP + AI Toolkit
-https://lnkd.in/gQHcc6mM
+12. Build AI agents in VS Code: 4 hands-on labs with MCP + AI Toolkit - https://lnkd.in/gQHcc6mM
+
+--------------------------------------------
+
+Top 10 free AI courses.  Learn from Harvard, Microsoft, Google, and more.
+
+* AI Foundations & Basics
+  1. Harvard – Introduction to AI with Python  -  Learn AI using Python code. - 🔗 https://lnkd.in/dQ2s_NcA
+  1. Microsoft – AI for Beginners - 12 weeks to learn AI basics. - https://lnkd.in/ddXxbc9x
+  1. Google – AI Courses  - ↳ Learn responsible AI principles and applications.  - 🔗 https://lnkd.in/dzVw__Yb 
+  1. DeepLearning.AI – Generative AI for Everyone - ↳ Understand and apply generative AI tools.  - 🔗 https://lnkd.in/dCCzA9Mi
+  1. LinkedIn – Generative AI Courses - ↳ Different short courses on AI. - 🔗 https://lnkd.in/dKq7vccZ
+
+* Prompt Engineering & AI Applications
+  1. Vanderbilt – ChatGPT Prompt Engineering - ↳ Learn prompting for better AI use. - 🔗 https://lnkd.in/deb-vnWV
+  1. OpenAI – Prompt Engineering for Developers - ↳ Make apps using OpenAI tools. - 🔗 https://lnkd.in/dUEDtUSR
+  1. edX – AI Applications and Prompt Engineering - ↳ Create AI applications with prompt engineering. - 🔗 https://lnkd.in/dPthKgiE
+  1. AWS – Foundations of Prompt Engineering - ↳ Learn prompts for AWS AI services. - 🔗 https://lnkd.in/dG9fnzqx
+
+* Ethics & Big Data
+  1. UCL Davis – Big Data, AI, and Ethics - ↳ Learn about ethics in AI and data. - 🔗 https://lnkd.in/dtT_CJ4j 
