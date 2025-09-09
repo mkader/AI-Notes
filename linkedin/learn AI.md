@@ -114,4 +114,14 @@ Top 10 free AI courses.  Learn from Harvard, Microsoft, Google, and more.
   1. AWS – Foundations of Prompt Engineering - ↳ Learn prompts for AWS AI services. - 🔗 https://lnkd.in/dG9fnzqx
 
 * Ethics & Big Data
-  1. UCL Davis – Big Data, AI, and Ethics - ↳ Learn about ethics in AI and data. - 🔗 https://lnkd.in/dtT_CJ4j 
+  1. UCL Davis – Big Data, AI, and Ethics - ↳ Learn about ethics in AI and data. - 🔗 https://lnkd.in/dtT_CJ4j
+
+-----------------------------------------------------------------
+new FREE AI Agents courses
+
+* MS Generative AI for Beginners: https://lnkd.in/ewsH8gMT - 21 Lessons, need to know to start building Generative AI applications
+* Function-Calling and Data Extraction with LLMs : https://lnkd.in/ed_2bB5s - Learn to use LLM function-calling to connect with tools and extract structured data
+* Building Your Own DB Agent : https://lnkd.in/eZTXvG4E - → Learn to interact with db using NL. Beginner-friendly, with optional Python/SQL knowledge
+* LangChain for LLM Application Development : https://lnkd.in/eJXG8sc9 - Beginner-friendly course on building LLM apps with LangChain. Basic Python helps
+* Building and Evaluating Advanced RAG Applications : https://lnkd.in/eFpfRWaf - Learn the latest RAG methods. Ideal for anyone with basic Python knowledge
+* Building Agentic RAG with LlamaIndex : https://lnkd.in/emrYAQdK - Learn to quickly build agents that reason over your documents. For anyone with basic Python knowledge
