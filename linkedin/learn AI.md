@@ -1,51 +1,32 @@
 Here’s your roadmap
 
 𝟬. 𝗙𝘂𝗻𝗱𝗮𝗺𝗲𝗻𝘁𝗮𝗹𝘀 (Weeks 1–3) - Understand the moving pieces before you connect them.
-
   1. Karpathy – “LLMs in an Hour”  - Good explanation - https://lnkd.in/gJg77fqt
-  
   1. How GPTs Are Born: Internet Feeding + Training Loops - https://lnkd.in/g2pXsyHn
-  
   1. How GPTs Learn to Be Helpful - https://lnkd.in/gPimp6mv
-  
   1. Stanford CS229 Lecture - https://lnkd.in/g-HCdnAm
-  
   1. “Attention Is All You Need” - https://lnkd.in/gXUccydp
 
 𝟭. 𝗣𝗿𝗼𝗺𝗽𝘁 𝗖𝗿𝗮𝗳𝘁 (Weeks 4–5) - If you can’t guide the model, nothing else matters.
-
   1. OpenAI Prompt Engineering Guide - https://lnkd.in/gqjcPxcQ
-  
   1. Prompt engineering for devs - https://lnkd.in/gHwMeZzp
 
 𝟮. 𝗔𝗽𝗽𝗹𝗶𝗰𝗮𝘁𝗶𝗼𝗻 𝗟𝗮𝘆𝗲𝗿: 𝗔𝗱𝗮𝗽𝘁𝗮𝘁𝗶𝗼𝗻 + 𝗢𝗿𝗰𝗵𝗲𝘀𝘁𝗿𝗮𝘁𝗶𝗼𝗻 (Weeks 6–10) - Fine-tuning, retrieval, chaining, grounding, tool use.
-
   1. DeepLearning.ai Generative AI Course Guide - https://lnkd.in/gbdiAkPD
-  
   1. LLMOps: Deploy, Observe, Iterate - https://lnkd.in/gS_tA8hJ
 
 𝟯. 𝗔𝗴𝗲𝗻𝘁𝗶𝗰 𝗣𝗮𝘁𝘁𝗲𝗿𝗻𝘀 & 𝗙𝗿𝗮𝗺𝗲𝘄𝗼𝗿𝗸𝘀 (Weeks 11–12) - How to make agents reason, act, collaborate—and not break halfway through.
-
   1. Google Agents Whitepaper - https://lnkd.in/ghcxpVXd
-  
   1. ReAct: Reasoning + Acting - https://lnkd.in/gbXxR4Dp
-  
   1. AutoGen Patterns Short Course - https://lnkd.in/gE_dMbYa
-  
   1. crewAI Short Course - https://lnkd.in/gEkTGQ-G
-  
   1. LangGraph Short Course - https://lnkd.in/gmgtwpjf
-  
   1. GenAI_Agents GitHub repo - https://lnkd.in/gqjNSzrW
 
 𝟰. 𝗢𝗯𝘀𝗲𝗿𝘃𝗮𝗯𝗶𝗹𝗶𝘁𝘆 & 𝗘𝘃𝗮𝗹𝘀 (Weeks 13–14) - If you can’t evaluate or debug your agents, you’re just playing pretend.
-
   1. Agent as a Judge - https://lnkd.in/gmiUe-nv
-  
   1. Evaluating AI Agents - https://lnkd.in/gcY8WyjV
-  
   1. Safe and Reliable AI via Guardrails - https://lnkd.in/g5CykhcH
-  
   1. Red-Teaming LLM Applications - https://lnkd.in/gNjcb4Kd
 
 ---------------------------------------------
@@ -115,7 +96,6 @@ Top 10 free AI courses.  Learn from Harvard, Microsoft, Google, and more.
 
 * Ethics & Big Data
   1. UCL Davis – Big Data, AI, and Ethics - ↳ Learn about ethics in AI and data. - 🔗 https://lnkd.in/dtT_CJ4j
-
 -----------------------------------------------------------------
 new FREE AI Agents courses
 
@@ -125,3 +105,39 @@ new FREE AI Agents courses
 * LangChain for LLM Application Development : https://lnkd.in/eJXG8sc9 - Beginner-friendly course on building LLM apps with LangChain. Basic Python helps
 * Building and Evaluating Advanced RAG Applications : https://lnkd.in/eFpfRWaf - Learn the latest RAG methods. Ideal for anyone with basic Python knowledge
 * Building Agentic RAG with LlamaIndex : https://lnkd.in/emrYAQdK - Learn to quickly build agents that reason over your documents. For anyone with basic Python knowledge
+------------------------------------------------------
+I've spent the last year learning AI Agents. These 17 Github repositories. Are all you need to master AI Agents. Most of these repos cover complex concepts in greater detail And some are courses in themselves
+
+1. AI Agent Crash Course - 🔗 https://lnkd.in/e8AsU-uc
+
+2. Donner Agents - 🔗 https://lnkd.in/eHDadZTy
+
+3. Awesome Generative AI - 🔗 https://lnkd.in/eV6uJpim
+
+4. Microsoft AI agents for beginners - 🔗 https://lnkd.in/e-a2gqSv
+
+5. RAG Techniques - 🔗 https://lnkd.in/e9YbJN8Q
+
+6. GenAI Agents - 🔗 https://lnkd.in/euAyXsnQ
+
+7. AI ML Roadmap from scratch - 🔗 https://lnkd.in/eP7cCqHn
+
+8. Hands On Large Language Models - 🔗 https://lnkd.in/eFR7xhhR
+
+9. Prompt Engineering Guide - 🔗 https://lnkd.in/eeftKQGd
+
+10. Awesome MCP Servers - 🔗 https://lnkd.in/eiwgdhxj
+
+11. 1000+ Pre-Built AI Agents - 🔗 https://lnkd.in/eFgXqYxH
+
+12. Agents towards Production  - 🔗 https://lnkd.in/eW5A5GrT
+
+13. Hands-On AI Engineering - 🔗 https://lnkd.in/eyFfWu8u
+
+14. LLM Course - 🔗 https://lnkd.in/eg9JzpF8
+
+15. 500+ Real Life AI Agent Use-Cases - 🔗 https://lnkd.in/eSy89CCV
+
+16. Context Engineering A to Z - 🔗 https://lnkd.in/eaKUeDdQ
+
+17. ML For Beginners - 🔗 https://lnkd.in/e7S8yDbS
