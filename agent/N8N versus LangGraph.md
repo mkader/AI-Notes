@@ -11,4 +11,4 @@ LangGraph is a Python framework for building AI Agent workflows using a flexible
   * A Conditional node decides whether to retry or mark the process done.
 
 
-<img src="https://github.com/mkader/AI-Notes/blob/main/agent/N8N%20versus%20LangGraph.jpg"
+<img src="https://github.com/mkader/AI-Notes/blob/main/agent/N8N%20versus%20LangGraph.jpg">
