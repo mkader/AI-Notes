@@ -1,217 +1,143 @@
 # Running Large Language Models (LLMs) Locally Using Ollama
 * Last updated: March 4, 2026
 * LLMs are no longer limited to cloud environments.
-* With tools like Ollama, developers can run powerful LM directly on their own machines, gaining full control over data, costs, and performance.
-* Explores how Ollama makes it simple to download, manage, and run LLMs locally, offering developers a practical way to experiment, prototype, and deploy AI-powered applications entirely on their own infrastructure.
+* With Ollama tools, developers can run powerful LM directly on their own machines, gaining full control over data, costs, and performance.
+* Explores how Ollama makes it to download, manage and run LLMs locally, a practical way to experiment, prototype, and deploy AI-powered applications entirely on their own infrastructure.
 
 ### Run LLM Locally
-* Running LLMs locally is confidentiality, offline access, or low-latency responses, all without relying on external APIs.
+* Running LLMs locally is confidentiality, offline access or low-latency responses, all without relying on external APIs.
 * Data privacy is a key sensitive information, such as proprietary code, customer data, or internal documents, can be processed without leaving the local machine or network.
 * Running LLMs locally gives developers finer control over model versions, updates, and performance tuning, allowing experimentation with different models and configurations without external constraints.
 * These factors make local LLM deployment increasingly attractive for learning, prototyping, and building real-world AI applications.
 
 ### Run Cloud based Run LLM
-* Cloud-based services (OpenAI) have made LLMs widely accessible, but they require sending prompts and data to external servers, which can raise concerns around privacy, compliance, and data ownership.
+* Cloud-based services (OpenAI) have made LLMs widely accessible, but they require sending prompts and data to external servers, which can raise concerns around privacy, compliance and data ownership.
 * Cloud-based LLM services are convenient and scalable.
 * Cloud APIs typically charge per token or request, which can quickly become expensive during experimentation, development, or high-volume usage. 
 
 ### Hardware Requirements for Running LLMs Locally
-* Running LLMs locally hardware depend on the size of the model, the precision used, and the type of workload (experimentation, inference, or fine-tuning).
+* Running LLMs locally hardware depend on the size of the model, the precision used and the type of workload (experimentation, inference, or fine-tuning).
 * At a minimum, a modern CPU with sufficient RAM can run smaller LLMs (such as 3B–7B parameter models), especially when they are quantized.
   * What Is a Quantized Model? - is a ML model whose numerical parameters (weights and sometimes activations) have been converted from high-precision representations—typically 32-bit floating point (FP32)—to lower-precision formats such as 16-bit (FP16), 8-bit (INT8), or even 4-bit (INT4).
 * As a rough guideline, a quantized 7B model typically requires 6–8 GB of RAM, while larger models scale up quickly beyond that.
 * Solid-state storage (SSD) is also recommended to reduce model load times and improve overall responsiveness.
 * For better performance, particularly lower latency and higher throughput, a GPU or Apple Silicon accelerator is highly desirable.
-  * GPUs with sufficient VRAM can handle larger models and longer context windows more efficiently than CPUs.
+  * GPUs with sufficient VRAM can handle LMs and longer context windows more efficiently than CPUs.
   * On NVIDIA hardware, VRAM capacity often becomes the limiting factor,
   * on Apple Silicon (M-series chips), the unified memory architecture allows models to share memory efficiently between the CPU and GPU cores.
   * In practice, this makes Apple Silicon well-suited for running moderately sized LLMs locally.
 
 ### What Is Ollama?
 * Ollama is a platform that provides local deployment and management of LLMs on your own machine.
-* Ollama allows you to run models locally, which means your data doesn't need to leave your device—useful for privacy, speed, and offline use.
+* Ollama allows to run models locally, which means your data doesn't need to leave your device—useful for privacy, speed, and offline use.
 * Ollama comes with two key components:
   * A desktop application that resembles ChatGPT, allowing you to chat and ask questions
   * A command line application (CLI) that you can use in Terminal (macOS) or Command Prompt (Windows)
-* Ollama.com, download (OllamaSetup.exe) and install.
+* From Ollama.com, download (OllamaSetup.exe) and install.
    
 ### Finding Available Models
-* Go to Ollama.com or your downloaded tool
+* From Ollama.com or installed tool
 * Search the model (tool or website) - llama3.2, it's relatively small (around 2GB).
   * llama3.2:latest – This is the same as the one listed as llama:3.2:3b. This is the model that will be installed if the user did not specify the tag (e.g. 1b or 3b)
   * llama3.2:1b – This model has 1 billion parameters, and its size is 1.3GB
   * llama3.2:3b – This model has 3 billion parameters, and its size is 2GB
 * Models with more parameters are often more capable, but they are larger and more computationally demanding.
-* Download and run the model onto your computer and run it automatically ``` ollama run llama3.2 ```
+* Download and run automatically the model onto your computer ``` ollama run llama3.2 ```
  * <img width="500" height="300" alt="image" src="https://github.com/user-attachments/assets/f091839a-eba1-454b-a3c6-4950673998f4" /> 
  * <img width="500" height="125" alt="image" src="https://github.com/user-attachments/assets/f8e20754-f313-446c-91e2-c59ff7426f01" />
 * Other models: gpt-oss, qwen2.5, gemma3, deepseek-r1
-Make sure to download the version of each model that matches your available memory.
 
-Using the Ollama CLI
-For developers interested in experimenting with Ollama, the Ollama CLI offers one of the easiest ways to interact with the platform. The CLI is accessed using the ollama command, as illustrated in the examples below. I'll demonstrate using Terminal on a Mac, though the same commands work on Windows as well.
+### Using the Ollama CLI
+1. To start, you can check if Ollama is installed by running ``` ollama ```
+   * <img width="300" height="200" alt="image" src="https://github.com/user-attachments/assets/77a02bbb-f4ef-42f1-bde5-ebb9cc3c5d48" />
+1. See the list of available options ``` ollama help ```
+   * <img width="350" height="300" alt="image" src="https://github.com/user-attachments/assets/324ce448-4434-4b34-9743-4a9613e627dd" />
+1. Download a model without running it, use the pull command ``` ollama pull llama3.2 ```
+1. Download and run automatically the model onto your computer ``` ollama run llama3.2 ```
+1. Start chatting with the model.
+   * When you are done, just type /bye to return to the Terminal.
+   * <img width="200" height="30" alt="image" src="https://github.com/user-attachments/assets/5967937c-49f6-4688-9138-64d89b58ad81" />
+   * <img width="400" height="300" alt="image" src="https://github.com/user-attachments/assets/2292fc56-7c71-415b-ba21-af9910f50742" />
+1. View the list of downloaded models onto your computer ``` ollama list ```         
+1. Remove a model ``` ollama rm llama3.2 ```
+1. Start Ollama manually ``` ollama serve ```
+   * By default, Ollama runs as a background service, listening on port 11434, which allows your applications to communicate with the models it hosts. If it not running
+   * If you see an error message like the following, this means the Ollama backend is already running:
+   * <img width="1198" height="56" alt="image" src="https://github.com/user-attachments/assets/4da6e293-db49-41b1-a09b-1f144f0a556d" />
 
-To start, you can check if Ollama is installed by running:
-
+### Generating Text Using the Ollama API
+* With Ollama running in the backend, you can build applications that connect to it, allowing them to leverage the models it hosts.
+* Use curl or Postman to test it, sends a prompt “Tell me a joke” to the llama3.2 model:
+  ```
+    $ curl http://localhost:11434/api/generate -d '{
+      "model": "llama3.2",
+      "prompt": "Tell me a joke",
+      "stream": false
+    }'
+  ```
+   * <img width="400" height="300" alt="image" src="https://github.com/user-attachments/assets/36f6def5-acba-4e29-b095-321c779469cf" />
+  ```
+  {
+      "model": "llama3.2",
+      "created_at": "2026-03-11T16:34:24.0673662Z",
+      "response": "Why don't eggs tell jokes?\n\nBecause they'd crack each other up!",
+      "done": true,
+      "done_reason": "stop",
+      "context": [
+          128006,
+          9125,
+          ...
+          709,
+          0
+      ],
+      "total_duration": 3762366300,
+      "load_duration": 2528385500,
+      "prompt_eval_count": 29,
+      "prompt_eval_duration": 535122000,
+      "eval_count": 16,
+      "eval_duration": 688958700
+  }
+  ```
+* Set the stream parameter to true (or simply leave it out altogether)
+  * This streaming format allows your application to receive partial tokens as they are generated, enabling real-time display of the model's output rather than waiting for the full response to complete.
+  * the responses:
+   * <img width="200" height="400" alt="image" src="https://github.com/user-attachments/assets/26bf992f-b1ca-496d-95b5-d135ac078c68" />
+  ```
+    {
+        "model": "llama3.2",
+        "created_at": "2026-03-11T16:39:47.5727622Z",
+        "response": "Here",
+        "done": false
+    }
+    {
+        "model": "llama3.2",
+        "created_at": "2026-03-11T16:39:47.6180924Z",
+        "response": "'s",
+        "done": false
+    }
+    {
+        "model": "llama3.2",
+        "created_at": "2026-03-11T16:39:47.667321Z",
+        "response": " a",
+        "done": false
+    }
+    ...
+    {
+        "model": "llama3.2",
+        "created_at": "2026-03-11T16:39:48.4639517Z",
+        "response": ".",
+        "done": false
+    }
+    {
+        "model": "llama3.2",
+        "created_at": "2026-03-11T16:39:48.5091369Z",
+        "response": "",
+        "done": true,
+        "done_reason": "stop",
+        "context": [
+            128006,
+  ```
  
-$ ollama
-You should see the list of available options you can use with the ollama app:
-
- 
-$ ollama
-Usage:
-  ollama [flags]
-  ollama [command]
-
-Available Commands:
-  serve       Start ollama
-  create      Create a model
-  show        Show information for a model
-  run         Run a model
-  stop        Stop a running model
-  pull        Pull a model from a registry
-  push        Push a model to a registry
-  signin      Sign in to ollama.com
-  signout     Sign out from ollama.com
-  list        List models
-  ps          List running models
-  cp          Copy a model
-  rm          Remove a model
-  help        Help about any command
-
-Flags:
-  -h, --help      help for ollama
-  -v, --version   Show version information
-
-Use "ollama [command] --help" for more information about a command.
-To download a model without running it, use the pull command:
-
- 
-$ ollama pull llama3.2
-pulling manifest 
-pulling dde5aa3fc5ff: 100% ▕████████████▏ 2.0 GB 
-pulling 966de95ca8a6: 100% ▕████████████▏ 1.4 KB 
-pulling fcc5a6bec9da: 100% ▕████████████▏ 7.7 KB 
-pulling a70ff7e570d9: 100% ▕████████████▏ 6.0 KB 
-pulling 56bb8bd477a5: 100% ▕████████████▏   96 B 
-pulling 34bb5ab01051: 100% ▕████████████▏  561 B 
-verifying sha256 digest 
-writing manifest 
-success 
-The above command downloads the llama3.2 model onto the local computer. To download and run a model, use the run command:
-
- 
-$ ollama run llama3.2
-You can now start chatting with the model:
-
- 
->>> Tell me a joke
-Why don't eggs tell jokes?
-
-Because they'd crack each other up.
-
->>> Send a message (/? for help)
-When you are done, just type /bye to return to the Terminal.
-
-To view the list of models you have downloaded onto your computer, use the list command:
-
- 
-$ ollama list         
-NAME             ID            SIZE    MODIFIED      
-llama3.2:latest  a80c4f17acd5  2.0 GB  2 minutes ago
-To remove a model, use the rm command:
-
- 
-$ ollama rm llama3.2
-deleted 'llama3.2'
-By default, Ollama runs as a background service, listening on port 11434, which allows your applications to communicate with the models it hosts. If the Ollama backend service isn't running for any reason, you can start it manually using the serve command:
-
- 
-$ ollama serve
-If you see an error message like the following, this means the Ollama backend is already running:
-
- 
-Error: listen tcp 127.0.0.1:11434: bind: address already in use
-Generating Text Using the Ollama API
-With Ollama running in the backend, you can build applications that connect to it, allowing them to leverage the models it hosts. One way to test that Ollama is working correctly is to use the curl utility. The following command sends a prompt “Tell me a joke” to the llama3.2 model:
-
- 
-$ curl http://localhost:11434/api/generate -d '{
-  "model": "llama3.2",
-  "prompt": "Tell me a joke",
-  "stream": false
-}'
-The result from llama3.2 looks like this:
-
- 
-{
-    "model": "llama3.2",
-    "created_at": "2026-01-16T03:49:16.419632Z",
-    "response": "A man walked into a library and asked the librarian, 
-      \"Do you have any books on Pavlov's dogs and Schrödinger's cat?\" 
-      The librarian replied, \"It rings a bell, but I'm not sure if it's 
-      here or not.\"",
-    "done": true,
-    "done_reason": "stop",
-    "context": [
-        128006,
-        9125,
-        ...
-        539,
-        1210
-    ],
-    "total_duration": 1630109209,
-    "load_duration": 84332709,
-    "prompt_eval_count": 29,
-    "prompt_eval_duration": 98273500,
-    "eval_count": 54,
-    "eval_duration": 1194191879
-}
-If you set the stream parameter to true (or simply leave it out altogether), the responses would now look like this:
-
- 
-{
-    "model": "llama3.2",
-    "created_at": "2026-01-16T03:52:53.410609Z",
-    "response": "Why",
-    "done": false
-}
-{
-    "model": "llama3.2",
-    "created_at": "2026-01-16T03:52:53.439253Z",
-    "response": " don",
-    "done": false
-}
-{
-    "model": "llama3.2",
-    "created_at": "2026-01-16T03:52:53.469857Z",
-    "response": "'t",
-    "done": false
-}
-...
-...
-{
-    "model": "llama3.2",
-    "created_at": "2026-01-16T03:52:53.836842Z",
-    "response": "",
-    "done": true,
-    "done_reason": "stop",
-    "context": [
-        128006,
-        9125,
-        ...
-        1023,
-        709,
-        0
-    ],
-    "total_duration": 777216208,
-    "load_duration": 85119000,
-    "prompt_eval_count": 29,
-    "prompt_eval_duration": 258352958,
-    "eval_count": 16,
-    "eval_duration": 345037499
-}
-This streaming format allows your application to receive partial tokens as they are generated, enabling real-time display of the model's output rather than waiting for the full response to complete.
 
 Running Models on the Cloud
 What happens if the model you want to run in Ollama is too large to fit within your computer's available memory? For example, OpenAI has released the open-weight models called gpt-oss, which was designed for powerful reasoning, agentic tasks, and versatile developer use cases. It has two main variants (see Figure 3):
