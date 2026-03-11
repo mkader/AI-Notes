@@ -38,22 +38,14 @@
 ### Finding Available Models
 * Go to Ollama.com or your downloaded tool
 * Search the model (tool or website) - llama3.2, it's relatively small (around 2GB).
- * llama3.2:latest – This is the same as the one listed as llama:3.2:3b. This is the model that will be installed if the user did not specify the tag (e.g. 1b or 3b)
- * llama3.2:1b – This model has 1 billion parameters, and its size is 1.3GB
- * llama3.2:3b – This model has 3 billion parameters, and its size is 2GB
- * Models with more parameters are often more capable, but they are larger and more computationally demanding.
-* Download and run the model ``` ollama run llama3.2 ```
+  * llama3.2:latest – This is the same as the one listed as llama:3.2:3b. This is the model that will be installed if the user did not specify the tag (e.g. 1b or 3b)
+  * llama3.2:1b – This model has 1 billion parameters, and its size is 1.3GB
+  * llama3.2:3b – This model has 3 billion parameters, and its size is 2GB
+* Models with more parameters are often more capable, but they are larger and more computationally demanding.
+* Download and run the model onto your computer and run it automatically ``` ollama run llama3.2 ```
  * <img width="500" height="300" alt="image" src="https://github.com/user-attachments/assets/f091839a-eba1-454b-a3c6-4950673998f4" /> 
  * <img width="500" height="125" alt="image" src="https://github.com/user-attachments/assets/f8e20754-f313-446c-91e2-c59ff7426f01" />
-* 
-The above command will download the llama3.2 model onto your computer and run it automatically after it has finished downloading. You will learn more about the other commands in the next section.
-
-Besides llama3.2, here are some of my personal favorite models:
-
-gpt-oss
-qwen2.5
-gemma3
-deepseek-r1
+* Other models: gpt-oss, qwen2.5, gemma3, deepseek-r1
 Make sure to download the version of each model that matches your available memory.
 
 Using the Ollama CLI
