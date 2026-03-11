@@ -184,62 +184,37 @@
 * Upload image using "+ icon", if the model supports image input.
 
 ## Using Hugging Face Models in Ollama
-Sometimes, you may want to run a specific model from Hugging Face in Ollama—especially if the model you need isn't available on Ollama.com. Fortunately, Ollama supports running Hugging Face models that are in the GGUF format.
+* Run a specific model (not available on Ollama.com) from Hugging Face in Ollama.
+* Fortunately, Ollama supports running Hugging Face models that are in the GGUF format.
+* 2 ways to run Hugging Face models in Ollama
 
-What Is GGUF?
-GGUF (GPT-Generated Unified Format) is a binary file format for large language models (LLMs) that is designed to make models efficient, portable, and easy to run locally, especially on consumer hardware. It is most commonly used with inference engines like llama.cpp, Ollama, LM Studio, and similar tools.
+### What Is GGUF (GPT-Generated Unified Format)?
+* GGUF is a binary file format for LLMs that is designed to make models efficient, portable, and easy to run locally, especially on consumer hardware.
+* It is most commonly used with inference engines like llama.cpp, Ollama, LM Studio, and similar tools.
+* In simple terms, GGUF is a way to package a language model's weights and metadata so that it can be loaded quickly, use less memory, and support features like quantization (e.g., 4-bit, 5-bit, or 8-bit weights) to dramatically reduce model size while still retaining good performance.
+* Unlike older formats (such as GGML), GGUF stores rich metadata inside the file itself—including tokenizer info, architecture details, and special tokens—making models more self-contained and less error-prone to load.
 
-In simple terms, GGUF is a way to package a language model's weights and metadata so that it can be loaded quickly, use less memory, and support features like quantization (e.g., 4-bit, 5-bit, or 8-bit weights) to dramatically reduce model size while still retaining good performance. Unlike older formats (such as GGML), GGUF stores rich metadata inside the file itself—including tokenizer info, architecture details, and special tokens—making models more self-contained and less error-prone to load.
+### Method 1 — Run a Model Directly from Hugging Face
+  * Find the model directly on Hugging Face's website (https://huggingface.co). Filter by “GGUF”.
+  * <img width="600" height="450" alt="image" src="https://github.com/user-attachments/assets/6f0c3231-550f-4b08-8860-a24074ef4c07" />
+2. Use the unsloth/QwQ-32B-GGUF model located at: https://huggingface.co/unsloth/QwQ-32B-GGUF
+  * Since this model is in GGUF format, you can directly pull and run it using the ollama app in Terminal
+3. Download and start chatting ``` ollama run huggingface.co/unsloth/QwQ-32B-GGUF ```
 
-There are two ways to run Hugging Face models in Ollama. Let's go through each method step by step.
+### Run Hugging Face quantized versions models
+1. Some models on Hugging Face are available in quantized versions.
+2. For instance, the unsloth/QwQ-32B-GGUF model offers multiple quantized variants. You can explore them on the model's page.
+  * <img width="750" height="450" alt="image" src="https://github.com/user-attachments/assets/0eced311-5a49-4084-b6c3-32e41d6c8e07" />
+3. Download and run a quantized model by appending the quantized variant name to the model name ``` ollama run huggingface.co/unsloth/QwQ-32B-GGUF:Q4_K_M ```
+  * Running a quantized model reduces memory usage, enabling it to run efficiently on CPUs and low-VRAM GPUs while also improving inference speed.
+  * This makes quantized models ideal for real-time applications, edge devices, and deployment on resource-constrained hardware.
+  * They also consume less power, making them more energy-efficient and cost-effective for large-scale or battery-powered applications.
+  * By reducing computational requirements, quantization allows users to work with large models without needing high-end hardware, making AI more accessible and practical for a wider range of use cases.
 
-Method 1 — Run a Model Directly from Hugging Face
-The first method is to find the model you want directly on Hugging Face's website (https://huggingface.co). Once there, apply the “GGUF” filter to see a list of models available in the GGUF format (see Figure 8).
-
-Figure 8: Finding a model in GGUF format on the Hugging Face website
-Figure 8: Finding a model in GGUF format on the Hugging Face website
-For illustration, let's use the unsloth/QwQ-32B-GGUF model located at: https://huggingface.co/unsloth/QwQ-32B-GGUF (see Figure 9).
-
-Figure 9: Viewing the details for the unsloth/QwQ-32B-GGUF model
-Figure 9: Viewing the details for the unsloth/QwQ-32B-GGUF model
-Since this model is in GGUF format, you can directly pull and run it using the ollama app in Terminal:
-
- 
-$ ollama run huggingface.co/unsloth/QwQ-32B-GGUF
-When downloading a model from Hugging Face in Ollama, remember to prefix the model name with “huggingface.co/”
-
-If you encounter an error like the following when pulling a model:
-
- 
-Error: pull model manifest: 400: 
-{"error":"Repository is not GGUF or is not compatible with llama.cpp"}
-This error means you are attempting to pull a model manifest from a repository that is not in a format supported by Ollama (GGUF / llama.cpp-compatible format), e.g.:
-
-Most Hugging Face PyTorch .bin models
-Sharded HF models (.safetensors). These are not directly compatible with llama.cpp/OLLAMA unless converted.
-When Ollama has successfully downloaded the Hugging Face model, you should now be able to start chatting away (see Figure 10).
-
-Figure 10: Chatting with a Hugging Face model in Ollama
-Figure 10: Chatting with a Hugging Face model in Ollama
-Some models on Hugging Face are available in quantized versions. For instance, the unsloth/QwQ-32B-GGUF model offers multiple quantized variants. You can explore them on the model's page (see Figure 11).
-
-Figure 11: Exploring the quantized variants of the unsloth/QwQ-32B-GGUF model on Hugging Face
-Figure 11: Exploring the quantized variants of the unsloth/QwQ-32B-GGUF model on Hugging Face
-You can download and run a quantized model by appending the quantized variant name to the model name, as shown below:
-
- 
-$ ollama run \
-  huggingface.co/unsloth/QwQ-32B-GGUF:Q4_K_M
-Figure 12 shows Ollama running the quantized variant of the unsloth/QwQ-32B-GGUF model.
-
-Figure 12: Running the quantized variant of the unsloth/QwQ-32B-GGUF model on Ollama
-Figure 12: Running the quantized variant of the unsloth/QwQ-32B-GGUF model on Ollama
-Running a quantized model reduces memory usage, enabling it to run efficiently on CPUs and low-VRAM GPUs while also improving inference speed. This makes quantized models ideal for real-time applications, edge devices, and deployment on resource-constrained hardware. They also consume less power, making them more energy-efficient and cost-effective for large-scale or battery-powered applications. By reducing computational requirements, quantization allows users to work with large models without needing high-end hardware, making AI more accessible and practical for a wider range of use cases.
-
-Method 2 — Importing a Model with a Modelfile
-The second method uses a Modelfile to define and import a Hugging Face model into Ollama. A Modelfile lets you specify the model's source, system settings, and other configurations in a structured, easy-to-manage format.
-
-To start, download the model from Hugging Face in GGUF format. For this example, visit https://huggingface.co/unsloth/QwQ-32B-GGUF/tree/main and locate the file under the Files tab. For instance, download the QwQ-32B-Q4_K_M.gguf file by clicking the download icon (see Figure 13).
+### Method 2 — Importing a Model with a Modelfile
+* The second method uses a Modelfile to define and import a Hugging Face model into Ollama.
+* A Modelfile lets you specify the model's source, system settings, and other configurations in a structured, easy-to-manage format.
+* To start, download the model from Hugging Face in GGUF format. For this example, visit https://huggingface.co/unsloth/QwQ-32B-GGUF/tree/main and locate the file under the Files tab. For instance, download the QwQ-32B-Q4_K_M.gguf file by clicking the download icon (see Figure 13).
 
 Figure 13: Downloading the QwQ-32B-Q4_K_M.gguf file directly from Hugging Face
 Figure 13: Downloading the QwQ-32B-Q4_K_M.gguf file directly from Hugging Face
