@@ -228,172 +228,98 @@
 * To confirm and see the model named my-model:latest   ``` ollama list ```
 * Run: ``` ollama run my-model ```
   
-Converting a Hugging Face Model to GGUF Format
-Sometimes, the model you want to run in Ollama isn't available in GGUF format on Hugging Face. In such cases, you can convert a model—like meta-llama/Llama-3.2-3B-Instruct—to GGUF. To do this, you first need to install llama.cpp, which can be found at https://github.com/ggml-org/llama.cpp.
-
-Downloading the Hugging Face Model Using Python
-First, download the model using the transformers library in Python (see Listing 1).
-
-Listing 1: Code to download a model from Hugging Face
-# Download model directly
-from transformers import AutoModelForCausalLM, AutoTokenizer
-
-model_id = "meta-llama/Llama-3.2-3B-Instruct"
-
-# Download the tokenizer
-tokenizer = AutoTokenizer.from_pretrained(model_id)
-
-# Load the model
-model = AutoModelForCausalLM.from_pretrained(model_id)
-When you run the above code snippet, the meta-llama/Llama-3.2-3B-Instruct model and tokenizer will be downloaded onto your computer. The default location where Hugging Face model saves its models is ~/.cache/huggingface/hub/ (for macOS) and C:\users\<username>\.cache\huggingface\hub\ (for Windows).
-
-Converting the Model
-Assuming llama.cpp is installed in your home directory, let's make use of the convert_hf_to_gguf.py script located in the llama.cpp folder to convert the Hugging Face model to GGUF:
-
- 
-$ cd ~/llama.cpp
-$ python convert_hf_to_gguf.py 
-  ~/.cache/huggingface/hub/models--meta-llama--Llama-3.2-3B-
-  Instruct/snapshots/0cb88a4f764b7a12671c53f0838cd831a0843b95 
-  --outfile /Volumes/SSD2/Llama-3.2-3B-Instruct.gguf
-The above command runs the convert_hf_to_gguf.py script to convert the meta-llama/Llama-3.2–3B-Instruct model to GGUF format. Figure 14 shows the breakdown of the command.
-
-Figure 14: The breakdown of the command to convert a Hugging Face model to GGUF
-Figure 14: The breakdown of the command to convert a Hugging Face model to GGUF
-At the end of the conversion, you will get the model in GGUF format — Llama-3.2–3B-Instruct.gguf. You can now use this GGUF model in applications that support it, such as Ollama.
-
-Where Are the Models Saved?
-Now that we've explored the different models you can use with Ollama, the next question is often: where are these models stored locally? In the sections that follow, I'll explain how Ollama organizes its models and show you how to change the default location where they are saved.
-
-Examining the Ollama Models Structure
-First, let's look at how Ollama organizes its models. When you download a model using the pull command (for example, ollama pull llama3.2), it is stored by default in the following locations:
-
-macOS: ~/.ollama
-Windows: C:\Users\<username>\.ollama\
-Each downloaded model is split into multiple components to manage its files efficiently. The example below shows the contents of the ~/.ollama folder after downloading four different models:
-
-deepseek-r1:1.5b
-deepseek-r1:7b
-llama3.2:latest
-mxbai-embed-large:latest
-Let's consider a particular model — mxbai-embed-large:
-
- 
-~/.ollama
-    |__models
-         |__blobs
-               |__sha256-6e4c3...4a4e4
-               |__sha256-34bb5...e242b
-               |__sha256-38bad...3cdda
-               |__sha256-819c2...39c3d
-               |__ ....
-               |__ ....
-         |__manifests
-               |__registry.ollama.ai
-                      |__library
-                            |__deepseek-r1
-                                 |__1.5b
-                                 |__7b
-                            |__llama3.2
-                                 |__latest
-                            |__mxbai-embed-large
-                                 |__latest
-In the above, mxbai-embed-large is the model name and latest is the model version. Each model name is located under the models/manifests/registry.ollama.ai/library folder. If you examine the content of the latest file from the mxbai-embed-large model, you will see the following as shown in Listing 2.
-
-Listing 2: The content of the “latest” file
-{
-    "schemaVersion": 2,
-    "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-    "config": {
-        "mediaType": "application/vnd.docker.container.image.v1+json",
-        "digest": "sha256:38bad...3cdda",
-        "size": 408
-    },
-    "layers": [
-        {
-            "mediaType": "application/vnd.ollama.image.model",
-            "digest": "sha256:819c2...39c3d",
-            "size": 669603712
-        },
-        {
-            "mediaType": "application/vnd.ollama.image.license",
-            "digest": "sha256:c71d2...d0ab4",
-            "size": 11357
-        },
-        {
-            "mediaType": "application/vnd.ollama.image.params",
-            "digest": "sha256:b8374...5d089",
-            "size": 16
-        }
-    ]
-}
-Basically, Ollama employs the OCI (Open Container Initiative) image specification format, which Docker also uses, to distribute and manage its models. In the above example, the latest file is a manifest file describing an OCI image, complete with layers, digests (SHA256 hashes), and media types.
-
-In particular, the layers key contains the model weights (application/vnd.ollama.image.model), licensing info (application/vnd.ollama.image.license), and parameters (application/vnd.ollama.image.params). These types are specified by the mediaType key. The digest key contains unique identifiers for each layer, ensuring integrity and reproducibility. The values of the digest key maps to the respective files in the blobs folder. For example (see Listing 3), the value of the digest key in the config key maps to the sha256–38badd946f91096f47f2f84de521ca1ef8ba233625c312163d0ad9e9d253cdda file located in the blobs folder:
-
-Listing 3: Examining the value of the digest key
-{
-    "config": {
-        "mediaType": "application/vnd.docker.container.image.v1+json",
-        "digest": "sha256:38bad...3cdda",
-        "size": 408
-    }
-}
- 
-~/.ollama
-    |__models
-         |__blobs
-               |__sha256-6e4c3...4a4e4
-               |__sha256-34bb5...e242b
-               |__sha256-38bad...3cdda
-               |__sha256-819c2...39c3d
-               |__ ....
-For the mxbai-embed-large model, it has a total of four files (each specified in the digest key within the config and layers keys) located in the blobs folder:
-
- 
-~/.ollama
-    |__models
-         |__blobs
-               |__sha256-6e4c3...4a4e4
-               |__sha256-34bb5...e242b
-               |__sha256-38bad...3cdda
-               |__sha256-819c2...d0ab4
-               |__sha256:c71d2...d0ab4
-               |__sha256:b8374...5d089
-               |__ ....
-               |__ ....
-         |__manifests
-               |__registry.ollama.ai
-                      |__library
-                            |__deepseek-r1
-                                 |__1.5b
-                                 |__7b
-                            |__llama3.2
-                                 |__latest
-                            |__mxbai-embed-large
-                                 |__latest
-Once you understand the models folder structure, it is now easy to move specific models from the original directory to a new one.
-
-I created a Python utility that helps users migrate local Ollama models from one folder to another. This is especially useful if you want to transfer models downloaded on another computer to your current system without having to redownload them. You can access the utility here: https://github.com/weimenglee/MigrateOllamaModels.
-
-Changing the Model Locations
-As discussed earlier, Ollama stores downloaded models in a default directory. However, there are times when you may want to save models elsewhere—such as on an external drive—to free up space on your main system.
-
-There are a couple of ways to change the default model directory. The simplest method is through the Ollama desktop app: right-click the Ollama icon and select Settings…. This will open the Settings window (see Figure 15), where you can specify a new directory for storing your models.
-
-Figure 15: Viewing the Ollama Settings screen
-Figure 15: Viewing the Ollama Settings screen
-The second method is to change the model directory via the Terminal (macOS) or Command Prompt (Windows). On macOS, you can do this by editing your .zshrc file and adding the following line, replacing the path with the directory where you want to store your models:
-
- 
-export OLLAMA_MODELS="/Volumes/SSD/ollama"
-After making the change on macOS, restart Ollama, and any new models will be saved in the new directory.
-
-On Windows, the process is slightly different. First, uninstall Ollama. Then, create a new environment variable named OLLAMA_MODELS (see Figure 16) and set its value to the directory where you want your models to be stored. Once set, reinstall Ollama, and it will use this directory for all downloaded models.
-
-Figure 16: Adding a new environment variable named OLLAMA_MODELS in Windows
-Figure 16: Adding a new environment variable named OLLAMA_MODELS in Windows
-With this setup, all Ollama models you download will be in the directory you specified in the environment variable.
+## Where Are the Models Saved?
+* Download a model using the pull command, it is stored by default in the following locations: ``` macOS: ~/.ollama ``` ``` Windows: C:\Users\<username>\.ollama\ ```
+* Each downloaded model is split into multiple components to manage its files efficiently. The example below shows the contents of the ~/.ollama folder after downloading four different models:
+   ```
+   ~/.ollama
+       |__models
+            |__blobs
+                  |__sha256-6e4c3...4a4e4
+                  |__sha256-34bb5...e242b
+                  |__sha256-38bad...3cdda
+                  |__sha256-819c2...39c3d
+                  |__ ....
+                  |__ ....
+            |__manifests
+                  |__registry.ollama.ai
+                         |__library
+                               |__deepseek-r1
+                                    |__1.5b
+                                    |__7b
+                               |__llama3.2
+                                    |__latest
+                               |__mxbai-embed-large
+                                    |__latest
+   ```
+* Content of the latest file from the mxbai-embed-large model
+  ```
+  {
+      "schemaVersion": 2,
+      "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "config": {
+          "mediaType": "application/vnd.docker.container.image.v1+json",
+          "digest": "sha256:38bad...3cdda",
+          "size": 408
+      },
+      "layers": [
+          {
+              "mediaType": "application/vnd.ollama.image.model",
+              "digest": "sha256:819c2...39c3d",
+              "size": 669603712
+          },
+          {
+              "mediaType": "application/vnd.ollama.image.license",
+              "digest": "sha256:c71d2...d0ab4",
+              "size": 11357
+          },
+          {
+              "mediaType": "application/vnd.ollama.image.params",
+              "digest": "sha256:b8374...5d089",
+              "size": 16
+          }
+      ]
+  }
+  ```
+* Ollama employs the OCI (Open Container Initiative) image specification format, which Docker also uses, to distribute and manage its models.
+* In the above example, the latest file is a manifest file describing an OCI image, complete with layers, digests (SHA256 hashes), and media types.
+* In particular, the layers key contains the model weights (application/vnd.ollama.image.model), licensing info (application/vnd.ollama.image.license), and parameters (application/vnd.ollama.image.params).
+* These types are specified by the mediaType key.
+* The digest key contains unique identifiers for each layer, ensuring integrity and reproducibility.
+* The values of the digest key maps to the respective files in the blobs folder.
+* For example, the value of the digest key in the config key maps to the sha256–38badd946f91096f47f2f84de521ca1ef8ba233625c312163d0ad9e9d253cdda file located in the blobs folder:
+  ```
+  {
+      "config": {
+          "mediaType": "application/vnd.docker.container.image.v1+json",
+          "digest": "sha256:38bad...3cdda",
+          "size": 408
+      }
+  }
+   
+  ~/.ollama
+      |__models
+           |__blobs
+                 |__sha256-6e4c3...4a4e4
+                 |__sha256-34bb5...e242b
+                 |__sha256-38bad...3cdda
+                 |__sha256-819c2...39c3d
+                 |__ ....
+  ```
+* For the mxbai-embed-large model, it has a total of four files (each specified in the digest key within the config and layers keys) located in the blobs folder:
+* Once you understand the models folder structure, it is now easy to move specific models from the original directory to a new one.
+* Python utility (https://github.com/weimenglee/MigrateOllamaModels.) that helps users migrate local Ollama models from one folder to another.
+* This is especially useful if you want to transfer models downloaded on another computer to your current system without having to redownload them.
+  
+## Changing the Model Locations
+* Ollama stores downloaded models in a default directory. However, there are times when you may want to save models elsewhere—such as on an external drive—to free up space on your main system.
+* Ollama desktop app: Setting.  specify a new directory for storing your models.
+   * <img width="400" height="80" alt="image" src="https://github.com/user-attachments/assets/a90bf096-c09f-4a66-b0ac-47a93169796c" />
+* 2nd optin: to change the model directory via the Terminal (macOS) or Command Prompt (Windows).
+   * <img width="300" height="300" alt="image" src="https://github.com/user-attachments/assets/91450432-e1e7-4acb-85c2-ebd02761590c" />
+   *  First, uninstall Ollama. Then, create a new environment variable named OLLAMA_MODELS and set its value to the directory where you want your models to be stored.
+   * Once set, reinstall Ollama, and it will use this directory for all downloaded models.
+* With this setup, all Ollama models you download will be in the directory you specified in the environment variable.
 
 Using Prompts to Customize the Behavior of a Model
 With Ollama, you can run a variety of LLMs directly on your computer — simply load a model and start asking questions. Since everything runs locally, your queries never leave your machine, keeping your data and privacy secure. For example, using the llama3.2 model, you could summarize text, translate content, generate code samples, or answer questions based on a specific block of text.
