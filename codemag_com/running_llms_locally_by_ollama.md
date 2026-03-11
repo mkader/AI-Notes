@@ -36,25 +36,16 @@
 * Ollama.com, download (OllamaSetup.exe) and install.
    
 ### Finding Available Models
-* Go to Ollama.com or your downloaded tool, search the model.
-* <img width="968" height="610" alt="image" src="https://github.com/user-attachments/assets/f091839a-eba1-454b-a3c6-4950673998f4" />
-* You can search for the model that you want. For example, if you want a model that is relatively small (around 2GB), you can search for llama3.2. Figure 2 shows the model page for llama3.2.
-
-Figure 2: Viewing the model page for llama3.2
-Figure 2: Viewing the model page for llama3.2
-On the page, you can see that there are a few variants of the model:
-
-<img width="1008" height="247" alt="image" src="https://github.com/user-attachments/assets/f8e20754-f313-446c-91e2-c59ff7426f01" />
-
-llama3.2:latest – This is the same as the one listed as llama:3.2:3b. This is the model that will be installed if the user did not specify the tag (e.g. 1b or 3b)
-llama3.2:1b – This model has 1 billion parameters, and its size is 1.3GB
-llama3.2:3b – This model has 3 billion parameters, and its size is 2GB
-Models with more parameters are often more capable, but they are larger and more computationally demanding.
-
-On the same model page, Ollama also shows how you can download and run the model:
-
- 
-ollama run llama3.2
+* Go to Ollama.com or your downloaded tool
+* Search the model (tool or website) - llama3.2, it's relatively small (around 2GB).
+ * llama3.2:latest – This is the same as the one listed as llama:3.2:3b. This is the model that will be installed if the user did not specify the tag (e.g. 1b or 3b)
+ * llama3.2:1b – This model has 1 billion parameters, and its size is 1.3GB
+ * llama3.2:3b – This model has 3 billion parameters, and its size is 2GB
+ * Models with more parameters are often more capable, but they are larger and more computationally demanding.
+* Download and run the model ``` ollama run llama3.2 ```
+ * <img width="500" height="300" alt="image" src="https://github.com/user-attachments/assets/f091839a-eba1-454b-a3c6-4950673998f4" /> 
+ * <img width="500" height="125" alt="image" src="https://github.com/user-attachments/assets/f8e20754-f313-446c-91e2-c59ff7426f01" />
+* 
 The above command will download the llama3.2 model onto your computer and run it automatically after it has finished downloading. You will learn more about the other commands in the next section.
 
 Besides llama3.2, here are some of my personal favorite models:
