@@ -195,58 +195,39 @@
 * Unlike older formats (such as GGML), GGUF stores rich metadata inside the file itself—including tokenizer info, architecture details, and special tokens—making models more self-contained and less error-prone to load.
 
 ### Method 1 — Run a Model Directly from Hugging Face
-  * Find the model directly on Hugging Face's website (https://huggingface.co). Filter by “GGUF”.
-  * <img width="600" height="450" alt="image" src="https://github.com/user-attachments/assets/6f0c3231-550f-4b08-8860-a24074ef4c07" />
+   * Find the model directly on Hugging Face's website (https://huggingface.co). Filter by “GGUF”.
+   * <img width="600" height="450" alt="image" src="https://github.com/user-attachments/assets/6f0c3231-550f-4b08-8860-a24074ef4c07" />
 2. Use the unsloth/QwQ-32B-GGUF model located at: https://huggingface.co/unsloth/QwQ-32B-GGUF
-  * Since this model is in GGUF format, you can directly pull and run it using the ollama app in Terminal
+   * Since this model is in GGUF format, you can directly pull and run it using the ollama app in Terminal
 3. Download and start chatting ``` ollama run huggingface.co/unsloth/QwQ-32B-GGUF ```
 
 ### Run Hugging Face quantized versions models
 1. Some models on Hugging Face are available in quantized versions.
 2. For instance, the unsloth/QwQ-32B-GGUF model offers multiple quantized variants. You can explore them on the model's page.
-  * <img width="750" height="450" alt="image" src="https://github.com/user-attachments/assets/0eced311-5a49-4084-b6c3-32e41d6c8e07" />
+   * <img width="750" height="450" alt="image" src="https://github.com/user-attachments/assets/0eced311-5a49-4084-b6c3-32e41d6c8e07" />
 3. Download and run a quantized model by appending the quantized variant name to the model name ``` ollama run huggingface.co/unsloth/QwQ-32B-GGUF:Q4_K_M ```
-  * Running a quantized model reduces memory usage, enabling it to run efficiently on CPUs and low-VRAM GPUs while also improving inference speed.
-  * This makes quantized models ideal for real-time applications, edge devices, and deployment on resource-constrained hardware.
-  * They also consume less power, making them more energy-efficient and cost-effective for large-scale or battery-powered applications.
-  * By reducing computational requirements, quantization allows users to work with large models without needing high-end hardware, making AI more accessible and practical for a wider range of use cases.
+   * Running a quantized model reduces memory usage, enabling it to run efficiently on CPUs and low-VRAM GPUs while also improving inference speed.
+   * This makes quantized models ideal for real-time applications, edge devices, and deployment on resource-constrained hardware.
+   * They also consume less power, making them more energy-efficient and cost-effective for large-scale or battery-powered applications.
+   * By reducing computational requirements, quantization allows users to work with large models without needing high-end hardware, making AI more accessible and practical for a wider range of use cases.
 
 ### Method 2 — Importing a Model with a Modelfile
-* The second method uses a Modelfile to define and import a Hugging Face model into Ollama.
+* Modelfile to define and import a Hugging Face model into Ollama.
 * A Modelfile lets you specify the model's source, system settings, and other configurations in a structured, easy-to-manage format.
-* To start, download the model from Hugging Face in GGUF format. For this example, visit https://huggingface.co/unsloth/QwQ-32B-GGUF/tree/main and locate the file under the Files tab. For instance, download the QwQ-32B-Q4_K_M.gguf file by clicking the download icon (see Figure 13).
-
-Figure 13: Downloading the QwQ-32B-Q4_K_M.gguf file directly from Hugging Face
-Figure 13: Downloading the QwQ-32B-Q4_K_M.gguf file directly from Hugging Face
-The advantage of this second method is that even if a GGUF version of the model you want isn't available, you can still download the model from Hugging Face using the standard Python approach and then convert it to GGUF using llama.cpp. Refer to the section “Converting a Hugging Face Model to GGUF Format” for detailed instructions on how to do this.
-
-Once the GGUF file is downloaded, create a file named Modelfile (no extension) and populate it as follows:
-
- 
-FROM ./downloads/QwQ-32B-Q4_K_M.gguf
-SYSTEM "You are a helpful AI assistant."
-PARAMETER temperature 0.7
-You can now use the following command to create a new model in Ollama based on the configuration defined in the Modelfile:
-
- 
-$ ollama create my-model -f Modelfile
-To confirm that the model is indeed created, you can use the list command to show all the models that you have on your location computer:
-
- 
-$ ollama list
-You will now see the model named my-model:latest:
-
- 
-$ ollama list
-NAME                                             ID       SIZE   MODIFIED       
-my-model:latest                             f32b0c97ff4b  15 GB   7 seconds ago
-huggingface.co/unsloth/QwQ-32B-GGUF:Q4_K_M  bcde3e2ab1a7  19 GB  32 minutes ago
-huggingface.co/unsloth/QwQ-32B-GGUF:latest  bcde3e2ab1a7  19 GB  50 minutes ago
-...
-Use the run command to run the model:
-
- 
-$ ollama run my-model
+* Download the model from Hugging Face in GGUF format, Locate the "File and versions" tab, like https://huggingface.co/unsloth/QwQ-32B-GGUF/tree/main
+* For instance, download the QwQ-32B-Q4_K_M.gguf file by clicking the download icon.
+* <img width="750" height="350" alt="image" src="https://github.com/user-attachments/assets/059b282c-fbab-4ce6-8270-9a8d1aed2b92" />
+* Advantage: if a GGUF version of the model not available, you can still download the model from Hugging Face using the standard Python approach and then convert it to GGUF using llama.cpp. Refer to the section “Converting a Hugging Face Model to GGUF Format” for detailed instructions on how to do this.
+* Once the GGUF file is downloaded, create a file named Modelfile (no extension) and populate it as follows:
+  ```
+    FROM ./downloads/QwQ-32B-Q4_K_M.gguf
+    SYSTEM "You are a helpful AI assistant."
+    PARAMETER temperature 0.7
+  ```
+* Ceate a new model in Ollama based on the configuration defined in the Modelfile ``` ollama create my-model -f Modelfile ```
+* To confirm and see the model named my-model:latest   ``` ollama list ```
+* Run: ``` ollama run my-model ```
+  
 Converting a Hugging Face Model to GGUF Format
 Sometimes, the model you want to run in Ollama isn't available in GGUF format on Hugging Face. In such cases, you can convert a model—like meta-llama/Llama-3.2-3B-Instruct—to GGUF. To do this, you first need to install llama.cpp, which can be found at https://github.com/ggml-org/llama.cpp.
 
