@@ -33,34 +33,34 @@
 * Ollama comes with two key components:
   * A desktop application that resembles ChatGPT, allowing you to chat and ask questions
   * A command line application (CLI) that you can use in Terminal (macOS) or Command Prompt (Windows)
-* From Ollama.com, download (OllamaSetup.exe) and install.
+* From Ollama.com, download (OllamaSetup.exe) and install Desktop.
    
 ### Finding Available Models
-* From Ollama.com or installed tool
-* Search the model (tool or website) - llama3.2, it's relatively small (around 2GB).
-  * llama3.2:latest – This is the same as the one listed as llama:3.2:3b. This is the model that will be installed if the user did not specify the tag (e.g. 1b or 3b)
-  * llama3.2:1b – This model has 1 billion parameters, and its size is 1.3GB
-  * llama3.2:3b – This model has 3 billion parameters, and its size is 2GB
-* Models with more parameters are often more capable, but they are larger and more computationally demanding.
-* Download and run automatically the model onto your computer ``` ollama run llama3.2 ```
- * <img width="500" height="300" alt="image" src="https://github.com/user-attachments/assets/f091839a-eba1-454b-a3c6-4950673998f4" /> 
- * <img width="500" height="125" alt="image" src="https://github.com/user-attachments/assets/f8e20754-f313-446c-91e2-c59ff7426f01" />
-* Other models: gpt-oss, qwen2.5, gemma3, deepseek-r1
+1. From Ollama.com or installed tool
+2. Search the model (desktop or website) - llama3.2, it's relatively small (around 2GB).
+   * llama3.2:latest – This is the same as the one listed as llama:3.2:3b. This is the model that will be installed if the user did not specify the tag (e.g. 1b or 3b)
+   * llama3.2:1b – This model has 1 billion parameters, and its size is 1.3GB
+   * llama3.2:3b – This model has 3 billion parameters, and its size is 2GB
+3. Models with more parameters are often more capable, but they are larger and more computationally demanding.
+4. Download and run automatically the model onto your computer ``` ollama run llama3.2 ```
+   * <img width="500" height="300" alt="image" src="https://github.com/user-attachments/assets/f091839a-eba1-454b-a3c6-4950673998f4" /> 
+   * <img width="500" height="125" alt="image" src="https://github.com/user-attachments/assets/f8e20754-f313-446c-91e2-c59ff7426f01" />
+5. Other models: gpt-oss, qwen2.5, gemma3, deepseek-r1
 
 ### Using the Ollama CLI
 1. To start, you can check if Ollama is installed by running ``` ollama ```
    * <img width="300" height="200" alt="image" src="https://github.com/user-attachments/assets/77a02bbb-f4ef-42f1-bde5-ebb9cc3c5d48" />
-1. See the list of available options ``` ollama help ```
+2. See the list of available options ``` ollama help ```
    * <img width="350" height="300" alt="image" src="https://github.com/user-attachments/assets/324ce448-4434-4b34-9743-4a9613e627dd" />
-1. Download a model without running it, use the pull command ``` ollama pull llama3.2 ```
-1. Download and run automatically the model onto your computer ``` ollama run llama3.2 ```
-1. Start chatting with the model.
+3. Download a model without running it, use the pull command ``` ollama pull llama3.2 ```
+4. Download and run automatically the model onto your computer ``` ollama run llama3.2 ```
+5. Start chatting with the model.
    * When you are done, just type /bye to return to the Terminal.
    * <img width="200" height="30" alt="image" src="https://github.com/user-attachments/assets/5967937c-49f6-4688-9138-64d89b58ad81" />
    * <img width="400" height="300" alt="image" src="https://github.com/user-attachments/assets/2292fc56-7c71-415b-ba21-af9910f50742" />
-1. View the list of downloaded models onto your computer ``` ollama list ```         
-1. Remove a model ``` ollama rm llama3.2 ```
-1. Start Ollama manually ``` ollama serve ```
+6. View the list of downloaded models onto your computer ``` ollama list ```         
+7. Remove a model ``` ollama rm llama3.2 ```
+8. Start Ollama manually ``` ollama serve ```
    * By default, Ollama runs as a background service, listening on port 11434, which allows your applications to communicate with the models it hosts. If it not running
    * If you see an error message like the following, this means the Ollama backend is already running:
    * <img width="1198" height="56" alt="image" src="https://github.com/user-attachments/assets/4da6e293-db49-41b1-a09b-1f144f0a556d" />
@@ -138,96 +138,52 @@
             128006,
   ```
  
+## Running Models on the Cloud
+* Ollama is too large to fit within your computer's available memory?
+* OpenAI gpt-oss Model, which was designed for powerful reasoning, agentic tasks, and versatile developer use cases
+  * 2 main variants:
+     * gpt-oss:20b – 14GB in size
+     * gpt-oss:120b – 65GB in size
+  * Most people with 16-24GB of RAM can run the 20b model, but the 120b variant is beyond the reach of most users.
+  * 2 more variants:
+    * gpt-oss:20b-cloud – this is the 20b model running on the cloud
+    * gpt-oss:120b-cloud – this is the 120b model running on the cloud
+  * These two variants let you run the models on Ollama.com's servers rather than on your local machine.
+  * <img width="400" height="450" alt="image" src="https://github.com/user-attachments/assets/c8cafd20-9843-4ef8-8b5f-8a6767335565" />
+* Not all models are supported on Ollama's cloud.
+* Only models with the -cloud suffix can be run on the cloud; all others are local-only.
+* In general, smaller models, such as 3B-parameter versions, are designed to run locally on your machine, allowing for full control over data and privacy.
+* Larger or specially optimized models may offer cloud variants to reduce hardware requirements and improve performance, but these come with the trade-off of sending data over the internet.
+* Running models on Ollama's cloud means your data is no longer fully private, but it allows you to access much more powerful models than you could run locally.
 
-Running Models on the Cloud
-What happens if the model you want to run in Ollama is too large to fit within your computer's available memory? For example, OpenAI has released the open-weight models called gpt-oss, which was designed for powerful reasoning, agentic tasks, and versatile developer use cases. It has two main variants (see Figure 3):
+### Accessing Ollama from the Network
+1. By default, Ollama can only be accessed on the computer where it is installed.
+1. To allow other machines on your local network to connect, you need to bind it to all network interfaces by setting the environment variable OLLAMA_HOST to 0.0.0.0:11434.
+1. After making this change, restart the Ollama server.
+1. Once restarted, the Ollama server will be accessible to other devices on the same subnet.
 
-gpt-oss:20b – 14GB in size
-gpt-oss:120b – 65GB in size
-Figure 3: The model page for gpt-oss released by OpenAI
-Figure 3: The model page for gpt-oss released by OpenAI
-Most people with 16-24GB of RAM can run the 20b model, but the 120b variant is beyond the reach of most users. Note that there are two more variants:
+### To run an Ollama model on the cloud, follow the steps outlined here.
+* Running Ollama's model in the cloud means your data is sent to a third party, which defeats the purpose of running it locally in the first place.
+* First, choose a model. ``` ollama run gpt-oss:120b-cloud ```
+   * if error, signin first
+   * <img width="300" height="100" alt="image" src="https://github.com/user-attachments/assets/b10677f0-383d-4deb-b1b2-6ab7b52ce164" />
+* use the signin command ``` ollama signin ``` or signin by link
+   * <img width="578" height="202" alt="image" src="https://github.com/user-attachments/assets/7e954744-a9fc-4b13-b2b1-4c33d997c4f8" />
+* Once connected, you can now run the gpt-oss:120b-cloud model on the cloud
+   * <img width="300" height="200" alt="image" src="https://github.com/user-attachments/assets/25c46a68-0a50-40f7-9857-e5fb408847fa" />
 
-gpt-oss:20b-cloud – this is the 20b model running on the cloud
-gpt-oss:120b-cloud – this is the 120b model running on the cloud
-These two variants let you run the models on Ollama.com's servers rather than on your local machine.
+## Using the Ollama Desktop App
+* For non-technical users, the Ollama desktop app provides a much easier way to interact with Ollama.
+   * <img width="800" height="500" alt="image" src="https://github.com/user-attachments/assets/9b36156a-fa72-453c-8aae-1e0bd7dc2b4f" />
+* Simple conversation with the gpt-oss:120b-cloud model using the Ollama desktop app.
+   * <img width="500" height="500" alt="image" src="https://github.com/user-attachments/assets/69139e7e-e0f0-477a-a87d-56561f36958c" />
+* Select the model's response length:
+   * Short – brief, concise answers
+   * Medium – balanced detail (default)
+   * Long – more detailed, verbose responses
+* Upload image using "+ icon", if the model supports image input.
 
-Accessing Ollama from the Network
-By default, Ollama can only be accessed on the computer where it is installed. To allow other machines on your local network to connect, you need to bind it to all network interfaces by setting the environment variable OLLAMA_HOST to 0.0.0.0:11434. After making this change, restart the Ollama server.
-
-Once restarted, the Ollama server will be accessible to other devices on the same subnet.
-
-To run an Ollama model on the cloud, follow the steps outlined here.
-
-Keep in mind that running Ollama's model in the cloud means your data is sent to a third party, which defeats the purpose of running it locally in the first place.
-
-First, choose a model. For this example, let's choose gpt-oss:120b-cloud.
-
- 
-$ ollama run gpt-oss:120b-cloud
-Connecting to 'gpt-oss:120b' on 'ollama.com' ⚡
->>>
-If you ask a question, you will likely see an error:
-
- 
-Error: 401 Unauthorized
-This happens because your computer needs to be authorized by Ollama's cloud before it can run the model. To fix this, use the signin command:
-
- 
-$ ollama signin
-This generates a URL with a public key to register your device with Ollama's cloud. You will now see the following message:
-
- 
-You need to be signed in to Ollama to run Cloud models.
-To sign in, navigate to:
-    https://ollama.com/connect?name=
-    Wei-Mengs-MacBook-Air.local&key=c3NoL...Unk
-Copy the link and open it in your web browser. Sign in to Ollama.com or create an account if needed. Once authorized, your machine will be able to run cloud models, and you should see a confirmation screen as shown in Figure 4.
-
-Figure 4: Connecting your computer to Ollama's server
-Figure 4: Connecting your computer to Ollama's server
-Click the Connect button. The above step essentially:
-
-Sends your public SSH key (which Ollama has generated for you when you first launch Ollama) to Ollama's servers so they can authenticate your device.
-It allows the Ollama web portal or other clients to securely communicate with your local Ollama installation without needing a password.
-Once connected, you can now run the gpt-oss:120b-cloud model on the cloud:
-
- 
-$ ollama run gpt-oss:120b-cloud
-Connecting to 'gpt-oss:120b' on 'ollama.com' ⚡
->>> hello
-Thinking...
-
-We need to respond. Likely greet back.
-...done thinking.
-
-Hello! How can I help you today?
->>>
-Not all models are supported on Ollama's cloud. Only models with the -cloud suffix can be run on the cloud; all others are local-only. In general, smaller models, such as 3B-parameter versions, are designed to run locally on your machine, allowing for full control over data and privacy. Larger or specially optimized models may offer cloud variants to reduce hardware requirements and improve performance, but these come with the trade-off of sending data over the internet.
-
-Running models on Ollama's cloud means your data is no longer fully private, but it allows you to access much more powerful models than you could run locally.
-
-Using the Ollama Desktop App
-For non-technical users, the Ollama desktop app provides a much easier way to interact with Ollama. In the latest versions, the desktop app can be accessed by clicking the Ollama icon at the top of the screen on macOS (see Figure 5), or from the system tray on Windows.
-
-Figure 5: Launching the Ollama desktop app
-Figure 5: Launching the Ollama desktop app
-Figure 6 shows the Ollama desktop app. You can see a list of commonly used models available to you. If a model has not yet been downloaded, it will automatically download the first time you start a conversation with it.
-
-Figure 6: Using the Ollama desktop app
-Figure 6: Using the Ollama desktop app
-Figure 7 shows a simple conversation with the gpt-oss:120b-cloud model using the Ollama desktop app.
-
-Figure 7: Starting a conversation with the gpt-oss:120b-cloud model on the Ollama desktop app
-Figure 7: Starting a conversation with the gpt-oss:120b-cloud model on the Ollama desktop app
-In the middle of the screen, there is a drop-down menu where you can select the model's response length:
-
-Short – brief, concise answers
-Medium – balanced detail (default)
-Long – more detailed, verbose responses
-There is also a + icon, which you can use to upload images to the model (if the model supports image input).
-
-Using Hugging Face Models in Ollama
+## Using Hugging Face Models in Ollama
 Sometimes, you may want to run a specific model from Hugging Face in Ollama—especially if the model you need isn't available on Ollama.com. Fortunately, Ollama supports running Hugging Face models that are in the GGUF format.
 
 What Is GGUF?
