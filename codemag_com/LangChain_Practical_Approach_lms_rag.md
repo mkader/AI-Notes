@@ -52,73 +52,48 @@ os.environ['OPENAI_API_KEY'] = "OpenAI API Key"
     )
   ```
    
-The next component to create is the ChatOpenAI:
-
- 
+4. Next component ChatOpenAI:
+```
 from langchain_openai import ChatOpenAI
 
 model = ChatOpenAI(model="gpt-4o-mini")
 Here, you're making use of the “gpt-4o-mini” model from OpenAI.
-
-The third component is the StrOutputParser:
-
- 
+```
+5. 3rd component StrOutputParser:
+   * It's used to handle the output from your model and parse it as a straightforward string.
+   * This is useful when working with responses that don't require complex parsing or structuring.
+   * StrOutputParser will ensure that the model's output is returned as a raw string.
+```
 from langchain_core.output_parsers \
 import StrOutputParser
 
 output_parser = StrOutputParser()
-The StrOutputParser is used to handle the output from your model and parse it as a straightforward string. This is useful when working with responses that don't require complex parsing or structuring. StrOutputParser will ensure that the model's output is returned as a raw string.
-
-Chaining the Components
-Finally, you can now combine your components into a single chain by linking the PromptTemplate, ChatOpenAI model, and StrOutputParser. This chaining approach allows a streamlined pipeline where you can input a question, have it processed through each component, and receive a parsed response.
-
- 
+```
+6. Chaining the Components into a single chain.
+   * Allows a streamlined pipeline where you can input a question, have it processed through each component, and receive a parsed response.
+   * the | operator is used to combine multiple components into a chain.
+   * This “piping” operator allows you to create a seamless workflow where the output of one component is automatically passed as the input to the next.
+``` 
 # create the chain
 chain = prompt | model | output_parser
-In LangChain, the | operator is used to combine multiple components (such as PromptTemplate, ChatOpenAI, and StrOutputParser) into a chain. This “piping” operator allows you to create a seamless workflow where the output of one component is automatically passed as the input to the next.
-
-Invoking the Chain
-To use the chain to answer a question, call its invoke() method and pass in a dictionary containing the question key and setting its value to the question you're asking:
-
- 
+```
+7. Invoking the Chain
+   * Call invoke() method and pass in a dictionary containing the question key and setting its value to the question.
+   * The invoke() method returns the final processed output after it flows through each component in the chain.
+   * This invoke() method simplifies the interaction with your LangChain application by handling all components in sequence and directly providing the final answer.
+```
 chain.invoke({"question": "Who is Steve Jobs?"})
-The invoke() method in LangChain returns the final processed output after it flows through each component in the chain. You will see something like the following:
+```
 
-[AI Response]
+### Maintaining Conversations with Memory
+* ChatGPT understand and can handle follow-up questions seamlessly because it uses memory to keep track of the conversation.
+* For example, after asking, “Who is Steve Jobs?” follow up with, “Companies he founded?” ChatGPT understands that “he” refers to Steve Jobs and can provide relevant information.
+* To maintain a conversation with the model, use the ConversationBufferMemory component in LangChain.
+   * The ConversationBufferMemory component helps store the ongoing conversation's context, allowing the model to remember previous inputs and responses.
+   * This memory buffer enables the model to refer back to earlier parts of the conversation, making follow-up questions and references more coherent.
 
- 
-Steve Jobs was an American entrepreneur, inventor, and business magnate best 
-known as the co-founder of Apple Inc. He was born on February 24, 1955, and 
-passed away on October 5, 2011. Jobs played a crucial role in the development 
-of revolutionary products such as the Macintosh computer, iPod, iPhone, and 
-iPad. He was known for his visionary approach to technology and design, as 
-well as his emphasis on user experience. In addition to his work at Apple, 
-Jobs was also the CEO of Pixar Animation Studios and played a significant 
-role in the production of acclaimed films like "Toy Story." His leadership 
-style and focus on innovation have left a lasting impact on the technology 
-industry and popular culture.
-This invoke() method simplifies the interaction with your LangChain application by handling all components in sequence and directly providing the final answer.
-
-Maintaining Conversations with Memory
-If you've used ChatGPT before, you know it can handle follow-up questions seamlessly. For example, after asking, “Who is Steve Jobs?” you might follow up with, “What are some of the companies he founded?” ChatGPT understands that “he” refers to Steve Jobs and can provide relevant information about the companies he founded. This ability to maintain context across questions is possible because ChatGPT uses memory to keep track of the conversation.
-
-The LangChain application that you built earlier, however, doesn't have memory of the previous conversation. To prove that, ask a follow-up question:
-
- 
-chain.invoke({"question": 
-              "What company did he found?"}) 
-And you will get the following response from the model:
-
-[AI Response]
-
- 
-Could you please provide more context or specify who you are referring 
-to? This will help me give you a more accurate answer.
-To maintain a conversation with the model, you can use the ConversationBufferMemory component in LangChain. The ConversationBufferMemory component helps store the ongoing conversation's context, allowing the model to remember previous inputs and responses. This memory buffer enables the model to refer back to earlier parts of the conversation, making follow-up questions and references more coherent.
-
-To maintain a conversation effectively, you should modify the prompt template to include two placeholders: one for the conversation history and one for the current question. This structure allows the model to consider the entire context of the conversation when generating a response:
-
- 
+8. To maintain a conversation effectively, modify the prompt template to include two placeholders: one for the conversation history and one for the current question.
+```
 # Define the prompt template
 template = '''
 Previous conversation: {history}
@@ -129,37 +104,37 @@ Answer: '''
 prompt = PromptTemplate(template = template,
     input_variables = ['history', 'question']
 )
-To store the history of the conversation, create an instance of the ConversationBufferMemory class:
-
- 
+```
+9. To store the history of the conversation, create an instance of the ConversationBufferMemory class:
+```
 # Set up conversational memory
 memory = ConversationBufferMemory()
-To retrieve the history of the conversation whenever you ask the model a question, you can use the following statement:
-
- 
+```
+10. To retrieve the history of the conversation whenever you ask the model a question, you can use the following statement:
+``` 
 memory.load_memory_variables({})["history"]}
-Here's how the above statement works:
-
-memory.load_memory_variables({}): This method retrieves the current memory variables stored in the ConversationBufferMemory. By passing an empty dictionary, you are requesting all memory variables without any filters.
-[“history”]: This accesses the specific history variable from the retrieved memory. It provides the entire context of the conversation up to that point.
-So now when you ask a question, you create a dictionary with two keys: question and history:
-
- 
+```
+   * Here's how the above statement works:
+      * memory.load_memory_variables({}): It retrieves the current memory variables stored in the ConversationBufferMemory.
+      * By passing an empty dictionary, you are requesting all memory variables without any filters.
+      * [“history”]: This accesses the specific history variable from the retrieved memory. It provides the entire context of the conversation up to that point.
+11. So now when you ask a question, you create a dictionary with two keys: question and history:
+   * Whenever you ask a question, you are also passing back the history of the conversation to the model so that it can provide the context for the current question.
+```
 response = chain.invoke(
     {"question" : question, 
       "history" : memory.load_memory_variables({})["history"]} )
 print(response)
-Essentially, whenever you ask a question, you are also passing back the history of the conversation to the model so that it can provide the context for the current question.
-
-When the model returns a response, you should save the context to the ConversationBufferMemory instance using the save_context() method. This method allows you to store both the question and the answer, thereby updating the conversation history. Here's how you can do this:
-
- 
+```
+12. When the model returns a response, save the context to the ConversationBufferMemory instance using the save_context() method. It allows to store both the question and the answer
+```
 memory.save_context(
     {"question": question}, 
     {"answer": response} )
-Listing 1 shows the complete application that can maintain a conversation with the model.
+```
 
-Listing 1: Maintaining a conversation with the model
+### Complete Code that can maintain a conversation with the model.
+```
 from langchain.memory import ConversationBufferMemory
 from langchain_core.output_parsers import StrOutputParser
 from langchain_openai import ChatOpenAI
@@ -205,22 +180,7 @@ print(response)
 
 memory.save_context({"question": question}, 
                     {"answer": response})
-Two questions were asked. The model prints out the following output:
-
-[AI Response]
-
- 
-Steve Jobs was an American entrepreneur, inventor, and business magnate best 
-known for co-founding Apple Inc. in 1976. He played a key role in the 
-development of revolutionary products such as the Macintosh computer, iPod, 
-iPhone, and iPad, which helped to transform the technology and consumer 
-electronics industries. Jobs was known for his visionary leadership, 
-design-focused approach, and emphasis on user experience. He was also 
-the CEO of Pixar Animation Studios, contributing to the success of 
-animated films like "Toy Story." Jobs passed away on October 5, 2011, 
-but his legacy continues to influence technology and design today.
-
-Steve Jobs co-founded Apple Inc. in 1976.
+```
 The ConversationBufferMemory class provides two ways to access the chat history:
 
 memory.load_memory_variables({})[“history”] provides a formatted and concise view of the conversation history, ideal for use in prompts.
