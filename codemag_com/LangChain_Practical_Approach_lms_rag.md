@@ -12,8 +12,8 @@
 ## LangChain Example
 1. Install libraries
 ```
-!pip install langchain
-!pip install langchain-openai
+pip install langchain
+pip install langchain-openai
 ```
 2. Using LLMs from OpenAI
 ```
@@ -85,9 +85,55 @@ chain = prompt | model | output_parser
 chain.invoke({"question": "Who is Steve Jobs?"})
 ```
 
+* Complete Code with Azure OPEN AI
+```
+import os
+from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_openai import AzureChatOpenAI
+
+azure_endpoint = "https://egptus2.openai.azure.com"
+azure_deployment = "EGPT-4.1"
+azure_api_key = "UM0NJQQJ9PP"
+azure_api_version= "2024-09-01-preview"
+
+# azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+# azure_api_key = os.getenv("AZURE_OPENAI_API_KEY")
+# azure_api_version = os.getenv("AZURE_OPENAI_API_VERSION")
+# azure_deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT")
+
+template = '''
+Question: {question}
+Answer: '''
+
+prompt = PromptTemplate(
+    template = template,
+    input_variables = ['question']
+)
+
+model = AzureChatOpenAI(
+    azure_endpoint=azure_endpoint,
+    api_key=azure_api_key,
+    api_version=azure_api_version,
+    azure_deployment=azure_deployment,
+    temperature=0,
+)
+
+output_parser = StrOutputParser()
+
+chain = prompt | model | output_parser
+
+response = chain.invoke({"question": "Who is Steve Jobs?"})
+print(response)
+
+response= chain.invoke({"question":  "What company did he found?"}) 
+print(response)
+```
+
 ### Maintaining Conversations with Memory
 * ChatGPT understand and can handle follow-up questions seamlessly because it uses memory to keep track of the conversation.
 * For example, after asking, “Who is Steve Jobs?” follow up with, “Companies he founded?” ChatGPT understands that “he” refers to Steve Jobs and can provide relevant information.
+* <img width="200" height="100" alt="image" src="https://github.com/user-attachments/assets/5c20b85e-9899-4159-a07b-333ab524139d" />
 * To maintain a conversation with the model, use the ConversationBufferMemory component in LangChain.
    * The ConversationBufferMemory component helps store the ongoing conversation's context, allowing the model to remember previous inputs and responses.
    * This memory buffer enables the model to refer back to earlier parts of the conversation, making follow-up questions and references more coherent.
@@ -131,6 +177,71 @@ print(response)
 memory.save_context(
     {"question": question}, 
     {"answer": response} )
+```
+
+### Complete code with Azure OPEN AI
+```
+import os
+from langchain_classic.prompts import PromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_openai import AzureChatOpenAI
+from langchain_classic.memory import ConversationBufferMemory
+
+azure_endpoint = "https://egptus2.openai.azure.com"
+azure_deployment = "EGPT-4.1"
+azure_api_key = "UM0NJQQJ9PP"
+azure_api_version= "2024-09-01-preview"
+
+# azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+# azure_api_key = os.getenv("AZURE_OPENAI_API_KEY")
+# azure_api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-09-01-preview")
+# azure_deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT", "EnservioGPT-4.1")
+
+# Define the prompt template
+template = '''
+Previous conversation: {history}
+Question: {question}
+Answer: '''
+
+# Create the PromptTemplate with history
+prompt = PromptTemplate(template = template,
+    input_variables = ['history', 'question']
+)
+
+# Set up conversational memory
+memory = ConversationBufferMemory()
+
+memory.load_memory_variables({})["history"]
+
+model = AzureChatOpenAI(
+    azure_endpoint=azure_endpoint,
+    api_key=azure_api_key,
+    api_version=azure_api_version,
+    azure_deployment=azure_deployment,
+    temperature=0,
+)
+
+output_parser = StrOutputParser()
+
+chain = prompt | model | output_parser
+
+# Invoke the chain with a question and the memory 
+# will track history
+question = "Who is Steve Jobs?"
+response = chain.invoke({"question" : question, 
+     "history" : memory.load_memory_variables({})["history"]})
+print(response)
+
+memory.save_context({"question": question}, {"answer": response} )
+
+# Ask another question to continue the conversation
+question = "What company did he found?"
+response = chain.invoke({"question": question,
+                        "history": memory.load_memory_variables(
+                          {})["history"]})
+print(response)
+
+memory.save_context({"question": question}, {"answer": response})
 ```
 
 ### Complete Code that can maintain a conversation with the model.
@@ -181,31 +292,17 @@ print(response)
 memory.save_context({"question": question}, 
                     {"answer": response})
 ```
-The ConversationBufferMemory class provides two ways to access the chat history:
+* The ConversationBufferMemory class provides two ways to access the chat history:
+   * memory.load_memory_variables({})[“history”] provides a formatted and concise view of the conversation history, ideal for use in prompts.
+   * memory.chat_memory.messages gives direct access to the raw messages in a structured format, suitable for deeper inspection or manipulation.
+      * Observe that each question contains two objects: HumanMessage (question asked by the user) and AIMessage (response from the model).
+     ```
+     [HumanMessage(content='Who is Steve Jobs?'),
+     AIMessage(content='Steve Jobs was an American entrepreneur, ''' today.'),
 
-memory.load_memory_variables({})[“history”] provides a formatted and concise view of the conversation history, ideal for use in prompts.
-memory.chat_memory.messages gives direct access to the raw messages in a structured format, suitable for deeper inspection or manipulation.
-Let's examine the result returned by memory.chat_memory.messages:
-
- 
-[HumanMessage(content='Who is Steve Jobs?'),
- AIMessage(content='Steve Jobs was an American entrepreneur, 
- inventor, and business magnate best known for co-founding Apple 
- Inc. in 1976. He played a key role in the development of 
-revolutionary products such as the Macintosh computer, iPod, 
-iPhone, and iPad, which helped to transform the technology and 
-consumer electronics industries. Jobs was known for his visionary 
-leadership, design-focused approach, and emphasis on user 
-experience. He was also the CEO of Pixar Animation Studios, 
-contributing to the success of animated films like "Toy Story." 
-Jobs passed away on October 5, 2011, but his legacy continues to 
-influence technology and design today.'),
-
-HumanMessage(content='What company did he found?'),
-AIMessage(content='Steve Jobs co-founded Apple Inc.
-in 1976.')]
-Observe that each question contains two objects: HumanMessage (question asked by the user) and AIMessage (response from the model).
-
+      HumanMessage(content='What company did he found?'),
+      AIMessage(content='Steve Jobs co-founded Apple Inc. in 1976.')]
+     ```
 Sticking within the LLM Context Size
 Although using a ConversationBufferMemory object to maintain an ongoing conversation by passing back the history can be effective, there is one potential problem: memory overload or context length limitations. Most language models, including those based on the GPT architecture, have a maximum token limit for the input they can process at one time. If the conversation history becomes too lengthy, you may exceed this token limit. Also, as the context grows, the computational load increases. This can lead to slower responses and increased resource consumption, affecting the performance of your application.
 
