@@ -303,51 +303,46 @@ memory.save_context({"question": question},
       HumanMessage(content='What company did he found?'),
       AIMessage(content='Steve Jobs co-founded Apple Inc. in 1976.')]
      ```
-Sticking within the LLM Context Size
-Although using a ConversationBufferMemory object to maintain an ongoing conversation by passing back the history can be effective, there is one potential problem: memory overload or context length limitations. Most language models, including those based on the GPT architecture, have a maximum token limit for the input they can process at one time. If the conversation history becomes too lengthy, you may exceed this token limit. Also, as the context grows, the computational load increases. This can lead to slower responses and increased resource consumption, affecting the performance of your application.
-
-There are a couple of techniques to prevent context length limitations. Here are the two most common ways to resolve this issue:
-
-Truncating the chat history: Limit the conversation history to the most recent exchanges.
-Summarizing the past interactions: Instead of including the full conversations in the past, summarize them to keep the context.
-With the first approach, you can send in only the most recent two messages by filtering the last two messages, like this:
-
- 
-response = chain.invoke(
-    {"question": question,
-     "history" : memory.chat_memory.messages[-2 * 2:]})
-Remember, each conversation has two components HumanMessage and AIMessage. Hence you need to multiply by two in the above statement.
-
-For the second approach, the idea is that once the conversation history becomes too lengthy, you should summarize the previous interactions into a more concise format. This helps manage memory usage and maintain a relevant context without overwhelming the model with excessive detail. Listing 2 shows how you can make use of the Hugging Face transformers' pipeline object to perform the summarization:
-
-Listing 2: Summarizing the history using Hugging Face transformers' pipeline object
-from transformers import pipeline
-    
-def summarize_history():
-    long_history = memory.load_memory_variables({})["history"]
-
-    # load the model to perform summarization
-    summarizer = pipeline("summarization", 
-                          model="facebook/bart-large-cnn")
-    summary = summarizer(long_history, 
-                         max_length=150, 
-                         min_length=30, 
-                         do_sample=False)
-
-    # clear the memory after summarizing
-    memory.clear()
-
-    # Save summarized context
-    memory.save_context(
-        { "summary": summary[0]['summary_text'] },
-        { "answer": "" })
-Note that you need to install the transformers library using the pip command:
-
- 
-!pip install transformers
-You can now modify your program so that if the history contains more than four questions, summarize the history by calling the summarize_history() function (see Listing 3).
-
-Listing 3: Modifying the code to summarize the chat history if it has more than four history entries
+     
+## Sticking within the LLM Context Size
+* using a ConversationBufferMemory object, there is one potential problem: memory overload or context length limitations.
+* Most LMs (including the GPT), have a maximum token limit for the input they can process at one time.
+* If the conversation history becomes too lengthy, you may exceed this token limit.
+* Context grows, the computational load increases. This can lead to slower responses and increased resource consumption, affecting the performance of your application.
+* Couple of techniques to prevent context length limitations. Here are the two most common ways to resolve this issue:
+    * 1st Approach: Truncating the chat history: Limit the conversation history to the most recent exchanges.
+    * 2nd Approach: Summarizing the past interactions: Instead of including the full conversations in the past, summarize them to keep the context.
+* 1st approach, send in only the most recent two messages by filtering the last two messages, like this:
+   * Each conversation has two components HumanMessage and AIMessage. Hence you need to multiply by two in the above statement.
+      ```
+      response = chain.invoke(
+          {"question": question,
+           "history" : memory.chat_memory.messages[-2 * 2:]})
+      ```
+* 2nd approach, the idea is that once the conversation history becomes too lengthy, you should summarize the previous interactions into a more concise format.
+     * This helps manage memory usage and maintain a relevant context without overwhelming the model with excessive detail.
+     * Use of the Hugging Face transformers' pipeline (``` !pip install transformers ```) object to perform the summarization
+     * "summarization" is not working, facebook removed use different text
+     ```
+         from transformers import pipeline
+             
+         def summarize_history():
+             long_history = memory.load_memory_variables({})["history"]
+         
+             # load the model to perform summarization
+             summarizer = pipeline("summarization",  model="facebook/bart-large-cnn")
+             summary = summarizer(long_history, max_length=150,  min_length=30,  do_sample=False)
+         
+             # clear the memory after summarizing
+             memory.clear()
+         
+             # Save summarized context
+             memory.save_context(
+                 { "summary": summary[0]['summary_text'] },
+                 { "answer": "" })
+      ```
+13. Code to summarize the chat history if it has more than four history entries
+```
 while True:
     question = input('Question: ')
     if question.lower() == 'quit': break
@@ -363,12 +358,12 @@ while True:
     
     # if more then 4 messages, summarize the history
     if len(memory.chat_memory.messages) > 8: summarize_history()
-You can now chat for as long as you want!
+```
 
-Asking Multiple Questions
-The invoke() method allows you to pass a question to the chain. Instead of passing this method a single dictionary, you can pass it a list of dictionaries if you want to ask multiple questions in one go. Listing 4 shows how this is done.
-
-Listing 4: Asking multiple questions at once
+## Asking Multiple Questions
+* The invoke() method allows you to pass a question to the chain.
+* Instead of passing this method a single dictionary, you can pass it a list of dictionaries if you want to ask multiple questions in one go.
+```
 from langchain import PromptTemplate
 from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers \
@@ -397,25 +392,14 @@ qs = [
 # ask multiple qns
 res = chain.invoke(qs)
 print(res)
-Based on the questions, the chain returns the following result:
+```
 
-[AI Response]
-
- 
-1. The population of Singapore is approximately 5.6 million people as 
-of 2023.
-2. The question of whether the egg or chicken came first is a philosophical 
-and scientific debate. From a biological perspective, it's generally accepted 
-that the egg came first, as birds evolved from reptiles, which laid eggs 
-long before chickens existed.
-Prompt for Language Translation
-Up to this point, the examples have primarily focused on querying the language model (LLM) with questions. However, you can enhance the functionality of the prompt template to facilitate task-oriented requests. For instance, you can modify the prompt to instruct the LLM to perform specific tasks, such as translating a sentence from one language to another. By adjusting the prompt structure, you enable the model to understand the context of the task and respond accordingly, effectively broadening the scope of interactions beyond mere inquiries.
-
-The example shown in Listing 5 demonstrates how to create a translation chain, which integrates a prompt template, a language model, and an output parser to facilitate translating sentences between languages.
-
-Listing 5: Modifying the prompt for language translation task
-from langchain_core.output_parsers \
-import StrOutputParser
+## Prompt for Language Translation
+* Enhance the functionality of the prompt template to facilitate task-oriented requests.
+* Modify the prompt to instruct the LLM to perform specific tasks, such as translating a sentence from one language to another.
+* Create a translation chain, which integrates a prompt template, a language model, and an output parser to facilitate translating sentences between languages.
+```
+from langchain_core.output_parsers import StrOutputParser
 from langchain_openai import ChatOpenAI
 from langchain import PromptTemplate
 
@@ -426,13 +410,10 @@ Translation:
 '''
 
 prompt = PromptTemplate(template = template,
-    input_variables = ['source_language','target_language',
-                       'sentence']
+    input_variables = ['source_language','target_language', 'sentence']
 )
 
-chain = prompt | \
-        ChatOpenAI(model="gpt-4o-mini") | \
-        StrOutputParser()
+chain = prompt |  ChatOpenAI(model="gpt-4o-mini") | StrOutputParser()
 
 chain.invoke(
     {
@@ -440,20 +421,15 @@ chain.invoke(
         'target_language':'Chinese',
         'sentence':'How are you'
     })
-The PromptTemplate is structured to take in the source language, target language, and the sentence to be translated. The code allows users to invoke the chain with specific input values, resulting in the desired translation. In this example, the English sentence “How are you?” is translated into Chinese.
-
-The chain returns this translation: Hello 你好吗.
-
-Advertisement
-
-Exploring Alternatives to OpenAI LLMs
-Until now, our focus has been on OpenAI's large language models (LLMs). Although these models deliver excellent results, they also involve operational expenses. A viable alternative to consider is leveraging models from Hugging Face, which can provide similar capabilities without the associated costs.
-
-To make use of the Hugging Face models in LangChain, you need to install the following libraries:
-
- 
+```
+## Exploring Alternatives to OpenAI LLMs
+* Used OpenAI's LLMs, it deliver excellent results, they also involve operational expenses.
+* Alternative to consider is leveraging models from Hugging Face, which can provide similar capabilities without the associated costs.
+* Use of the Hugging Face models in LangChain, you need to install the following libraries:
+```
 !pip install langchain_community
 !pip install langchain-huggingface
+```
 Listing 6 shows how you use the HuggingFaceEndPoint class to use the tiiuae/falcon-7b-instruct model to answer questions.
 
 Listing 6: Using the Hugging Face LLM for the LangChain application
