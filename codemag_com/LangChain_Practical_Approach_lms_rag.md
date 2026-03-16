@@ -422,23 +422,21 @@ chain.invoke(
         'sentence':'How are you'
     })
 ```
-## Exploring Alternatives to OpenAI LLMs
+## Exploring Hugging Face - Alternatives to OpenAI LLMs
 * Used OpenAI's LLMs, it deliver excellent results, they also involve operational expenses.
-* Alternative to consider is leveraging models from Hugging Face, which can provide similar capabilities without the associated costs.
-* Use of the Hugging Face models in LangChain, you need to install the following libraries:
+* Hugging Face, which can provide similar capabilities without the associated costs.
 ```
 !pip install langchain_community
 !pip install langchain-huggingface
 ```
-Listing 6 shows how you use the HuggingFaceEndPoint class to use the tiiuae/falcon-7b-instruct model to answer questions.
-
-Listing 6: Using the Hugging Face LLM for the LangChain application
+* Use the tiiuae/falcon-7b-instruct model to answer questions, featuring approximately 7 billion parameters designed for instruction-based tasks.
+* It suitable for various natural language processing applications such as answering questions, generating text, summarizing content, and engaging in dialogue.
+```
 import os
 from langchain import PromptTemplate
 from langchain_huggingface import HuggingFaceEndpoint
 from langchain_core.output_parsers import StrOutputParser
 
-# replace with your own access token
 os.environ['HUGGINGFACEHUB_API_TOKEN'] = 'Hugging Face token'
 
 template = '''
@@ -457,48 +455,185 @@ hub_llm = HuggingFaceEndpoint(repo_id = 'tiiuae/falcon-7b-instruct',
 
 chain = prompt | hub_llm | StrOutputParser()
 chain.invoke({"question": "Who is Steve Jobs?"})
-The tiiuae/falcon-7b-instruct model is a large language model developed by the Technology Innovation Institute, featuring approximately 7 billion parameters designed for instruction-based tasks. It excels in understanding and following instructions, making it suitable for various natural language processing applications such as answering questions, generating text, summarizing content, and engaging in dialogue.
+```
 
-Note that when you use the HuggingFaceEndPoint class, the inferencing is performed on Hugging Face's server. You will see the following printout from the application:
+## Implementing Retrieval-Augmented Generation (RAG) with LangChain
+* RAG is a robust technique in natural language processing that synergizes the retrieval of relevant information with the generation of contextually appropriate responses.
+* This combination enhances tasks such as question answering, dialogue generation, and content creation, allowing organizations to deliver more accurate and pertinent answers to user queries.
+* In the previous examples, the LLMs used were pre-trained on a static dataset, which restricts their knowledge to the information available at the time of training.
+* This limitation can hinder their ability to provide up-to-date or specific answers, especially when dealing with rapidly changing information or niche topics.
+* RAG addresses this challenge by integrating real-time data retrieval, enabling models to access and incorporate fresh information into their responses.
 
- 
-\nSteve Jobs was an American entrepreneur who co-founded Apple Inc. and was 
-instrumental in the creation of the personal computer and the development of 
-the digital media industry. He is widely considered one of the most 
-influential innovators of the 20th century.
-Implementing RAG with LangChain
-Retrieval-Augmented Generation (RAG) is a robust technique in natural language processing that synergizes the retrieval of relevant information with the generation of contextually appropriate responses. This combination enhances tasks such as question answering, dialogue generation, and content creation, allowing organizations to deliver more accurate and pertinent answers to user queries. In the previous examples, the large language models (LLMs) used were pre-trained on a static dataset, which restricts their knowledge to the information available at the time of training. This limitation can hinder their ability to provide up-to-date or specific answers, especially when dealing with rapidly changing information or niche topics. RAG addresses this challenge by integrating real-time data retrieval, enabling models to access and incorporate fresh information into their responses.
-
-In this section, I'll guide you through the process of creating a RAG application using LangChain. In this example, I'll provide a long paragraph of text as the input and leverage a large language model (LLM) to answer questions related to that text. This approach will demonstrate how RAG can enhance the model's ability to generate accurate and contextually relevant responses by combining the retrieval of information with generative capabilities. In a real-world scenario, this example could be expanded to handle documents stored in various formats, such as PDF, Word, or plain text. By integrating document loaders and retrieval mechanisms, the application could process and extract relevant information from these files, enabling the language model to answer questions based on a much broader range of sources. This extension makes the RAG approach especially useful for applications in knowledge management, customer support, and research, where information often exists in diverse document formats.
-
-Installing the Libraries
-For this example, you need to install the following libraries:
-
- 
+* In a real-world scenario, this example could be expanded to handle documents stored in various formats, such as PDF, Word, or plain text.
+* By integrating document loaders and retrieval mechanisms, the application could process and extract relevant information from these files, enabling the language model to answer questions based on a much broader range of sources.
+* This extension makes the RAG approach especially useful for applications in knowledge management, customer support, and research, where information often exists in diverse document formats.
+1. Install Library
+```
 !pip install langchain docarray tiktoken
-Once the libraries are installed, import the relevant modules:
-
- 
-from langchain_community.vectorstores import \
-    DocArrayInMemorySearch
-from langchain_core.output_parsers import \
-    StrOutputParser
-from langchain_core.prompts import \
-    ChatPromptTemplate
-from langchain_core.runnables import \
-    RunnableParallel, RunnablePassthrough
+```
+2. import the relevant modules
+```
+from langchain_community.vectorstores import DocArrayInMemorySearch
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnableParallel, RunnablePassthrough
 from langchain_openai import OpenAIEmbeddings
 from langchain_openai import ChatOpenAI
 import os
-You also need to ensure that your OpenAI API key is set:
 
- 
-# replace with your own API Key
 os.environ['OPENAI_API_KEY'] = "OpenAI API Key"
-Defining the Text
-Next, define a variable called text (see Listing 7) to store a paragraph that provides information about diabetes. You'll use this paragraph as the reference content for the Retrieval-Augmented Generation (RAG) application, allowing the model to answer questions based on this specific text.
+```
+### Defining the Text 
+3. Use the below diabletes paragraph as the reference content for the RAG application, allowing the model to answer questions based on this specific text.
+```
+text = '''
+Diabetes mellitus is a chronic metabolic disorder 
+'''
+ssociated with the disease.
+'''
+```
+### Steps to Performing RAG 
+   * To get a LLM to answer questions based on a specific document, follow these steps:
+   * Perform word vector embeddings on the document: Word vector embeddings convert the document text into a numerical representation that captures the semantic meaning of the words and sentences.
+        * This allows the model to understand relationships between concepts in the document, making it easier to retrieve relevant information.
+        * Each sentence or passage is transformed into a vector, which helps locate information relevant to the question.
+   * Store the embeddings in a vector database: After creating embeddings for each segment of the document, store them in a vector database (e.g., Pinecone, Weaviate, or FAISS).
+        * This database indexes the embeddings, enabling quick and efficient retrieval based on semantic similarity.
+   * Retrieve relevant document sections: Search the vector database for sections of the document with embeddings similar to the question's embedding.
+        * This retrieves the most contextually relevant parts of the document.
+   * Pass retrieved sections to the LLM for answer generation: Finally, pass the retrieved sections along with the question to the LLM.
+        * By doing this, the model can generate an informed answer based on the content of the document rather than relying solely on its pre-trained knowledge.
+   * <img width="550" height="350" alt="image" src="https://github.com/user-attachments/assets/40d19c41-8a43-477e-96fd-1e21c706e345" />
 
-Listing 7: The variable containing the block of text
+### Chunking with Overlaps
+   * Before performing word vector embeddings, it's important to break down the documents into chunks because of:
+   * Context Size Limits: LLMs and vector databases have constraints on the length of text they can process at once.
+         * Chunking ensures that each segment stays within these limits, preventing issues with model input size and vector database compatibility.
+   * Improved Semantic Representation: Smaller, focused chunks allow for more precise embeddings that capture specific meanings, enhancing the accuracy of similarity searches.
+         * Larger segments may combine too many ideas, making it difficult for the model to retrieve the most relevant information.
+   * Efficient Retrieval: Chunking enables a more targeted retrieval process.
+         * When a user asks a question, smaller segments can be selectively retrieved based on relevance.
+         * This makes retrieval faster and prevents overwhelming the model with unnecessary information.
+   
+   * <img width="600" height="250" alt="image" src="https://github.com/user-attachments/assets/2a93711b-7d3a-4313-8a52-4986918b0418" />
+   * Document is typically broken down into chunks with overlap, which involves dividing a block of text into segments that share a portion of their content.
+   * This method is particularly beneficial for maintaining context across adjacent chunks, ensuring that critical information is not lost during processing.
+   * By including overlapping sections, the model can better understand relationships between sentences and provide more accurate responses to queries, especially when dealing with complex topics that span multiple segments.
+
+4. Splits a block of text into a specific chunk size with a specific number of sentence to overlap.
+```
+def split_text_with_overlap(text, chunk_size, overlap_size):
+    # Split the text into sentences
+    sentences = text.split('. ')
+    chunks = []
+    current_chunk = ""
+
+    for sentence in sentences:
+        # Check if adding this sentence exceeds the chunk size
+        if len(current_chunk) + len(sentence) + 1 <= chunk_size:
+            if current_chunk:  # If it's not the first sentence
+                current_chunk += ". "
+            current_chunk += sentence
+        else:
+            # Store the current chunk
+            chunks.append(current_chunk.strip())
+            # Create a new chunk with the overlap
+            # Add the last `overlap_size` sentences from 
+            # the current chunk
+            overlap_sentences = \
+                current_chunk.split('. ')[-overlap_size:]
+            current_chunk = '. '.join(overlap_sentences) + \
+                            ". " + sentence
+
+    # Add any remaining chunk
+    if current_chunk:
+        chunks.append(current_chunk.strip())
+
+    return chunks
+
+# Define chunk size and overlap size
+chunk_size = 300  
+overlap_size = 1  # Number of sentences to overlap
+
+# Split the text into chunks with overlap
+text_chunks = split_text_with_overlap(
+                  text, chunk_size, overlap_size)
+
+# Print the resulting chunks
+for i, chunk in enumerate(text_chunks):
+    print(f"Chunk {i+1}:\n{chunk}\n")
+```
+   * <img width="250" height="400" alt="image" src="https://github.com/user-attachments/assets/15a135f9-db33-4d9e-8c30-f42fb0f56bac" />
+5. DocArrayInMemorySearch class to store document embeddings in memory for efficient similarity search:
+``` 
+# creates an DocArrayInMemorySearch store and 
+# insert data
+vectorstore = DocArrayInMemorySearch.from_texts(
+    text_chunks,
+    embedding = OpenAIEmbeddings(),
+)
+```
+### Use the chunks and perform word vector embeddings using the OpenAIEmbeddings class.
+   * OpenAIEmbeddings is a class provided by LangChain that allows you to generate vector embeddings for text using OpenAI's models.
+   * These embeddings are vector representations that capture the semantic meaning of the text, enabling efficient similarity searches, document retrieval, and other natural language processing (NLP) tasks where understanding the meaning of text is crucial.
+
+### Creating a Retriever Object
+6. Convert the vector store into a retriever object, which can be used to search and retrieve relevant documents based on a query:
+   * A retriever object is a component designed to fetch relevant information from a dataset, document collection, or knowledge base based on a given query or context.
+```
+retriever = vectorstore.as_retriever()
+```
+7. Create a LangChain application using the following components: RunnableParallel, PromptTemplate, ChatOpenAI, StrOutputParser
+```
+template = """Answer the question based only on the 
+following context: {context}
+Question: {question}
+"""
+
+# uses a model from OpenAI
+model = ChatOpenAI(model = "gpt-4o-mini")
+
+# creates the prompt
+prompt = ChatPromptTemplate.from_template(template)
+
+# creats the output parser
+output_parser = StrOutputParser()
+
+# RunnableParallel is used to run multiple processes or operations in parallel
+setup_and_retrieval = RunnableParallel(
+    { 
+        "context": retriever, 
+        "question": RunnablePassthrough()
+    }
+)
+
+# creating the chain
+chain = setup_and_retrieval | prompt | model | output_parser
+```
+   * The component of interest here is the RunnableParallel component. RunnableParallel is a class in LangChain that allows you to execute multiple tasks or operations in parallel:
+   * In this implementation, the setup_and_retrieval object is designed to handle two parallel tasks: retrieving context from a retriever and passing through a question without any modifications.
+   ```
+   setup_and_retrieval = RunnableParallel(
+       { 
+           "context": retriever, 
+           "question": RunnablePassthrough()
+       }
+   )
+   ```
+8. start asking questions pertaining to the block of text:
+```
+chain.invoke('What is Type 2 diabetes?')
+chain.invoke('What causes diabetes?')
+```
+### Complete code with aZURE OPENAI
+```
+from langchain_openai import AzureChatOpenAI
+from langchain_community.vectorstores import DocArrayInMemorySearch
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import  ChatPromptTemplate
+from langchain_core.runnables import RunnableParallel, RunnablePassthrough
+from langchain_openai import  AzureOpenAIEmbeddings
+
 text = '''
 Diabetes mellitus is a chronic metabolic disorder 
 characterized by high blood sugar levels, which can lead
@@ -543,30 +678,14 @@ individuals living with diabetes can lead fulfilling
 lives while minimizing the risk of complications 
 associated with the disease.
 '''
-Steps to Performing RAG
-To get a large language model (LLM) to answer questions based on a specific document, follow these steps:
+    
+azure_endpoint = "https://egptus2.openai.azure.com"
+azure_api_key = "UM0NJQQJ9PP"
+azure_embedding_deployment = "text-embedding-3-small"
+azure_embedding_api_version= "2024-12-01-preview"
+azure_chat_deployment = "EGPT-4.1"
+azure_chat_api_version= "2024-09-01-preview"
 
-Perform word vector embeddings on the document: Word vector embeddings convert the document text into a numerical representation that captures the semantic meaning of the words and sentences. This allows the model to understand relationships between concepts in the document, making it easier to retrieve relevant information. Each sentence or passage is transformed into a vector, which helps locate information relevant to the question.
-Store the embeddings in a vector database: After creating embeddings for each segment of the document, store them in a vector database (e.g., Pinecone, Weaviate, or FAISS). This database indexes the embeddings, enabling quick and efficient retrieval based on semantic similarity.
-Retrieve relevant document sections: Search the vector database for sections of the document with embeddings similar to the question's embedding. This retrieves the most contextually relevant parts of the document.
-Pass retrieved sections to the LLM for answer generation: Finally, pass the retrieved sections along with the question to the LLM. By doing this, the model can generate an informed answer based on the content of the document rather than relying solely on its pre-trained knowledge.
-Figure 2 shows the process.
-
-Figure 2: Steps for performing RAG
-Figure 2: Steps for performing RAG
-Chunking with Overlaps
-Before performing word vector embeddings, it's important to break down the documents into chunks because of:
-
-Context Size Limits: LLMs and vector databases have constraints on the length of text they can process at once. Chunking ensures that each segment stays within these limits, preventing issues with model input size and vector database compatibility.
-Improved Semantic Representation: Smaller, focused chunks allow for more precise embeddings that capture specific meanings, enhancing the accuracy of similarity searches. Larger segments may combine too many ideas, making it difficult for the model to retrieve the most relevant information.
-Efficient Retrieval: Chunking enables a more targeted retrieval process. When a user asks a question, smaller segments can be selectively retrieved based on relevance. This makes retrieval faster and prevents overwhelming the model with unnecessary information.
-Figure 3 shows that a document is typically broken down into chunks with overlap, which involves dividing a block of text into segments that share a portion of their content. This method is particularly beneficial for maintaining context across adjacent chunks, ensuring that critical information is not lost during processing. By including overlapping sections, the model can better understand relationships between sentences and provide more accurate responses to queries, especially when dealing with complex topics that span multiple segments.
-
-Figure 3: Document chunking with overlap
-Figure 3: Document chunking with overlap
-Now that you understand the process, let's define a function named split_text_with_overlap() that splits a block of text into a specific chunk size with a specific number of sentence to overlap (see Listing 8).
-
-Listing 8: Performing chunking with overlap
 def split_text_with_overlap(text, chunk_size, overlap_size):
     # Split the text into sentences
     sentences = text.split('. ')
@@ -585,10 +704,8 @@ def split_text_with_overlap(text, chunk_size, overlap_size):
             # Create a new chunk with the overlap
             # Add the last `overlap_size` sentences from 
             # the current chunk
-            overlap_sentences = \
-                current_chunk.split('. ')[-overlap_size:]
-            current_chunk = '. '.join(overlap_sentences) + \
-                            ". " + sentence
+            overlap_sentences = current_chunk.split('. ')[-overlap_size:]
+            current_chunk = '. '.join(overlap_sentences) +  ". " + sentence
 
     # Add any remaining chunk
     if current_chunk:
@@ -601,52 +718,37 @@ chunk_size = 300
 overlap_size = 1  # Number of sentences to overlap
 
 # Split the text into chunks with overlap
-text_chunks = split_text_with_overlap(
-                  text, chunk_size, overlap_size)
+text_chunks = split_text_with_overlap( text, chunk_size, overlap_size)
 
 # Print the resulting chunks
 for i, chunk in enumerate(text_chunks):
     print(f"Chunk {i+1}:\n{chunk}\n")
-The block of text is now split into 10 chunks (see Figure 4).
 
-Figure 4: The block of text is split into 10 chunks with overlaps
-Figure 4: The block of text is split into 10 chunks with overlaps
-You'll now use the DocArrayInMemorySearch class to store document embeddings in memory for efficient similarity search:
-
- 
 # creates an DocArrayInMemorySearch store and 
 # insert data
-vectorstore = DocArrayInMemorySearch.from_texts(
-    text_chunks,
-    embedding = OpenAIEmbeddings(),
+vectorstore = DocArrayInMemorySearch.from_texts(text_chunks,
+    embedding = AzureOpenAIEmbeddings (
+        azure_endpoint=azure_endpoint,
+        api_key=azure_api_key,
+        api_version=azure_embedding_api_version,
+        azure_deployment=azure_embedding_deployment,
+    ),
 )
-You'll use the chunks that you have created and perform word vector embeddings using the OpenAIEmbeddings class.
 
-OpenAIEmbeddings is a class provided by LangChain that allows you to generate vector embeddings for text using OpenAI's models. These embeddings are vector representations that capture the semantic meaning of the text, enabling efficient similarity searches, document retrieval, and other natural language processing (NLP) tasks where understanding the meaning of text is crucial.
-
-Creating a Retriever Object
-You can now convert the vector store into a retriever object, which can be used to search and retrieve relevant documents based on a query:
-
- 
 retriever = vectorstore.as_retriever()
-A retriever object is a component designed to fetch relevant information from a dataset, document collection, or knowledge base based on a given query or context.
 
-You can now create a LangChain application using the following components:
-
-RunnableParallel
-PromptTemplate
-ChatOpenAI
-StrOutputParser
-Listing 9 shows how the various components are created and then chained together.
-
-Listing 9: Chaining all the components
 template = """Answer the question based only on the 
 following context: {context}
 Question: {question}
 """
 
-# uses a model from OpenAI
-model = ChatOpenAI(model = "gpt-4o-mini")
+model = AzureChatOpenAI(
+    azure_endpoint=azure_endpoint,
+    api_key=azure_api_key,
+    api_version=azure_chat_api_version,
+    azure_deployment=azure_chat_deployment,
+    temperature=0,
+)
 
 # creates the prompt
 prompt = ChatPromptTemplate.from_template(template)
@@ -665,59 +767,13 @@ setup_and_retrieval = RunnableParallel(
 
 # creating the chain
 chain = setup_and_retrieval | prompt | model | output_parser
-The component of interest here is the RunnableParallel component. RunnableParallel is a class in LangChain that allows you to execute multiple tasks or operations in parallel:
 
- 
-setup_and_retrieval = RunnableParallel(
-    { 
-        "context": retriever, 
-        "question": RunnablePassthrough()
-    }
-)
-In this implementation, the setup_and_retrieval object is designed to handle two parallel tasks: retrieving context from a retriever and passing through a question without any modifications.
+resp = chain.invoke('What is Type 2 diabetes?')
+print(resp)
 
-Creating the Chain
-Finally, the various components are chained together:
-
- 
-chain = setup_and_retrieval | \
-        prompt | \
-        model | \
-        output_parser
-You can now start asking questions pertaining to the block of text:
-
- 
-chain.invoke('What is Type 2 diabetes?')
-You will get the following response:
-
-[AI Response]
-
- 
-Type 2 diabetes is often associated with insulin resistance and is more 
-prevalent in adults, although it is increasingly observed in children 
-and adolescents due to rising obesity rates. It is a chronic metabolic 
-disorder characterized by high blood sugar levels, which can lead 
-to serious health complications if not effectively managed. Risk 
-factors for developing Type 2 diabetes include genetic predisposition, 
-sedentary lifestyle, poor dietary choices, and obesity, particularly 
-visceral fat that contributes to insulin resistance.
-Here's another question:
-
- 
-chain.invoke('What causes diabetes?')
-And you get the following response:
-
-[AI Response]
-
- 
-Diabetes is caused by high blood sugar levels, which can result from 
-various factors. For Type 1 diabetes, it is an autoimmune condition 
-where the immune system attacks insulin-producing beta cells in the 
-pancreas, leading to little or no insulin production. For Type 2 
-diabetes, it is often associated with insulin resistance and is 
-influenced by risk factors such as genetic predisposition, sedentary 
-lifestyle, poor dietary choices, and obesity, particularly visceral 
-fat that contributes to insulin resistance.
+resp = chain.invoke('What causes diabetes?')
+print(resp)
+```
 Changing the Embedding Model
 For the RAG application you've developed so far, you've used OpenAI for the following components:
 
