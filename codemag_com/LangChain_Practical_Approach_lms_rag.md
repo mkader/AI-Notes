@@ -774,44 +774,33 @@ print(resp)
 resp = chain.invoke('What causes diabetes?')
 print(resp)
 ```
-Changing the Embedding Model
-For the RAG application you've developed so far, you've used OpenAI for the following components:
-
-Word vector embeddings: OpenAI's models have been employed to convert text documents into numerical representations (embeddings) that capture the semantic meaning of the text. This allows you to effectively compare and retrieve relevant information based on user queries.
-Large language model (LLM): You've used OpenAI's LLM to generate responses and answer questions based on the retrieved context. This model leverages its training on vast amounts of text to provide coherent and contextually appropriate answers.
-Although OpenAI's models are efficient, using them can come with trade-offs, particularly concerning privacy. When you send data to OpenAI for processing — whether for generating embeddings or responses — there is a potential risk of exposing sensitive information. This is because of:
-
-Data transmission: Queries and documents must be transmitted over the internet to OpenAI's servers, which could expose them to interception or unauthorized access.
-Data storage: Depending on the terms of service, the data you send might be stored by OpenAI for training or improvement purposes, which raises concerns about how that data is used and who has access to it.
-Compliance: Organizations handling sensitive information, especially in regulated industries, may face compliance challenges when using cloud-based solutions, as they need to ensure that they meet data protection regulations.
-For those concerned about privacy, alternative solutions, such as local or self-hosted models (like those from Hugging Face), can be considered. These models allow you to maintain control over your data, ensuring that sensitive information remains within your own infrastructure.
-
-In this section, you'll replace OpenAI's models with those from Hugging Face. First, you'll use the “BAAI/bge-small-en-v1.5” model for embedding:
-
+## Changing the Embedding Model
+* Word vector embeddings: OpenAI's models have been employed to convert text documents into numerical representations (embeddings) that capture the semantic meaning of the text. This allows you to effectively compare and retrieve relevant information based on user queries.
+* LLM: used OpenAI's LLM to generate responses and answer questions based on the retrieved context. This model leverages its training on vast amounts of text to provide coherent and contextually appropriate answers.
+* OpenAI's models are efficient, but concerning data privacy, This is because of:
+   * Data transmission: Queries and documents must be transmitted over the internet to OpenAI's servers, which could expose them to interception or unauthorized access.
+   * Data storage: Depending on the terms of service, the data you send might be stored by OpenAI for training or improvement purposes, which raises concerns about how that data is used and who has access to it.
+   * Compliance: Organizations handling sensitive information, especially in regulated industries, may face compliance challenges when using cloud-based solutions, as they need to ensure that they meet data protection regulations.
+* For those concerned about privacy, alternative solutions, such as local or self-hosted models (like those from Hugging Face), can be considered.
+* These models allow you to maintain control over your data, ensuring that sensitive information remains within your own infrastructure.
+* Use Hugging Face,  “BAAI/bge-small-en-v1.5” model for embedding:
+   * The model is a pre-trained LM developed by the BAAI (Beijing Academy of Artificial Intelligence).
+   * It's part of the BGE (BERT-based generative embedding) series and is designed for various NL processing tasks, including embedding generation.
+```
+from langchain.embeddings import HuggingFaceEmbeddings
+embedding_model = HuggingFaceEmbeddings(model_name="BAAI/bge-small-en-v1.5")
  
-from langchain.embeddings import \ HuggingFaceEmbeddings
-
-embedding_model = \ HuggingFaceEmbeddings(
-    model_name="BAAI/bge-small-en-v1.5")
-The model BAAI/bge-small-en-v1.5 is a pre-trained language model developed by the BAAI (Beijing Academy of Artificial Intelligence). It's part of the BGE (BERT-based generative embedding) series and is designed for various natural language processing tasks, including embedding generation.
-
-Like the example, earlier, you'll use the DocArrayInMemorySearch class to store document embeddings in memory:
-
- 
-from langchain_community.vectorstores import \
-    DocArrayInMemorySearch
+from langchain_community.vectorstores import DocArrayInMemorySearch
 
 vectorstore = DocArrayInMemorySearch.from_texts(text_chunks,
     embedding = embedding_model,
 )
 
 retriever = vectorstore.as_retriever()
-Using the vector store created, you'll create a retriever.
-
-Changing the LLM
-Apart from using a model from Hugging Face for word vector embeddings, you'll also use a large language model (LLM) from Hugging Face to perform the response generation. This allows you to keep the entire pipeline local or within the Hugging Face ecosystem, enhancing data privacy and reducing dependency on external APIs.** Listing 10** shows that you can make use of the facebook/bart-large model via the pipeline object in the transformers library:
-
- 
+```
+* Use a LLM from Hugging Face to perform the response generation. This allows you to keep the entire pipeline local or within the Hugging Face ecosystem, enhancing data privacy and reducing dependency on external APIs.
+* Use of the facebook/bart-large model via the pipeline object in the transformers library:
+``` 
 # Load a Hugging Face pipeline for text generation
 generator = pipeline('text2text-generation', 
                      model='facebook/bart-large',
@@ -820,9 +809,11 @@ generator = pipeline('text2text-generation',
 
 # Create a LangChain LLM wrapper
 model = HuggingFacePipeline(pipeline=generator)
-Listing 10: Changing the LLM to a model hosted by Hugging Face
-from langchain_core.runnables import RunnableParallel, 
-    RunnablePassthrough
+```
+
+```
+# Changing the LLM to a model hosted by Hugging Face
+from langchain_core.runnables import RunnableParallel, RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.llms import HuggingFacePipeline
@@ -863,9 +854,9 @@ setup_and_retrieval = RunnableParallel(
 
 # creating the chain
 chain = setup_and_retrieval | prompt | model | output_parser
-Also note that you can offload the processing to the GPU (for Windows; if you have a supported NVIDIA GPU) or MPS (if you have an Apple Silicon Mac):
-
- 
+```
+* Processing to the GPU (for Windows; if you have a supported NVIDIA GPU) or MPS (if you have an Apple Silicon Mac):
+``` 
 # determine the device
 if torch.backends.mps.is_available():
     # for Apple Silicon Mac
@@ -878,35 +869,12 @@ generator = pipeline('text2text-generation',
                      model='facebook/bart-large',
                      max_length=500,
                      device=device) 
-Using the chain created, you can now ask a question where inference happens locally on your computer. This set up ensures that both the embedding retrieval and the large language model (LLM) processing occur on your own hardware, reducing reliance on external servers and improving data privacy:
-
- 
+```
+* Ask a question where inference happens locally on your computer. This set up ensures that both the embedding retrieval and the LLM processing occur on your own hardware, reducing reliance on external servers and improving data privacy:
+``` 
 chain.invoke('What is diabetes?')
-You'll get a response like the following:
-
-[AI Response]
-
- 
-Human: Answer the question based only on the following 
-context:[Document(page_content='Diabetes mellitus is a chronic metabolic 
-disorder characterized by high blood sugar levels, which can lead to serious 
-health complications if not effectively managed. There are two primary 
-types of diabetes: Type 1 diabetes, which is an autoimmune condition where 
-the immune system mistakenly attacks insulin-producing beta cells in the 
-pancreas, leading to little or no insulin production; and Type 2 diabetes, 
-a type of diabetes that is more often associated with insulin resistance 
-and is more prevalent in adults, though increasingly observed in children 
-and adolescents due to rising obesity rates')]Question: What is diabetes? 
-What is the most common cause of type 2 diabetes?Human: If you can answer 
-this question, please do so in the following way: Document('Diabetes is a 
-disease that affects the body's ability to produce and use insulin, the 
-hormone responsible for regulating blood sugar. It is a condition that can 
-be life-threatening if not properly managed'), Document('Type 2 diabetes 
-is a serious condition')] Document(document('Diagnosis')]Document(document(
-document_title='Type 2 Diabetes')Document(Document_description)Document(
-doc_title)Document_content(document.doc_content)
-Document-content(doc-content-1) Document_content-2(doc)-content-3
-The output from Hugging Face models can vary significantly based on several factors, such as model type, configuration, and input parameters. For example, generation models may produce different styles or lengths of responses based on settings like temperature, max_length, or top_k/top_p sampling parameters. When using Hugging Face models in applications, you may need to tweak these settings or use output parsers to ensure consistency in responses, especially in tasks like question answering or summarization, where stable and contextually relevant outputs are important. I'll leave this topic for another article.
-
-Summary
-In this article, I walked you through the essential components and practical applications of the LangChain framework. It starts with a basic example to establish a foundation, then explores chaining components, managing conversation memory, and using LangChain's memory features to stay within LLM context limits. Additionally, it covers language translation prompts, alternative models beyond OpenAI, and a hands-on guide to implementing Retrieval-Augmented Generation (RAG) for document-based querying. With clear steps on chunking, creating retriever objects, and customizing embeddings, I hope this article provides you with a solid starting point for using LangChain in various NLP tasks.
+```
+* The output from Hugging Face models can vary significantly based on several factors, such as model type, configuration, and input parameters.
+   * For example, generation models may produce different styles or lengths of responses based on settings like temperature, max_length, or top_k/top_p sampling parameters.
+   * Tweak these settings or use output parsers to ensure consistency in responses, especially in tasks like question answering or summarization, where stable and contextually relevant outputs are important.
+to implementing Retrieval-Augmented Generation (RAG) for document-based querying. With clear steps on chunking, creating retriever objects, and customizing embeddings, I hope this article provides you with a solid starting point for using LangChain in various NLP tasks.
