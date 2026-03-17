@@ -192,26 +192,19 @@ agent.run("Open the file named Speakers.json")
 * <img width="400" height="200" alt="image" src="https://github.com/user-attachments/assets/2bf476c0-7075-4dce-866c-f1107f3e4b26" />
 * <img width="450" height="200" alt="image" src="https://github.com/user-attachments/assets/0fd3b57c-fbd4-400f-9468-774a65d0d894" />
 
-Web Search Tool
-In the earlier example, you may find that search results returned by DuckDuckGoSearchTool are often unreliable. A better approach is to create your own search tool using Tavily.
-
-The Tavily API allows you to filter results by type—such as news, academic papers, or recent content—and control how many results are returned. Access requires an API key, which you can obtain at https://www.tavily.com.
-
-Advertisement
-
-The following code snippet shows how you can set up an agent to call a custom Tavily search tool, fetch real-time information, and answer questions using the results combined with the LLM’s reasoning.
-
- 
+## Web Search Tool
+* search results returned by DuckDuckGoSearchTool are often unreliable.
+* A better approach is to create your own search tool using Tavily.
+* The Tavily API (https://www.tavily.com) allows you to filter results — news, academic papers or recent content—and control. Get API key
+```
 import os
 import requests
-from smolagents import ToolCallingAgent, 
-  LiteLLMModel, tool
+from smolagents import ToolCallingAgent, LiteLLMModel, tool
 
 TAVILY_API_KEY = "<TAVILY_API_KEY>"
 
 @tool
-def tavily_search(query: str, 
-                  max_results: int = 5) -> str:
+def tavily_search(query: str, max_results: int = 5) -> str:
     """Perform a web search
     Args:
         query: The search query
@@ -221,15 +214,13 @@ def tavily_search(query: str,
         str: The search result
     """
     url = "https://api.tavily.com/search"
-headers = {"Authorization": f"Bearer
-             {TAVILY_API_KEY}"}
+    headers = {"Authorization": f"Bearer {TAVILY_API_KEY}"}
     payload = {
         "query": query,
         "num_results": max_results
     }
     
-response = requests.post(url, json=payload,
-  headers=headers)
+    response = requests.post(url, json=payload, headers=headers)
     response.raise_for_status()
     return response.json()
 
@@ -238,31 +229,12 @@ model = LiteLLMModel(
     api_base = "https://api.openai.com/v1",
 )
 
-agent = ToolCallingAgent(tools=[tavily_search], 
-                         model = model,
-                         add_base_tools = False)
-
-You can now ask a question like this:
-
+agent = ToolCallingAgent(tools=[tavily_search], model = model, add_base_tools = False)
  
 agent.run("Who won the U.S. presidential election in 2024?")
-
-Figure 5 shows the agent calling the tavily_search() tool.
-
-Figure 5: The agent calling the tavily_search() tool to find answers to the question
-Figure 5: The agent calling the tavily_search() tool to find answers to the question
-In the second step, it will call the final_answer() tool to return the answer (see Figure 6).
-
-Figure 6: The tool calling the final_answer() tool to return the answer
-Figure 6: The tool calling the final_answer() tool to return the answer
-Weather Search Tool
-The next custom tool to build enables the agent to fetch real-time weather information for any location. To accomplish this, you’ll integrate the OpenWeatherMap API, a widely used service that provides current weather data, forecasts, and other meteorological information. You can apply for a free API key from https://openweathermap.org.
-
-By connecting the agent to OpenWeatherMap, it can retrieve up-to-date weather conditions—such as temperature, humidity, wind speed, and precipitation—for a specified city. This allows the agent to answer dynamic, real-world questions like, “What’s the weather in Singapore today?” or “Will it rain in New York tomorrow?”, demonstrating how agents can combine reasoning with live data from external services.
-
-The following code snippet shows how you can set up an agent to call a custom weather search tool and fetch real-time weather information:
-
- 
+```
+## Weather Search Tool - OpenWeatherMap  - https://openweathermap.org
+``` 
 from smolagents import ToolCallingAgent, LiteLLMModel, tool
 import requests
 
@@ -279,8 +251,7 @@ def get_weather_info(city: str) -> str:
     
     api_key = "<OpenWeatherMap_API_key>"
 
-url = f"http://api.openweathermap.org/
-data/2.5/weather?q={city}&appid={api_key}&units=metric"
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
 
     response = requests.get(url)
     if response.status_code == 200:
@@ -288,28 +259,17 @@ data/2.5/weather?q={city}&appid={api_key}&units=metric"
         weather = data["weather"][0]["description"]
         temperature = data["main"]["temp"]
 
-        return f"The weather in {city} is {weather}
-                 with a temperature of {temperature}°C."
+        return f"The weather in {city} is {weather} with a temperature of {temperature}°C."
     else:
         return f"Could not retrieve weather information for {city}."
 
 agent = ToolCallingAgent(tools = [get_weather_info], model = model)
 
-You can now ask a question like this:
-
- 
 agent.run("What is the current weather for Singapore?")
-Figure 7 shows how the agent can fetch the weather for Singapore using this tool.
+```
 
-Figure 7: The agent using the get_weather_info() tool to fetch weather information for a country
-Figure 7: The agent using the get_weather_info() tool to fetch weather information for a country
-Stock Price Tool
-Now that you’ve built several foundational tools (file tools, weather, etc.), the next tool to add to the agent’s toolkit is a Stock Price Search Tool. This tool allows the agent to retrieve the latest stock price for a given ticker symbol—useful for financial queries, dashboards, or automated workflows. To retrieve real-time stock prices, you’ll make use of the Finnhub API. Finnhub provides fast and reliable market data with a simple REST interface, making it ideal for building agent tools.
-
-To use the Finnhub API, you need to sign up for a free API key at finnhub.io. The following code snippet shows how you can set up the agent to call the get_stock_price() as a tool:
-
- 
-
+## Stock Price Tool -  Finnhub API - finnhub.io
+```
 import requests
 
 API_KEY = "<finnhub.io_KEY>"  
@@ -323,24 +283,17 @@ def get_stock_price(symbol:str) -> str:
         str: A string containing the price for the specified stock.
     """
 
-url = f"https://finnhub.io/api/v1/quote?symbol={symbol}&token={API_KEY}"
+    url = f"https://finnhub.io/api/v1/quote?symbol={symbol}&token={API_KEY}"
 
     response = requests.get(url)
     data = response.json()    
-return (f"Current Price of {symbol}: {data['c']}")
+    return (f"Current Price of {symbol}: {data['c']}")
 
 agent = ToolCallingAgent(tools = [get_stock_price], model = model)
-
-You can now ask a question like this:
-
- 
 agent.run("What is the current stock price for Nvidia?")
+```
 
-The agent will now call the get_stock_price() tool to fetch the latest stock price for Nvidia (see Figure 8).
-
-Figure 8: The agent calling the get_stock_price() tool to fetch the prices of a stock
-Figure 8: The agent calling the get_stock_price() tool to fetch the prices of a stock
-Agentic AI in Action
+## Agentic AI in Action
 Agentic AI starts with the ability to answer simple, straightforward questions—like checking today’s weather or converting a file format—but its real strength emerges when faced with more complex, multi-step problems. Instead of merely providing information, the agent can plan, reason, and use multiple tools to achieve a goal: fetching live market data, analyzing trends, querying databases, generating reports, or orchestrating entire workflows automatically.
 
 To see this in action, let’s consider a concrete example where agentic AI shines: breaking down a complex question into smaller steps and calling different tools to systematically arrive at a complete answer. Listing 1 shows an agent equipped with two tools: weather_tool() and currency_exchange_tool().
