@@ -57,25 +57,24 @@
 
 ## Creating Your Own Agent
 1. Install a few packages
+   * Installs SmolAgents along with the LiteLLM integration, which allows you to connect and use lightweight LLMs.
+   * ddgs, a Python package for DuckDuckGo search, which can be used as a built-in tool for agents to perform web searches.
 ```
 !pip install 'smolagents[litellm]'
 !pip install ddgs
 ```
-  * Installs SmolAgents along with the LiteLLM integration, which allows you to connect and use lightweight LLMs.
-  * ddgs, a Python package for DuckDuckGo search, which can be used as a built-in tool for agents to perform web searches. O
-
 2. For the underlying LLM, you have multiple options.
-  * use OpenAI’s models
-  * choose Ollama - , a platform that allows you to run LLMs locally on your machine for privacy and offline use.
+   * use OpenAI’s models
+   * choose Ollama - , a platform that allows you to run LLMs locally on your machine for privacy and offline use.
 ```
 import os
 os.environ["OPENAI_API_KEY"] = "<OPENAI_API_KEY>"
 ```
 
 3. create an agent using the ToolCallingAgent class from SmolAgents:
-  * ToolCallingAgent instance that is ready to perform reasoning and call tools.
-  * No custom tools added, and the built-in base tools are disabled (add_base_tools=False).
-  * Later, you can extend this agent by adding tools such as a Python interpreter, search APIs, or any custom function, allowing it to execute multi-step tasks and interact with external systems.
+   * ToolCallingAgent instance that is ready to perform reasoning and call tools.
+   * No custom tools added, and the built-in base tools are disabled (add_base_tools=False).
+   * Later, you can extend this agent by adding tools such as a Python interpreter, search APIs, or any custom function, allowing it to execute multi-step tasks and interact with external systems.
 ```
 from smolagents import ToolCallingAgent, LiteLLMModel 
 
@@ -88,19 +87,19 @@ agent = ToolCallingAgent(tools = [], model = model, add_base_tools = False)
 ```
  
 4. Test this agent by asking it a simple question:
-  * straightforward question for the agent, as it can answer directly using the knowledge encoded in its training data.
-  * In this case, the agent doesn’t need to call any external tools;
-  * the only tool it invokes is the FinalAnswerTool (“final_answer”), which signals the completion of the workflow and marks the final answer.
-  * <img width="550" height="150" alt="image" src="https://github.com/user-attachments/assets/2b3301da-ad01-4d95-8d8f-74f4c3cdfdb8" />
+   * straightforward question for the agent, as it can answer directly using the knowledge encoded in its training data.
+   * In this case, the agent doesn’t need to call any external tools;
+   * the only tool it invokes is the FinalAnswerTool (“final_answer”), which signals the completion of the workflow and marks the final answer.
+   * <img width="550" height="150" alt="image" src="https://github.com/user-attachments/assets/2b3301da-ad01-4d95-8d8f-74f4c3cdfdb8" />
 ```
 agent.run("Where is Singapore located?") 
 ```
  
 5. Try a more challenging question:
-  * this query requires up-to-date information that’s not included in the agent’s training data.
-  * To answer it, the agent must identify that an external tool—such as a weather API—is needed.
-  * However, because our agent isn’t equipped with another tools (add_base_tools = False), it failed to answer the question.
-  * <img width="550" height="150" alt="image" src="https://github.com/user-attachments/assets/046f84f0-7218-4934-97d7-f300f2dc1f1a" />
+   * this query requires up-to-date information that’s not included in the agent’s training data.
+   * To answer it, the agent must identify that an external tool—such as a weather API—is needed.
+   * However, because our agent isn’t equipped with another tools (add_base_tools = False), it failed to answer the question.
+   * <img width="550" height="150" alt="image" src="https://github.com/user-attachments/assets/046f84f0-7218-4934-97d7-f300f2dc1f1a" />
 ```
 agent.run("What is the weather for Singapore today?")
 ```
@@ -137,26 +136,26 @@ agent = ToolCallingAgent(tools = [], model = model, add_base_tools = True)
    * <img width="500" height="400" alt="image" src="https://github.com/user-attachments/assets/2e0277a4-9430-4f4e-96c2-3419bbc85ad7" />
    * <img width="500" height="400" alt="image" src="https://github.com/user-attachments/assets/f4512927-09c2-40e2-a2e1-f832754180bf" />
 
-7. If you want to include specific base tools, you can add them directly via the tools parameter when creating the agent. For example:
+7. Include specific base tools, add them directly the tools parameter when creating the agent.
+   * With the tools added to the agent, it can now select and call the appropriate tools to answer user questions.
+   * DuckDuckGoSearchTool can easily encounter rate-limit errors. Bcause DuckDuckGo doesn’t provide an official public API.
+   * So most tools that rely on scraping or unofficial endpoints are subject to strict throttling.
+   * If the agent sends too many requests in a short period, the service may temporarily block further queries, resulting in errors.
 ``` 
 from smolagents import PythonInterpreterTool, DuckDuckGoSearchTool
 
 # adds the tools manually
 agent = ToolCallingAgent (tools = [PythonInterpreterTool(), DuckDuckGoSearchTool()], model = model)
 ```
-   * With the tools added to the agent, it can now select and call the appropriate tools to answer user questions.
-   * DuckDuckGoSearchTool can easily encounter rate-limit errors. Bcause DuckDuckGo doesn’t provide an official public API.
-   * So most tools that rely on scraping or unofficial endpoints are subject to strict throttling.
-   * If the agent sends too many requests in a short period, the service may temporarily block further queries, resulting in errors.
-
+   
 8. Try a query, you can error
-```
-agent.run("Open the file named Speakers.json")
-```
    * Because the agent’s tools, including file access and web scraping tools, have limitations on accessing external resources.
    * Files must exist in a location accessible to the agent, and tools like DuckDuckGo are unreliable for frequent or automated queries.
    * To avoid these issues, it’s often better to use custom tools with official APIs, such as Tavily for search, or ensure that files are located in accessible paths when using file-reading tools.
-
+```
+agent.run("Open the file named Speakers.json")
+```
+   
 ## Building Your Own Custom Tools
 * create the following tools:
    * A tool to read a file from the local directory: For accessing structured data like JSON or CSV files
