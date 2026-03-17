@@ -414,5 +414,3 @@ response = agent.run(task)
 print(response)
 ```
 * <img width="550" height="250" alt="image" src="https://github.com/user-attachments/assets/04e8cae6-026f-47a3-a5ea-52e318c386c4" />
-
-Reach out to us today to get your application assessment scheduled. www.codemag.com/ai
