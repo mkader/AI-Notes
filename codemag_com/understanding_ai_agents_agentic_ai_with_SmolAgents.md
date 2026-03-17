@@ -45,10 +45,10 @@
     * CodeAgent: Focused on generating and executing Python code inside a sandboxed environment.
     * ToolCallingAgent: Can use multiple tools (APIs, Python interpreter, custom functions) to solve more complex tasks.
   * Tool Integration. Agents can call built-in tools like:
-   * PythonInterpreterTool: Execute code
-   * DuckDuckGoSearchTool: Perform web searches
-   * FinalAnswerTool: Mark the final answer
-   * Custom Tools: Define your own tools to access APIs, read files, or perform specialized actions
+    * PythonInterpreterTool: Execute code
+    * DuckDuckGoSearchTool: Perform web searches
+    * FinalAnswerTool: Mark the final answer
+    * Custom Tools: Define your own tools to access APIs, read files, or perform specialized actions
  * Task Planning and Reasoning
    * Agents can break a user query into subtasks, select appropriate tools, execute them, and synthesize the results into a final answer.
  * Lightweight and Flexible
