@@ -3,7 +3,7 @@
   * Gemini API - with API Key.
   * client-server application
   * SPA using JavaScript and HTML, Tailwind CSS
-  * <img width="400" height="300" alt="image" src="https://github.com/user-attachments/assets/2ef42349-afa3-49e6-b808-f7954a92766e" />
+  * <img width="600" height="350" alt="image" src="https://github.com/user-attachments/assets/186a1745-bc2f-4be6-8ce5-88c01cf6dd5a" />
 
 
 ## Start Building
@@ -91,7 +91,7 @@ async function analyzeStock() {
 // ... disable button, show loading spinner ...
 ```
 
-## system prompt is as follows:
+## system prompt
 ```
 “You are a world-class financial analyst. ... CRITICAL INSTRUCTION: You MUST use the numerical citation format [1], [2], [3], etc., IMMEDIATELY after every sentence that contains factual information taken from the search results to ensure verification. Every factual statement must be followed by a citation. Do not use any external knowledge.”
 const systemPrompt = `..`;
@@ -102,7 +102,7 @@ const systemPrompt = `..`;
 “What is the latest news, recent performance, and key analyst sentiment for the stock ticker ${ticker}? Summarize this in one paragraph.”
 const userQuery = `..`;
 ```
-## define the grounding payload. 
+## define the payload. 
 ```
 const payload = {
     contents: [{ parts: [{ text: userQuery }] }],
@@ -134,7 +134,9 @@ const fetchOptions = {
     body: JSON.stringify(payload)
 };
 ```
-## The model returns the citation source information within the groundingMetadata object, specifically in the groundingChunks array. You iterate through this array to pull out the essential URI and title for each source. 
+## Response - information within the groundingMetadata object, specifically in the groundingChunks array. 
+* The first parameter is text, which is the generated text from the model, e.g., "The stock is up [1] by 5% [2].".
+* The second parameter is sources, which is an array of source objects. Finally, it returns an HTML string with citations as links.
 ```
 Listing 7: Extracting grounding metadata
 // In the analyzeStock function, after fetching the result:
@@ -171,10 +173,9 @@ function formatGroundedText(text, sources) {
     });
 }
 ```
-This function converts the plain text response with citation markers into HTML with clickable links. The first parameter is text, which is the generated text from the model, e.g., "The stock is up [1] by 5% [2].". The second parameter is sources, which is an array of source objects. Finally, it returns an HTML string with citations as links.
-
-At last, it displays the sources that can be seen in Listing 9.
-
+	
+## displays the sources
+```
 Listing 9: Rendering the final output
 // In the analyzeStock function, after formatGroundedText:
 if (sources.length > 0) {
@@ -184,22 +185,7 @@ if (sources.length > 0) {
         // and the clickable URL ...
     });
 }
-By implementing these steps—from robust network calls to aggressive prompt engineering and sophisticated regex replacements—you turn a simple AI summary into a powerful, verifiable analysis tool.
-
-Running the Application
-With the application done, load it up in a browser. I prefer to use Chrome browser for its great debugging tools, but feel free to use whatever you wish. As long as it can render the HTML file and execute the script, you're good to go.
-
-Now, enter a stock symbol, and click Analyze Stock. Note that your results will be different than mine because you're asking Gemini to give up-to-date information.
-
-As the application runs, you can see the user interface in Figure 2.
-
-Figure 2: The application in action
-Figure 2: The application in action
-Once the results are processed, you can see the output, as can be seen in Figure 3.
-
-Figure 3: TSLA's analysis
-Figure 3: TSLA's analysis
-This is quite incredible. I'm writing this article on October 8, 2025. Tesla literally introduced the “standard” Model Y and 3 yesterday and rolled out FSD 14.1 today. Also, the $7500 federal tax credit ended just a few days ago. So I know this information is up-to-date and the latest. Also, the stock prices are accurate as of today. Additionally, all the facts and figures check out, and where in doubt, I can verify all the citations listed below.
+```
 
 * Complete Code
 ```
@@ -662,7 +648,3 @@ This is quite incredible. I'm writing this article on October 8, 2025. Tesla lit
 </body>
 </html>
 ```
-
-As they say, trust but verify.
-
-I don't know about you, but I'm quite blown away with how easily I can build such a powerful time-saving application in a matter of minutes.
