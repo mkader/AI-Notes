@@ -115,65 +115,62 @@ model = LiteLLMModel(
 )
 ```
 
-Using Built-In Tools
-Let’s now equip the agent with some built-in (base) tools:
-
- 
-agent = ToolCallingAgent(tools = [], 
-                         model = model,
-                         add_base_tools = True)
+## Using Built-In Tools
+6. When you set add_base_tools=True, the following base tools are added by default:
+   * PythonInterpreterTool: To execute/evaluate Python code
+   * DuckDuckGoSearchTool: For web search
+   * ApiWebSearchTool: To perform API-based web searches (e.g., Brave Search)
+   * GoogleSearchTool: To search via Google (using SerpAPI / Serper)
+   * WebSearchTool: Another web-searching tool (supports DuckDuckGo/Bing)
+   * WikipediaSearchTool: To fetch content from Wikipedia
+   * VisitWebpageTool: To fetch and read webpage content
+   * FinalAnswerTool: Marks the final answer in the agent’s workflow
+   * UserInputTool: For interactive/user input during agent execution
+   * SpeechToTextTool: Transcribes audio to text
+``` 
 # add all base tools automatically
-When you set add_base_tools=True, the following base tools are added by default:
+agent = ToolCallingAgent(tools = [], model = model, add_base_tools = True)
+```
+   * <img width="550" height="375" alt="image" src="https://github.com/user-attachments/assets/4afeb038-5547-4474-ac61-c55a57261e77" />
+   * <img width="550" height="300" alt="image" src="https://github.com/user-attachments/assets/fe56e3fd-5b25-4eb8-898e-b55c4c7066de" />
+   * <img width="500" height="400" alt="image" src="https://github.com/user-attachments/assets/f1654fcf-56e1-4a58-99d6-c5734fcf94ae" />
+   * <img width="500" height="400" alt="image" src="https://github.com/user-attachments/assets/2e0277a4-9430-4f4e-96c2-3419bbc85ad7" />
+   * <img width="500" height="400" alt="image" src="https://github.com/user-attachments/assets/f4512927-09c2-40e2-a2e1-f832754180bf" />
 
-PythonInterpreterTool: To execute/evaluate Python code
-DuckDuckGoSearchTool: For web search
-ApiWebSearchTool: To perform API-based web searches (e.g., Brave Search)
-GoogleSearchTool: To search via Google (using SerpAPI / Serper)
-WebSearchTool: Another web-searching tool (supports DuckDuckGo/Bing)
-WikipediaSearchTool: To fetch content from Wikipedia
-VisitWebpageTool: To fetch and read webpage content
-FinalAnswerTool: Marks the final answer in the agent’s workflow
-UserInputTool: For interactive/user input during agent execution
-SpeechToTextTool: Transcribes audio to text
-If you want to include specific base tools, you can add them directly via the tools parameter when creating the agent. For example:
-
- 
-from smolagents.tools import 
-  PythonInterpreterTool, DuckDuckGoSearchTool
+7. If you want to include specific base tools, you can add them directly via the tools parameter when creating the agent. For example:
+``` 
+from smolagents import PythonInterpreterTool, DuckDuckGoSearchTool
 
 # adds the tools manually
-agent = ToolCallingAgent (tools = 
-            PythonInterpreterTool(), 
-            DuckDuckGoSearchTool()
-            model = model)
+agent = ToolCallingAgent (tools = [PythonInterpreterTool(), DuckDuckGoSearchTool()], model = model)
+```
+   * With the tools added to the agent, it can now select and call the appropriate tools to answer user questions.
+   * DuckDuckGoSearchTool can easily encounter rate-limit errors. Bcause DuckDuckGo doesn’t provide an official public API.
+   * So most tools that rely on scraping or unofficial endpoints are subject to strict throttling.
+   * If the agent sends too many requests in a short period, the service may temporarily block further queries, resulting in errors.
 
-With the tools added to the agent, it can now select and call the appropriate tools to answer user questions. However, there are some important caveats to be aware of. For instance, the built-in DuckDuckGoSearchTool can easily encounter rate-limit errors. This occurs because DuckDuckGo doesn’t provide an official public API, so most tools that rely on scraping or unofficial endpoints are subject to strict throttling. If the agent sends too many requests in a short period, the service may temporarily block further queries, resulting in errors.
-
-Similarly, if you try a query like:
-
- 
+8. Try a query, you can error
+```
 agent.run("Open the file named Speakers.json")
+```
+   * Because the agent’s tools, including file access and web scraping tools, have limitations on accessing external resources.
+   * Files must exist in a location accessible to the agent, and tools like DuckDuckGo are unreliable for frequent or automated queries.
+   * To avoid these issues, it’s often better to use custom tools with official APIs, such as Tavily for search, or ensure that files are located in accessible paths when using file-reading tools.
 
-You might see errors such as:
-
- 
-Unable [MS1.1]to access the file Speakers.json and perform any 
-actions due to rate limits and invalid URL issues.
-This happens because the agent’s tools, including file access and web scraping tools, have limitations on accessing external resources. Files must exist in a location accessible to the agent, and tools like DuckDuckGo are unreliable for frequent or automated queries. To avoid these issues, it’s often better to use custom tools with official APIs, such as Tavily for search, or ensure that files are located in accessible paths when using file-reading tools.
-
-Building Your Own Custom Tools
-Now that you’re familiar with the built-in base tools and some of their limitations, I can move on to building custom tools. Custom tools allow your agent to perform specific tasks reliably and extend its capabilities beyond the defaults. In this section, you’ll create the following tools:
-
-A tool to read a file from the local directory: For accessing structured data like JSON or CSV files
-A search tool using Tavily: A reliable search API optimized for LLMs, providing structured and concise results
-A weather search tool using OpenWeatherMap: To retrieve up-to-date weather information for any location
-A stock price search tool using finnhub.io: To retrieve up-to-date stock information
-Creating a custom tool in SmolAgents is straightforward. All you need to do is define a Python function that performs the desired task and prefix it with the @tool decorator. Once decorated, the function becomes a tool that your agent can invoke during its reasoning and planning process.
-
-Reading File Contents
-The first tool you’ll create reads a file from the local directory:
-
- 
+## Building Your Own Custom Tools
+* create the following tools:
+   * A tool to read a file from the local directory: For accessing structured data like JSON or CSV files
+   * A search tool using Tavily: A reliable search API optimized for LLMs, providing structured and concise results
+   * A weather search tool using OpenWeatherMap: To retrieve up-to-date weather information for any location
+   * A stock price search tool using finnhub.io: To retrieve up-to-date stock information
+* Creating a custom tool in SmolAgents is straightforward.
+* just define a Python function that performs the desired task and prefix it with the @tool decorator.
+* Once decorated, the function becomes a tool that your agent can invoke during its reasoning and planning process.
+9. Reading a File from the local directory
+   * get_my_files() is a function decorated with the @tool decorator, which turns it into a tool that can be used by a ToolCallingAgent.
+   * To ensure that the LLM can correctly identify when and how to use this tool, the function must include a clear and descriptive docstring.
+   * The docstring should explain what the tool does, describe its input parameters, and specify its output.
+```
 from smolagents import ToolCallingAgent, LiteLLMModel, tool
 
 @tool
@@ -189,31 +186,12 @@ def get_my_files(filename: str) -> str:
         return content
 
 # set get_my_files as a tool for the agent
-agent = ToolCallingAgent(tools = [get_my_files], 
-                         model = model,
-                         add_base_tools = True)
+agent = ToolCallingAgent(tools = [get_my_files], model = model, add_base_tools = True)
 
-In the example above, get_my_files() is a function decorated with the @tool decorator, which turns it into a tool that can be used by a ToolCallingAgent. To ensure that the LLM can correctly identify when and how to use this tool, the function must include a clear and descriptive docstring. The docstring should explain what the tool does, describe its input parameters, and specify its output.
-
-You can now ask a question such as:
-
- 
 agent.run("Open the file named Speakers.json")
-
-In my local directory (the same path as the Python program), there’s a JSON file named Speakers.json. With the custom tool in place, the agent can now call get_my_files() to fetch the contents of this JSON file. When executed, the agent retrieves the data and returns it in a structured format that the LLM can reason about.
-
-For example, the output looks like this:
-
- 
-'{ "speakers": [ { "name":"Mr Bellingham", 
-"shortname":"Barot_Bellingham", "reknown":"Royal 
-Academy of Painting and Sculpture", "bio":
-"Barot has 
-...
-...
-microscope images on canvas. Xhou will discuss 
-the art and science behind his incredibly 
-detailed works of art." } ]}'
+```
+* <img width="400" height="200" alt="image" src="https://github.com/user-attachments/assets/2bf476c0-7075-4dce-866c-f1107f3e4b26" />
+* <img width="450" height="200" alt="image" src="https://github.com/user-attachments/assets/0fd3b57c-fbd4-400f-9468-774a65d0d894" />
 
 Web Search Tool
 In the earlier example, you may find that search results returned by DuckDuckGoSearchTool are often unreliable. A better approach is to create your own search tool using Tavily.
