@@ -294,11 +294,14 @@ agent.run("What is the current stock price for Nvidia?")
 ```
 
 ## Agentic AI in Action
-Agentic AI starts with the ability to answer simple, straightforward questions—like checking today’s weather or converting a file format—but its real strength emerges when faced with more complex, multi-step problems. Instead of merely providing information, the agent can plan, reason, and use multiple tools to achieve a goal: fetching live market data, analyzing trends, querying databases, generating reports, or orchestrating entire workflows automatically.
-
-To see this in action, let’s consider a concrete example where agentic AI shines: breaking down a complex question into smaller steps and calling different tools to systematically arrive at a complete answer. Listing 1 shows an agent equipped with two tools: weather_tool() and currency_exchange_tool().
-
-Listing 1. An agent with two tools
+   * Agentic AI starts with the ability to answer simple, straightforward questions—like today’s weather or converting a file format—but its real strength emerges when faced with more complex, multi-step problems.
+   * Instead of merely providing information, the agent can plan, reason, and use multiple tools to achieve a goal: fetching live market data, analyzing trends, querying databases, generating reports, or orchestrating entire workflows automatically.
+   * For example, where agentic AI shines: breaking down a complex question into smaller steps and calling different tools to systematically arrive at a complete answer.
+   * Agent with two tools: weather_tool() and currency_exchange_tool().
+   * Agent decompose the request into two separate tasks and call the corresponding tools one after the other.
+   * First, it retrieves the weather data for Paris, then, if the condition is met, it fetches the USD → EUR exchange rate, and finally it combines the results to provide a complete answer
+   * <img width="550" height="350" alt="image" src="https://github.com/user-attachments/assets/23dfce1f-0eb5-459c-a22c-d3d783833946" />
+```
 from smolagents import LiteLLMModel, ToolCallingAgent, tool
 import requests
 
@@ -325,8 +328,7 @@ def weather_tool(city: str) -> str:
         temps = [item["main"]["temp"] for item in data["list"]]
         avg_temp = sum(temps) / len(temps)
         description = data["list"][0]["weather"][0]["description"]
-        return f"Weather in {city} next 24 hours: {description}, 
-            avg temp {avg_temp:.1f}°C"
+        return f"Weather in {city} next 24 hours: {description},  avg temp {avg_temp:.1f}°C"
     else:
         return f"Failed to fetch weather for {city}."
 
@@ -339,8 +341,7 @@ def currency_exchange_tool() -> str:
     response = requests.get(url)
     data = response.json()
     if "rates" in data and "EUR" in data["rates"]:
-        return f"Current USD → EUR rate: 
-            {data['rates']['EUR']:.4f}"
+        return f"Current USD → EUR rate:  {data['rates']['EUR']:.4f}"
     else:
         return "Failed to fetch exchange rate."
 
@@ -367,24 +368,18 @@ query = """
 result = agent.run(query)
 print("\nAgent final answer:")
 print(result)
-For instance, you might ask the agent a question like:
+```
 
- 
-"Check the [MS2.1]weather for Paris next week. If the weather is 
-cool (average temperature < 20°C), fetch the USD → EUR exchange rate.
-Return both the weather for Paris and the USD → EUR exchange rate."
-You will see the agent decompose the request into two separate tasks and call the corresponding tools one after the other. First, it retrieves the weather data for Paris, then, if the condition is met, it fetches the USD → EUR exchange rate, and finally it combines the results to provide a complete answer (see Figure 9).
-
-Figure 9: The agent breaks down the question into separate tasks and calls the respective tools to answer the question
-Figure 9: The agent breaks down the question into separate tasks and calls the respective tools to answer the question
-CodeAgent vs. ToolCallingAgent
-So far, all the agents you’ve built are based on the ToolCallingAgent, which is specifically designed to allow an LLM to reason, plan, and select the appropriate tools to accomplish a given task. This agent type is particularly effective for queries that require multi-step workflows, such as combining file access, web searches, and API calls to generate a complete response.
-
-However, there are scenarios where the agent’s primary task is to write, execute, and reason with Python code rather than call external APIs or services. For these cases, SmolAgents provides the CodeAgent class. CodeAgent focuses on sandboxed Python execution, allowing the agent to perform computations, manipulate data, and generate outputs directly within a controlled environment. This makes it ideal for data analysis, algorithm development, debugging, or any task where code execution is central to solving the user’s query. By using CodeAgent, developers can create agents that handle programming-focused tasks without relying on external tools, making it a powerful complement to ToolCallingAgent in an agentic AI workflow.
-
-The code snippet in Listing 2 demonstrates how a CodeAgent can be used to write Python code to answer a user’s analytical questions.
-
-Listing 2. Using the CodeAgent to write Python code to answer an analytical question
+## CodeAgent vs. ToolCallingAgent
+* ToolCallingAgent, which is specifically designed to allow an LLM to reason, plan, and select the appropriate tools to accomplish a given task.
+    * This agent type is particularly effective for queries that require multi-step workflows, such as combining file access, web searches, and API calls to generate a complete response.
+* However, there are scenarios where the agent’s primary task is to write, execute, and reason with Python code rather than call external APIs or services.
+* For these cases, SmolAgents provides the CodeAgent class.
+    * CodeAgent focuses on sandboxed Python execution, allowing the agent to perform computations, manipulate data, and generate outputs directly within a controlled environment.
+    * This makes it ideal for data analysis, algorithm development, debugging, or any task where code execution is central to solving the user’s query.
+    * By using CodeAgent, developers can create agents that handle programming-focused tasks without relying on external tools, making it a powerful complement to ToolCallingAgent in an agentic AI workflow.
+* CodeAgent can be used to write Python code to answer a user’s analytical questions.
+```
 from smolagents import CodeAgent, LiteLLMModel
 
 # Initialize the model
@@ -417,76 +412,7 @@ Return a clear summary including all three points.
 # Run CodeAgent
 response = agent.run(task)
 print(response)
-Figure 10 shows the code generated by the CodeAgent. You can see that in Step 1 (in Figure 10), it creates a set of Python statements to calculate the total and average scores for all the students.
-
-Figure 10: The CodeAgent generates Python code to answer the user’s question.
-Figure 10: The CodeAgent generates Python code to answer the user’s question.
-In Step 2, it generates the code to find and print the highest score and the name of the corresponding student:
-
- 
-# Finding the highest score and the corresponding 
-# student(s)      
-
-highest_score = max(student['Score'] for 
-  student in scores)  
-
-top_students = [student['Name'] for 
-  student in scores if student['Score'] == 
-  highest_score]                      
-
-print(f"Highest score: {highest_score}, 
-  Students: {top_students}")
-
-Likewise, in Step 3, it generates the code to find and print the lowest score and the name of the corresponding student:
-
- 
-# Finding the lowest score and the corresponding 
-# student(s)   
-
-lowest_score = min(student['Score'] for 
-  student in scores)   
-
-lowest_students = [student['Name'] for
-  student in scores if student['Score'] == 
-  lowest_score]                    
-
-print(f"Lowest score: {lowest_score}, 
-  Students: {lowest_students}")
-
-It finally returns a JSON string containing the results—the highest and lowest scores and the corresponding name of the students:
-
- 
-{
-  'average_score': 86.6, 
-  'highest_score': 
-    {
-      'score': 92, 
-      'students': ['Bob']
-    }, 
-  'lowest_score': 
-    {
-      'score': 78, 
-      'students': ['Charlie']
-    }
-}
-Summary
-This article explores the capabilities of agentic AI and demonstrates how it can handle both simple and complex multi-step tasks. Starting with basic queries, agents can reason, plan, and orchestrate multiple tools to fetch data, analyze trends, and generate actionable insights. I introduced the ToolCallingAgent, which allows an AI agent to call specialized tools to answer user questions efficiently.
-
-Several practical tools were implemented in the article, such as:
-
-weather_tool(): Retrieves weather data for a specified location
-currency_exchange_tool(): Fetches exchange rates between currencies
-get_stock_price(): Retrieves real-time stock prices from Finnhub.io
-Through examples, I demonstrated how the agent can decompose complex requests—like checking weather conditions and fetching currency exchange rates or stock data—by invoking these tools step by step, combining results, and delivering a complete answer.
-
-I also highlighted CodeAgent, which enables the agent to execute Python code for analytical questions. Overall, this showcases how agentic AI, equipped with ToolCallingAgent and specialized tools, can transform traditional Q&A systems into intelligent assistants capable of solving real-world problems end-to-end.
-
-What is Tavily?
-Tavily is a search API service designed specifically for AI agents and applications. Unlike scraping Google or using simpler search wrappers like DuckDuckGo, Tavily provides a structured JSON API with relevant, concise search results. It’s optimized for LLM workflows, so results are easy for an AI to interpret and incorporate into reasoning.
-
-Sponsored Sidebar: Adding LLM Assistants to Your Apps
-The future is here now and you don’t want to get left behind. Unlock the true potential of your software applications by adding AI Assistants.
-
-CODE Consulting can assess your applications and provide you with a roadmap for adding LLM features and optionally assist you in adding them to your applications.
+```
+* <img width="550" height="250" alt="image" src="https://github.com/user-attachments/assets/04e8cae6-026f-47a3-a5ea-52e318c386c4" />
 
 Reach out to us today to get your application assessment scheduled. www.codemag.com/ai
