@@ -61,21 +61,21 @@
 !pip install 'smolagents[litellm]'
 !pip install ddgs
 ```
- * Installs SmolAgents along with the LiteLLM integration, which allows you to connect and use lightweight LLMs.
- * ddgs, a Python package for DuckDuckGo search, which can be used as a built-in tool for agents to perform web searches. O
+  * Installs SmolAgents along with the LiteLLM integration, which allows you to connect and use lightweight LLMs.
+  * ddgs, a Python package for DuckDuckGo search, which can be used as a built-in tool for agents to perform web searches. O
 
 2. For the underlying LLM, you have multiple options.
- * use OpenAI’s models
- * choose Ollama - , a platform that allows you to run LLMs locally on your machine for privacy and offline use.
+  * use OpenAI’s models
+  * choose Ollama - , a platform that allows you to run LLMs locally on your machine for privacy and offline use.
 ```
 import os
 os.environ["OPENAI_API_KEY"] = "<OPENAI_API_KEY>"
 ```
 
 3. create an agent using the ToolCallingAgent class from SmolAgents:
- * ToolCallingAgent instance that is ready to perform reasoning and call tools.
- * No custom tools added, and the built-in base tools are disabled (add_base_tools=False).
- * Later, you can extend this agent by adding tools such as a Python interpreter, search APIs, or any custom function, allowing it to execute multi-step tasks and interact with external systems.
+  * ToolCallingAgent instance that is ready to perform reasoning and call tools.
+  * No custom tools added, and the built-in base tools are disabled (add_base_tools=False).
+  * Later, you can extend this agent by adding tools such as a Python interpreter, search APIs, or any custom function, allowing it to execute multi-step tasks and interact with external systems.
 ```
 from smolagents import ToolCallingAgent, LiteLLMModel 
 
@@ -88,19 +88,19 @@ agent = ToolCallingAgent(tools = [], model = model, add_base_tools = False)
 ```
  
 4. Test this agent by asking it a simple question:
- * straightforward question for the agent, as it can answer directly using the knowledge encoded in its training data.
- * In this case, the agent doesn’t need to call any external tools;
- * the only tool it invokes is the FinalAnswerTool (“final_answer”), which signals the completion of the workflow and marks the final answer.
- * <img width="550" height="150" alt="image" src="https://github.com/user-attachments/assets/2b3301da-ad01-4d95-8d8f-74f4c3cdfdb8" />
+  * straightforward question for the agent, as it can answer directly using the knowledge encoded in its training data.
+  * In this case, the agent doesn’t need to call any external tools;
+  * the only tool it invokes is the FinalAnswerTool (“final_answer”), which signals the completion of the workflow and marks the final answer.
+  * <img width="550" height="150" alt="image" src="https://github.com/user-attachments/assets/2b3301da-ad01-4d95-8d8f-74f4c3cdfdb8" />
 ```
 agent.run("Where is Singapore located?") 
 ```
  
 5. Try a more challenging question:
- * this query requires up-to-date information that’s not included in the agent’s training data.
- * To answer it, the agent must identify that an external tool—such as a weather API—is needed.
- * However, because our agent isn’t equipped with another tools (add_base_tools = False), it failed to answer the question.
- * <img width="550" height="150" alt="image" src="https://github.com/user-attachments/assets/046f84f0-7218-4934-97d7-f300f2dc1f1a" />
+  * this query requires up-to-date information that’s not included in the agent’s training data.
+  * To answer it, the agent must identify that an external tool—such as a weather API—is needed.
+  * However, because our agent isn’t equipped with another tools (add_base_tools = False), it failed to answer the question.
+  * <img width="550" height="150" alt="image" src="https://github.com/user-attachments/assets/046f84f0-7218-4934-97d7-f300f2dc1f1a" />
 ```
 agent.run("What is the weather for Singapore today?")
 ```
