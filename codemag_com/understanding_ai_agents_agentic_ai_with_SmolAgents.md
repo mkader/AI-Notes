@@ -409,192 +409,193 @@ You have the following student scores:
 Return a clear summary including all three points.
 """
 ```
-## Complete Code using Azure OPEN AI
-```
-import os
-import requests
-from smolagents import ToolCallingAgent, OpenAIModel, PythonInterpreterTool, DuckDuckGoSearchTool, tool, CodeAgent
-
-azure_endpoint = "https://eus2.openai.azure.com"
-azure_base = "https://es2.openai.azure.com/openai/v1"
-azure_api_key = "ZhaJAKD6HYwoFP"
-azure_chat_deployment = "EGPT-4.1"
-azure_chat_model_name = "gpt-4.1"
-azure_chat_api_version= "2024-12-01-preview"
-
-# Use OpenAIModel with the /openai/v1/ base URL (Azure AI Inference compatible endpoint)
-model = OpenAIModel(
-    model_id=azure_chat_deployment,
-    api_base=azure_base,
-    api_key=azure_api_key,
-)
-
-# create an agent
-# agent = ToolCallingAgent(tools = [], model = model, add_base_tools = False) 
-# agent = ToolCallingAgent(tools = [], model = model, add_base_tools = True) 
-# agent = ToolCallingAgent(tools = [PythonInterpreterTool(), DuckDuckGoSearchTool()], model = model) 
-
-# agent.run("Where is Singapore located?") 
-# agent.run("What is the weather for Singapore today?")
-
-@tool
-def get_my_files(filename: str) -> str:
-    """Opens a file and reads its contents
-    Args:
-        filename: The name of the file to open
-    Returns:
-        str: The contents of the file specified
-    """
-    with open(f'./{filename}', 'r') as file:
-        content = file.read()
-        return content
-
-# set get_my_files as a tool for the agent
-#agent = ToolCallingAgent(tools = [get_my_files], model = model, add_base_tools = True)
-#agent.run("Open the file named manufacturers.json")
-
-TAVILY_API_KEY = "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"
-
-@tool
-def tavily_search(query: str, max_results: int = 5) -> str:
-    """Perform a web search
-    Args:
-        query: The search query
-        max_results: The maximum number of 
-        results to return
-    Returns:
-        str: The search result
-    """
-    url = "https://api.tavily.com/search"
-    headers = {"Authorization": f"Bearer {TAVILY_API_KEY}"}
-    payload = {
-        "query": query,
-        "num_results": max_results
-    }
-    
-    response = requests.post(url, json=payload, headers=headers)
-    response.raise_for_status()
-    return response.json()
-
-#agent = ToolCallingAgent(tools=[tavily_search], model = model, add_base_tools = False)
-#agent.run("Who won the U.S. presidential election in 2024?")
-
-@tool
-def get_weather_info(city: str) -> str:
-    """
-    Retrieve the current weather information for a given city.
-    Args:
-        city: The name of the city to get the 
-        weather information for.
-    Returns:
-        str: A description of the current weather 
-        and temperature in the city.
-    """
-    
-    api_key = "1a76e83214d3581c84544eccef45e43c"
-
-    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
-
-    response = requests.get(url)
-    if response.status_code == 200:
-        data = response.json()
-        weather = data["weather"][0]["description"]
-        temperature = data["main"]["temp"]
-
-        return f"The weather in {city} is {weather}  with a temperature of {temperature}°C."
-    else:
-        return f"Could not retrieve weather information for {city}."
-
-#agent = ToolCallingAgent(tools = [get_weather_info], model = model)
-#agent.run("What is the current weather for Singapore?")
-
-@tool
-def forecast_weather_tool(city: str) -> str:
-    """
-    Fetches the weather for a city using OpenWeatherMap API.
-    
-    Args:
-        city: Name of the city to get the weather for.
-    """
-    api_key = "1a76e83214d3581c84544eccef45e43c"
-    url = "http://api.openweathermap.org/data/2.5/forecast"
-    params = {
-        "q": city, 
-        "appid": api_key, 
-        "units": "metric", 
-        "cnt": 8
-    }  # next 24h
-
-    response = requests.get(url, params=params)
-    data = response.json()
-    if "list" in data:
-        temps = [item["main"]["temp"] for item in data["list"]]
-        avg_temp = sum(temps) / len(temps)
-        description = data["list"][0]["weather"][0]["description"]
-        return f"Weather in {city} next 24 hours: {description}, avg temp {avg_temp:.1f}°C"
-    else:
-        return f"Failed to fetch weather for {city}."
-
-@tool
-def currency_exchange_tool() -> str:
-    """
-    Fetches the current USD to EUR exchange rate.
-    """
-    url = "https://api.exchangerate-api.com/v4/latest/USD"
-    response = requests.get(url)
-    data = response.json()
-    if "rates" in data and "EUR" in data["rates"]:
-        return f"Current USD → EUR rate: {data['rates']['EUR']:.4f}"
-    else:
-        return "Failed to fetch exchange rate."
-
-
-# the tools to use for this agent
-tools = [forecast_weather_tool, currency_exchange_tool]
-
-# create the agent with the LLM and tools
-agent = ToolCallingAgent(model = model, tools = tools)
-
-query = """
-  Check the weather for Paris next week. If the weather 
-  is cool (avg temp < 20°C), fetch the USD → EUR exchange rate.
-  Return me BOTH the weather for Paris and the USD → EUR 
-  exchange rate.
-"""
-
-# call the agent
-#result = agent.run(query)
-#print("\nAgent final answer:")
-#print(result)
-
-
-# Create the CodeAgent
-agent = CodeAgent(tools = [], model = model)
-
-# Inline data: student scores
-student_scores = [
-    {"Name": "Alice", "Score": 85},
-    {"Name": "Bob", "Score": 92},
-    {"Name": "Charlie", "Score": 78},
-    {"Name": "David", "Score": 90},
-    {"Name": "Eva", "Score": 88},
-]
-
-# Task for the agent
-task = f"""
-You have the following student scores:
-
-{student_scores}
-
-1. Compute the average score.
-2. Identify the student(s) with the highest score.
-3. Identify the student(s) with the lowest score.
-Return a clear summary including all three points.
-"""
-
-# Run CodeAgent
-response = agent.run(task)
-print(response)
-```
-
 * <img width="550" height="250" alt="image" src="https://github.com/user-attachments/assets/04e8cae6-026f-47a3-a5ea-52e318c386c4" />
+
+## Complete Code using Azure OPEN AI
+ ```
+ import os
+ import requests
+ from smolagents import ToolCallingAgent, OpenAIModel, PythonInterpreterTool, DuckDuckGoSearchTool, tool, CodeAgent
+ 
+ azure_endpoint = "https://eus2.openai.azure.com"
+ azure_base = "https://es2.openai.azure.com/openai/v1"
+ azure_api_key = "ZhaJAKD6HYwoFP"
+ azure_chat_deployment = "EGPT-4.1"
+ azure_chat_model_name = "gpt-4.1"
+ azure_chat_api_version= "2024-12-01-preview"
+ 
+ # Use OpenAIModel with the /openai/v1/ base URL (Azure AI Inference compatible endpoint)
+ model = OpenAIModel(
+     model_id=azure_chat_deployment,
+     api_base=azure_base,
+     api_key=azure_api_key,
+ )
+ 
+ # create an agent
+ # agent = ToolCallingAgent(tools = [], model = model, add_base_tools = False) 
+ # agent = ToolCallingAgent(tools = [], model = model, add_base_tools = True) 
+ # agent = ToolCallingAgent(tools = [PythonInterpreterTool(), DuckDuckGoSearchTool()], model = model) 
+ 
+ # agent.run("Where is Singapore located?") 
+ # agent.run("What is the weather for Singapore today?")
+ 
+ @tool
+ def get_my_files(filename: str) -> str:
+     """Opens a file and reads its contents
+     Args:
+         filename: The name of the file to open
+     Returns:
+         str: The contents of the file specified
+     """
+     with open(f'./{filename}', 'r') as file:
+         content = file.read()
+         return content
+ 
+ # set get_my_files as a tool for the agent
+ #agent = ToolCallingAgent(tools = [get_my_files], model = model, add_base_tools = True)
+ #agent.run("Open the file named manufacturers.json")
+ 
+ TAVILY_API_KEY = "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"
+ 
+ @tool
+ def tavily_search(query: str, max_results: int = 5) -> str:
+     """Perform a web search
+     Args:
+         query: The search query
+         max_results: The maximum number of 
+         results to return
+     Returns:
+         str: The search result
+     """
+     url = "https://api.tavily.com/search"
+     headers = {"Authorization": f"Bearer {TAVILY_API_KEY}"}
+     payload = {
+         "query": query,
+         "num_results": max_results
+     }
+     
+     response = requests.post(url, json=payload, headers=headers)
+     response.raise_for_status()
+     return response.json()
+ 
+ #agent = ToolCallingAgent(tools=[tavily_search], model = model, add_base_tools = False)
+ #agent.run("Who won the U.S. presidential election in 2024?")
+ 
+ @tool
+ def get_weather_info(city: str) -> str:
+     """
+     Retrieve the current weather information for a given city.
+     Args:
+         city: The name of the city to get the 
+         weather information for.
+     Returns:
+         str: A description of the current weather 
+         and temperature in the city.
+     """
+     
+     api_key = "1a76e83214d3581c84544eccef45e43c"
+ 
+     url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
+ 
+     response = requests.get(url)
+     if response.status_code == 200:
+         data = response.json()
+         weather = data["weather"][0]["description"]
+         temperature = data["main"]["temp"]
+ 
+         return f"The weather in {city} is {weather}  with a temperature of {temperature}°C."
+     else:
+         return f"Could not retrieve weather information for {city}."
+ 
+ #agent = ToolCallingAgent(tools = [get_weather_info], model = model)
+ #agent.run("What is the current weather for Singapore?")
+ 
+ @tool
+ def forecast_weather_tool(city: str) -> str:
+     """
+     Fetches the weather for a city using OpenWeatherMap API.
+     
+     Args:
+         city: Name of the city to get the weather for.
+     """
+     api_key = "1a76e83214d3581c84544eccef45e43c"
+     url = "http://api.openweathermap.org/data/2.5/forecast"
+     params = {
+         "q": city, 
+         "appid": api_key, 
+         "units": "metric", 
+         "cnt": 8
+     }  # next 24h
+ 
+     response = requests.get(url, params=params)
+     data = response.json()
+     if "list" in data:
+         temps = [item["main"]["temp"] for item in data["list"]]
+         avg_temp = sum(temps) / len(temps)
+         description = data["list"][0]["weather"][0]["description"]
+         return f"Weather in {city} next 24 hours: {description}, avg temp {avg_temp:.1f}°C"
+     else:
+         return f"Failed to fetch weather for {city}."
+ 
+ @tool
+ def currency_exchange_tool() -> str:
+     """
+     Fetches the current USD to EUR exchange rate.
+     """
+     url = "https://api.exchangerate-api.com/v4/latest/USD"
+     response = requests.get(url)
+     data = response.json()
+     if "rates" in data and "EUR" in data["rates"]:
+         return f"Current USD → EUR rate: {data['rates']['EUR']:.4f}"
+     else:
+         return "Failed to fetch exchange rate."
+ 
+ 
+ # the tools to use for this agent
+ tools = [forecast_weather_tool, currency_exchange_tool]
+ 
+ # create the agent with the LLM and tools
+ agent = ToolCallingAgent(model = model, tools = tools)
+ 
+ query = """
+   Check the weather for Paris next week. If the weather 
+   is cool (avg temp < 20°C), fetch the USD → EUR exchange rate.
+   Return me BOTH the weather for Paris and the USD → EUR 
+   exchange rate.
+ """
+ 
+ # call the agent
+ #result = agent.run(query)
+ #print("\nAgent final answer:")
+ #print(result)
+ 
+ 
+ # Create the CodeAgent
+ agent = CodeAgent(tools = [], model = model)
+ 
+ # Inline data: student scores
+ student_scores = [
+     {"Name": "Alice", "Score": 85},
+     {"Name": "Bob", "Score": 92},
+     {"Name": "Charlie", "Score": 78},
+     {"Name": "David", "Score": 90},
+     {"Name": "Eva", "Score": 88},
+ ]
+ 
+ # Task for the agent
+ task = f"""
+ You have the following student scores:
+ 
+ {student_scores}
+ 
+ 1. Compute the average score.
+ 2. Identify the student(s) with the highest score.
+ 3. Identify the student(s) with the lowest score.
+ Return a clear summary including all three points.
+ """
+ 
+ # Run CodeAgent
+ response = agent.run(task)
+ print(response)
+ ```
+
