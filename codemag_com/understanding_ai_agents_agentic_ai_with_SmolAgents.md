@@ -1,129 +1,119 @@
 # Understanding AI Agents and Agentic AI: Concepts, Tools, and Implementation with SmolAgents
 
-Artificial intelligence is rapidly evolving beyond simple question-and-answer interactions. Today, a new generation of systems—known as AI agents—can understand user intent, plan a sequence of actions, invoke external tools, execute code, and synthesize the results into intelligent responses. This emerging paradigm, often described as agentic AI, represents a shift from passive language models to active problem-solvers capable of handling complex, multi-step tasks in the real world. Instead of merely predicting text, agentic AI empowers models to reason, act, and iterate, bringing them closer to true autonomous assistants.
+* AI agents—can understand user intent, plan a sequence of actions, invoke external tools, execute code, and synthesize the results into intelligent responses.
+* Agentic AI, represents a shift from passive LMs to active problem-solvers capable of handling complex, multi-step tasks in the real world.
+  * Instead of merely predicting text, agentic AI empowers models to reason, act, and iterate, bringing them closer to true autonomous assistants.
 
-In this article, I’ll unpack what agents and agentic AI really are, why they matter, and how they differ from traditional prompt-based interactions. I then explore how to build practical, functional agents using SmolAgents, a lightweight and developer-friendly framework designed to connect large language models (LLMs) with actionable tools. Along the way, I’ll break down how tools extend an agent’s abilities, how the framework orchestrates reasoning and action, and how to design custom capabilities for real-world workflows. I’ll also examine the two core agent types in SmolAgents—CodeAgent, which specializes in generating and executing sandboxed Python code, and ToolCallingAgent, which enables an LLM to call external APIs, run custom functions, and integrate with a Python interpreter.
+* SmolAgents, a lightweight and developer-friendly framework designed to connect LLMs with actionable tools.
+* 2 core agent types
+  *  SmolAgents—CodeAgent, which specializes in generating and executing sandboxed Python code,
+  * ToolCallingAgent, which enables an LLM to call external APIs, run custom functions, and integrate with a Python interpreter.
 
-By the end of this article, you’ll have a clear understanding of how agentic AI works, how SmolAgents implements these concepts, and how to choose the right agent architecture for your needs.
+## What Is an Agent?
+* an agent is a specialized system designed to perform tasks autonomously by combining language understanding, reasoning, and tool usage. Figure shows the composition of an agent.
+  * <img width="250" height="150" alt="image" src="https://github.com/user-attachments/assets/2bb0ec8c-f5a9-4cba-a10a-d6f65e0be465" />
+* An agent typically consists of a LLM combined with a set of tools it can invoke to perform actions.
+* These tools enable the agent to interact with external systems and access information or capabilities beyond what the LLM alone can provide.
+* For example
+  * if a user asks a general question such as “Who is Bill Gates?”, the LLM can answer directly because its training data likely includes information about him.
+  * if the user asks, “What is the weather in Singapore today?”, the LLM cannot rely on its training data, as this information changes continuously.
+  * In such cases, the agent must call an external tool—such as a Weather API—to retrieve the latest weather data, which is then fed back to the LLM to generate a final, coherent response.
+* An AI agent can combine a LM with external tools to perform tasks it couldn’t accomplish with language alone, such as retrieving real-time data, executing code, or interacting with other software.
+* <img width="200" height="150" alt="image" src="https://github.com/user-attachments/assets/f2824d47-da3c-460a-8e5e-957ebe0795d9" />
+* Specifically, an AI agent:
+  * Understands natural language: Leverages a LLM to interpret user queries or instructions.
+  * Reasons and plans: Analyzes the task, breaks it into steps, and decides how to proceed.
+  * Acts using known tools: Selects and executes actions from a set of tools (e.g., APIs, search engines, or custom scripts) to gather data or perform operations.
+  * Delivers results: Processes tool outputs and returns a coherent response to the user.
+* To understand how an AI agent works, let’s explore a practical example. Suppose a user asks, “Book me a table for two at an Italian restaurant near Orchard Road tonight, and also check if it’s going to rain.” * Here’s how the agent handles this request:
+  * Ask in natural language: The user submits a single, complex question that involves dining reservations and weather forecasting.
+  * Task breakdown and planning: The agent analyzes the query and breaks it into separate subtasks—finding suitable Italian restaurants, checking table availability, making a reservation, and retrieving the weather forecast for the evening.
+  * Tool selection and execution: The agent may call a restaurant-search API to locate Italian restaurants near Orchard Road. It then uses a reservation API to check availability and book a table. Finally, it calls a weather API to determine whether rain is expected tonight.
+  * Result delivery: The agent combines the outputs from these tools and presents a cohesive answer, such as: “I’ve reserved a table for two at La Tavola on Orchard Road for 7:00 PM. Also, it looks like there’s a high chance of rain tonight, so you may want to bring an umbrella.”
+* Unlike a standard AI model that only responds to text prompts, an agentic AI can act autonomously to achieve complex, multi-step goals.
+* It not only interprets the user’s request but also plans, decides which tools to use, executes actions, and integrates the results into a coherent response.
+* In essence, agentic AI behaves like an intelligent agent capable of reasoning, taking initiative, and interacting with external systems to accomplish tasks on behalf of the user.
+* Agentic AI doesn’t just answer questions—it plans, acts, and interacts with the world to achieve complex goals autonomously.
 
-Advertisement
+## SmolAgents
+* Numerous frameworks available for building AI agents.
+* Popular options include SmolAgents by Hugging Face, LangChain, LangGraph (both by LangChain, Inc.), and Microsoft’s AutoGen.
+* SmolAgents enables LLMs to reason, plan, and act by integrating tool usage directly into the agent’s workflow.
+* With support for multi-step reasoning, API calls, code execution, and interaction with external systems, it provides a clean and intuitive way to create powerful agentic behaviors without unnecessary overhead.
+* key features of the SmolAgents framework:
+  * Agent Types
+    * CodeAgent: Focused on generating and executing Python code inside a sandboxed environment.
+    * ToolCallingAgent: Can use multiple tools (APIs, Python interpreter, custom functions) to solve more complex tasks.
+  * Tool Integration. Agents can call built-in tools like:
+   * PythonInterpreterTool: Execute code
+   * DuckDuckGoSearchTool: Perform web searches
+   * FinalAnswerTool: Mark the final answer
+   * Custom Tools: Define your own tools to access APIs, read files, or perform specialized actions
+ * Task Planning and Reasoning
+   * Agents can break a user query into subtasks, select appropriate tools, execute them, and synthesize the results into a final answer.
+ * Lightweight and Flexible
+   * Works with multiple LLM back-ends.
+   * Designed for both educational use and real-world agent applications.
 
-What Is an Agent?
-In the world of artificial intelligence, an agent is a specialized system designed to perform tasks autonomously by combining language understanding, reasoning, and tool usage. Figure 1 shows the composition of an agent.
-
-Figure 1: The components within an agent
-Figure 1: The components within an agent
-An agent typically consists of a large language model (LLM) combined with a set of tools it can invoke to perform actions. These tools enable the agent to interact with external systems and access information or capabilities beyond what the LLM alone can provide.
-
-For example, if a user asks a general question such as “Who is Bill Gates?”, the LLM can answer directly because its training data likely includes information about him. However, if the user asks, “What is the weather in Singapore today?”, the LLM cannot rely on its training data, as this information changes continuously. In such cases, the agent must call an external tool—such as a Weather API—to retrieve the latest weather data, which is then fed back to the LLM to generate a final, coherent response.
-
-An AI agent can combine a language model with external tools to perform tasks it couldn’t accomplish with language alone, such as retrieving real-time data, executing code, or interacting with other software.
-
-Figure 2 shows the thought process of an agent.
-
-Figure 2: The thought process of an agent
-Figure 2: The thought process of an agent
-Specifically, an AI agent:
-
-Understands natural language: Leverages a large language model (LLM) to interpret user queries or instructions.
-Reasons and plans: Analyzes the task, breaks it into steps, and decides how to proceed.
-Acts using known tools: Selects and executes actions from a set of tools (e.g., APIs, search engines, or custom scripts) to gather data or perform operations.
-Delivers results: Processes tool outputs and returns a coherent response to the user.
-To understand how an AI agent works, let’s explore a practical example. Suppose a user asks, “Book me a table for two at an Italian restaurant near Orchard Road tonight, and also check if it’s going to rain.” Here’s how the agent handles this request:
-
-Ask in natural language: The user submits a single, complex question that involves dining reservations and weather forecasting.
-Task breakdown and planning: The agent analyzes the query and breaks it into separate subtasks—finding suitable Italian restaurants, checking table availability, making a reservation, and retrieving the weather forecast for the evening.
-Tool selection and execution: The agent may call a restaurant-search API to locate Italian restaurants near Orchard Road. It then uses a reservation API to check availability and book a table. Finally, it calls a weather API to determine whether rain is expected tonight.
-Result delivery: The agent combines the outputs from these tools and presents a cohesive answer, such as: “I’ve reserved a table for two at La Tavola on Orchard Road for 7:00 PM. Also, it looks like there’s a high chance of rain tonight, so you may want to bring an umbrella.”
-The example above illustrates the core principles of agentic AI. Unlike a standard AI model that only responds to text prompts, an agentic AI can act autonomously to achieve complex, multi-step goals. It not only interprets the user’s request but also plans, decides which tools to use, executes actions, and integrates the results into a coherent response. In essence, agentic AI behaves like an intelligent agent capable of reasoning, taking initiative, and interacting with external systems to accomplish tasks on behalf of the user.
-
-Agentic AI doesn’t just answer questions—it plans, acts, and interacts with the world to achieve complex goals autonomously.
-
-SmolAgents
-Today, there are numerous frameworks available for building AI agents, each offering its own philosophy and strengths. Popular options include SmolAgents by Hugging Face, LangChain, LangGraph (both by LangChain, Inc.), and Microsoft’s AutoGen. Although all of them support agent development, they differ in complexity, flexibility, and intended use cases.
-
-In this article, I’ll focus on building agents using SmolAgents, a lightweight and developer-friendly Python framework. SmolAgents enables large language models (LLMs) to reason, plan, and act by integrating tool usage directly into the agent’s workflow. With support for multi-step reasoning, API calls, code execution, and interaction with external systems, it provides a clean and intuitive way to create powerful agentic behaviors without unnecessary overhead.
-
-Here are some key features of the SmolAgents framework:
-
-Agent Types
-CodeAgent: Focused on generating and executing Python code inside a sandboxed environment.
-ToolCallingAgent: Can use multiple tools (APIs, Python interpreter, custom functions) to solve more complex tasks.
-Tool Integration. Agents can call built-in tools like:
-PythonInterpreterTool: Execute code
-DuckDuckGoSearchTool: Perform web searches
-FinalAnswerTool: Mark the final answer
-Custom Tools: Define your own tools to access APIs, read files, or perform specialized actions
-Task Planning and Reasoning
-Agents can break a user query into subtasks, select appropriate tools, execute them, and synthesize the results into a final answer.
-Lightweight and Flexible
-Works with multiple LLM back-ends.
-Designed for both educational use and real-world agent applications.
-The name “SmolAgents” is a playful twist on “small agents. “Smol” is internet slang for “small” or “cute,” often used to describe something lightweight or minimal.
-
-Creating Your Own Agent
-Let’s start by creating a simple AI agent. First, you need to install a few packages required for SmolAgents and its dependencies. Run the following commands:
-
- 
+## Creating Your Own Agent
+1. Install a few packages
+```
 !pip install 'smolagents[litellm]'
 !pip install ddgs
+```
+ * Installs SmolAgents along with the LiteLLM integration, which allows you to connect and use lightweight LLMs.
+ * ddgs, a Python package for DuckDuckGo search, which can be used as a built-in tool for agents to perform web searches. O
 
-The first command installs SmolAgents along with the LiteLLM integration, which allows you to connect and use lightweight LLMs. The second command installs ddgs, a Python package for DuckDuckGo search, which can be used as a built-in tool for agents to perform web searches. Once these packages are installed, you’re ready to create your first agent and start experimenting with reasoning, planning, and tool usage.
-
-For the underlying LLM, you have multiple options. You can use OpenAI’s models, which are widely supported and offer powerful language capabilities, or you can choose Ollama, a platform that allows you to run LLMs locally on your machine for privacy and offline use. Both options integrate seamlessly with SmolAgents, letting your agent perform reasoning, planning, and tool-based actions. For this first example, you’ll use OpenAI’s gpt-40-mini model as the underlying LLM. To enable SmolAgents to access OpenAI, you need to set your OpenAI API key as an environment variable:
-
- 
+2. For the underlying LLM, you have multiple options.
+ * use OpenAI’s models
+ * choose Ollama - , a platform that allows you to run LLMs locally on your machine for privacy and offline use.
+```
 import os
 os.environ["OPENAI_API_KEY"] = "<OPENAI_API_KEY>"
+```
 
-Let’s now create an agent using the ToolCallingAgent class from SmolAgents:
-
- 
+3. create an agent using the ToolCallingAgent class from SmolAgents:
+ * ToolCallingAgent instance that is ready to perform reasoning and call tools.
+ * No custom tools added, and the built-in base tools are disabled (add_base_tools=False).
+ * Later, you can extend this agent by adding tools such as a Python interpreter, search APIs, or any custom function, allowing it to execute multi-step tasks and interact with external systems.
+```
 from smolagents import ToolCallingAgent, LiteLLMModel 
 
 # use a model from OpenAI
-model = LiteLLMModel(
-    model_id="gpt-4o-mini",
-    api_base="https://api.openai.com/v1"
-)
+model = LiteLLMModel(model_id="gpt-4o-mini", api_base="https://api.openai.com/v1")
 
 # create an agent
-agent = ToolCallingAgent(tools = [], 
-            model = model,
-            add_base_tools = False) 
+agent = ToolCallingAgent(tools = [], model = model, add_base_tools = False) 
 
-The above code snippet creates a ToolCallingAgent instance that is ready to perform reasoning and call tools. At this stage, you haven’t added any custom tools, and the built-in base tools are disabled (add_base_tools=False). Later, you can extend this agent by adding tools such as a Python interpreter, search APIs, or any custom function, allowing it to execute multi-step tasks and interact with external systems. This set up gives you a flexible starting point for building more advanced agentic workflows.
-
-Let’s test this agent by asking it a simple question:
-
+```
  
+4. Test this agent by asking it a simple question:
+ * straightforward question for the agent, as it can answer directly using the knowledge encoded in its training data.
+ * In this case, the agent doesn’t need to call any external tools;
+ * the only tool it invokes is the FinalAnswerTool (“final_answer”), which signals the completion of the workflow and marks the final answer.
+ * <img width="550" height="150" alt="image" src="https://github.com/user-attachments/assets/2b3301da-ad01-4d95-8d8f-74f4c3cdfdb8" />
+```
 agent.run("Where is Singapore located?") 
-Figure 3 shows the thought process of the agent while it attempts to answer the question.
-
-Figure 3: The thought process of the agent as it tries to answer the question
-Figure 3: The thought process of the agent as it tries to answer the question
-This question is straightforward for the agent, as it can answer directly using the knowledge encoded in its training data. In this case, the agent doesn’t need to call any external tools; the only tool it invokes is the FinalAnswerTool (“final_answer”), which signals the completion of the workflow and marks the final answer. This simple example highlights how an agent can efficiently handle queries that fall within its existing knowledge without relying on additional resources.
-
-Now, let’s try a more challenging question:
-
+```
  
+5. Try a more challenging question:
+ * this query requires up-to-date information that’s not included in the agent’s training data.
+ * To answer it, the agent must identify that an external tool—such as a weather API—is needed.
+ * However, because our agent isn’t equipped with another tools (add_base_tools = False), it failed to answer the question.
+ * <img width="550" height="150" alt="image" src="https://github.com/user-attachments/assets/046f84f0-7218-4934-97d7-f300f2dc1f1a" />
+```
 agent.run("What is the weather for Singapore today?")
+```
 
-Unlike the previous example, this query requires up-to-date information that’s not included in the agent’s training data. To answer it, the agent must identify that an external tool—such as a weather API—is needed. However, because our agent isn’t equipped with another tools (add_base_tools = False), it failed to answer the question. Figure 4 shows how the agent failed to get the answer.
-
-Figure 4: Because the agent has no access to tools, it can’t find real-time weather information.
-Figure 4: Because the agent has no access to tools, it can’t find real-time weather information.
-Changing LLM
-Before I explore how to add tools to the agent, it’s worth noting that you can also use a model from Ollama instead of OpenAI. Ollama allows you to run LLMs locally, giving you more control and privacy. The following code snippet demonstrates how to use the Llama 3.2 model hosted on your local machine via Ollama:
-
- 
+## Changing LLM
+ * Use Ollama model instead of OpenAI.
+```  
 model = LiteLLMModel(
     model_id = "ollama/llama3.2",
     api_base = "http://127.0.0.1:11434",
     num_ctx = 8192, # context window size
 )
-
-To use this model, ensure that Ollama is installed and running on your computer. Once it’s active, SmolAgents can connect to the local instance, allowing your agent to perform reasoning, planning, and tool-based actions using the Llama 3.2 model without relying on external APIs.
+```
 
 Using Built-In Tools
 Let’s now equip the agent with some built-in (base) tools:
