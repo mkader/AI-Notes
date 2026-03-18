@@ -1,13 +1,9 @@
 # Integrating AI and ML in .NET Core with ML.NET
 
-* ML.NET is Microsoft's cross-platform, open-source machine learning framework that brings AI and ML to .NET developers.
+* ML.NET is Microsoft's cross-platform, open-source ML framework that brings AI and ML to .NET developers.
 * ML.NET lets you build, train, and deploy ML models that can help you build high-quality intelligent applications that can cater to the needs of today's businesses. 
-* It enables you to solve complex problems like classification, regression, clustering and recommendation
-* Some of the most popular ML frameworks include - TensorFlow, PyTorch, Microsoft CNTK, Amazon Machine Learning
-
+* Most popular ML frameworks include - TensorFlow, PyTorch, Microsoft CNTK, Amazon Machine Learning
 * use ML.NET to do most of the things you can do with Azure Cognitive Services. 
-* ML.NET lets you work with ML in C# or F# without leaving the .NET ecosystem. 
-* use ML.NET to integrate ML into your web, mobile, desktop, and even IoT apps. 
 
 * Do with ML.NET at a glance:
     * Regression Helps predict numerical values (i.e., item prices, population, etc.)
@@ -19,48 +15,38 @@
     * Model evaluation: Assesses model performance based on their accuracy, precision, etc.
 
 ## A typical ML workflow encompasses the following phases:
-    * Problem statement: Define the business problem and then analyze how best to apply machine learning to solve the problem.
-    * Data collection: The first phase in this workflow retrieves data from various data sources.
-    * Data preparation: The data is cleaned to remove any errors and make the data ready for analysis and modeling.
-    * Model selection and training: Select the appropriate ML algorithm (i.e., decision tree, logistic regression, neural network, etc.) and train the model using the dataset so that it knows the patterns and relationships in the data to be able to make predictions.
-    * Evaluation: Test the trained model to measure performance using metrics such as precision, accuracy, etc.
-    * Deployment: The trained and validated model is integrated into the production systems (i.e., business applications built using ASP.NET Core, mobile apps, desktop apps, etc.) so that it can generate predictions or automate decisions in real world environments.
-    * Monitoring and maintenance: Monitor the model performance, and retrain and update the model as needed to keep it accurate and relevant over time.
+   * Problem statement: Define the business problem and then analyze how best to apply machine learning to solve the problem.
+   * Data collection: The first phase in this workflow retrieves data from various data sources.
+   * Data preparation: The data is cleaned to remove any errors and make the data ready for analysis and modeling.
+   * Model selection and training: Select the appropriate ML algorithm (i.e., decision tree, logistic regression, neural network, etc.) and train the model using the dataset so that it knows the patterns and relationships in the data to be able to make predictions.
+   * Evaluation: Test the trained model to measure performance using metrics such as precision, accuracy, etc.
+   * Deployment: The trained and validated model is integrated into the production systems (i.e., business applications built using ASP.NET Core, mobile apps, desktop apps, etc.) so that it can generate predictions or automate decisions in real world environments.
+   * Monitoring and maintenance: Monitor the model performance, and retrain and update the model as needed to keep it accurate and relevant over time.
 
 ## Understanding the ML.NET Components
-    * MLContext - It represents the starting point in any ML.NET workflow and provides a single context to manage data loading, processing, transformation, model training, evaluation, and model persistence.
-    * IDataView 
-          * In ML.NET, data is represented using an abstraction named IDataView. 
-          * It provides an efficient and schema-aware representation of both training and prediction data. 
-          * IDataView objects are evaluated lazily for better performance and resource efficiency.
-    * Data loaders and data converters
-          * use File Loaders for retrieving data available in text, binary, and image files, 
-          * or use the Database Loader to load data from a database and then train the datasets. 
-          * Data Transformers are used to clean and transform the data in a format that's understandable by ML.NET.
-    * Model training
-          * It is a process used to build and train the models. 
-          * ML.NET takes advantage of one or more of the built-in algorithms for training models.
-              * Clustering
-              * Classification
-              * Regression
-              * Time series analysis
-              * Anomaly detection
+   * MLContext 
+     * It represents the starting point in any ML.NET workflow and provides a single context to manage data loading, processing, transformation, model training, evaluation, and model persistence.
+   * IDataView 
+     * In ML.NET, data is represented using an abstraction named IDataView. 
+     * It provides an efficient and schema-aware representation of both training and prediction data. 
+     * IDataView objects are evaluated lazily for better performance and resource efficiency.
+   * Data loaders and data converters
+     * use File Loaders for retrieving data available in text, binary, and image files, 
+     * or use the Database Loader to load data from a database and then train the datasets. 
+     * Data Transformers are used to clean and transform the data in a format that's understandable by ML.NET.
+   * Model training
+     * It is a process used to build and train the models. 
+     * ML.NET takes advantage of one or more of the built-in algorithms for training models - Clustering, Classification, Regression, Time series analysis, Anomaly detection
+   * Model evaluation
+     * Before deploy a trained model into the production environment, make sure that it's high-quality so that it can make the right predictions using model evaluation. 
+     * ML.NET has multiple evaluators to evaluate the accuracy, precision, and performance of trained models. 
+     * These model evaluators take advantage of several metrics to measure how well your model is performing in real-time. 
+     * The most commonly used metrics in this regard are:
+        * Binary classification: Accuracy, precision, recall, F1Score, AreaUnderROC
+        * Regression: RMSE (root mean squared error), RSquared
+        * Clustering: Normalized mutual information
 
-
-    * Model evaluation
-
-Before you deploy a trained model into the production environment, you want to make sure that it's high-quality so that it can make the right predictions using model evaluation. ML.NET has multiple evaluators to evaluate the accuracy, precision, and performance of trained models. These model evaluators take advantage of several metrics to measure how well your model is performing in real-time. The most commonly used metrics in this regard are:
-
-Binary classification: Accuracy, precision, recall, F1Score, AreaUnderROC
-Regression: RMSE (root mean squared error), RSquared
-Clustering: Normalized mutual information
-Getting Started with ML.NET in Visual Studio
-In this section, I'll examine how you can create a simple application using ML.NET. I'll start by creating a console application in Visual Studio 2022.
-
-Create a New .NET 10 Console Application
-Let's create a Windows application project to work with the C# 14 code examples given in the subsequent sections of this article. You can create a WPF project in Visual Studio 2022 in several ways. When you launch Visual Studio 2022, you'll see the Start window. You can choose Continue without code to launch the main screen of the Visual Studio 2022 IDE.
-
-To create a new Windows Application Project in Visual Studio 2022:
+## Create a New .NET 10 Console Application in VS 2022:
 
 Start the Visual Studio 2022 Preview IDE.
 In the Create a new project window, select Console App and click Next to move on.
