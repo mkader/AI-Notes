@@ -6,7 +6,7 @@
 * SecureCodeAgent uses this service as its GenAI engine.
   
 * how SecureCodeAgent works, quick summary of secure code agent.
-* <img width="400" height="450" alt="image" src="https://github.com/user-attachments/assets/4b630ae6-bd15-44cd-b684-83baad9e66d9" />
+* <img width="200" height="225" alt="image" src="https://github.com/user-attachments/assets/4b630ae6-bd15-44cd-b684-83baad9e66d9" />
 
 ## Why Catching Issues Early Matters
 * Fixing a vulnerability in production can cost 10–30 times more than fixing it during development.
@@ -35,7 +35,6 @@
 
 ## How SecureCodeAgent Works
 * <img width="700" height="400" alt="image" src="https://github.com/user-attachments/assets/2c49aebe-f3ac-45a4-afbe-0a1c0d5f49da" />
-* <img width="700" height="400" alt="image" src="https://github.com/user-attachments/assets/efbcb9bd-6fd5-4fb0-bcf3-ce5fa340b7da" />
 
 * Each finding is presented in a structured, developer-friendly table, highlighting:
     * The specific insecure or inefficient line of code
