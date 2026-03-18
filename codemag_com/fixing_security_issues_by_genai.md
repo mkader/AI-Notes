@@ -227,32 +227,7 @@ def run_securecodeagent_json(code_snippet):
     )
     return json.loads(response.choices[0].message.content)
 
-
-def analyze_with_retry(sample_code, max_retries=3):
-    for attempt in range(max_retries):
-        try:
-            resp = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[
-                    {
-                        "role": "system",
-                        "content": "Analyze code for security Issues."
-                    },
-                    {
-                        "role": "user",
-                        "content": sample_code
-                    }
-                ],
-                temperature=0
-            )
-            return resp.choices[0].message.content
-        except RateLimitError:
-            time.sleep(2 ** attempt)
-        except Exception as e:
-            logging.error(e)
-
 # Print security analysis
-    
 #file_name = "password_store_sample.py"
 file_name = "fetch_data.py"
 sample_code_path = Path(__file__).with_name(file_name)
@@ -268,5 +243,3 @@ print("=== Structured Findings ===")
 results = run_securecodeagent_json(sample_code)
 print(json.dumps(results, indent=2))
 ```
-
-Conclusion
