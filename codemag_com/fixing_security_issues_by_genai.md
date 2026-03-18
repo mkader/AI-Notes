@@ -34,7 +34,7 @@
     * Improve their own awareness of secure coding practices.
 
 ## How SecureCodeAgent Works
-* <img width="700" height="400" alt="image" src="https://github.com/user-attachments/assets/2c49aebe-f3ac-45a4-afbe-0a1c0d5f49da" />
+* <img width="700" height="400" alt="image" src="https://github.com/user-attachments/assets/14218887-06cb-46bf-befd-3293c5b3b34e" />
 
 * Each finding is presented in a structured, developer-friendly table, highlighting:
     * The specific insecure or inefficient line of code
