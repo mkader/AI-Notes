@@ -271,261 +271,157 @@
           max_tokens = 1024,
           temperature = 0.8)
       print(completion)
+      message = completion.choices[0].message.content
+      print(message)
       ```
     * The ChatCompletion.create() function takes in the following arguments:
         * Model: The model to use
         * Messages: The message to send to the chat bot, which must be packaged as a list of dictionaries
         * max_tokens: The maximum number of tokens to generate in the “completion.” If you set this to a small number, the response returned may not be complete.
         * Temperature: A value between 0 and 2. Lower value makes the output more deterministic. If you set it to a higher value like 0.8, the output is more likely to be different when you call the function multiple times.
-        * Tokens can be thought of as pieces of words. Before the API processes your prompt, it's broken down into tokens. Approximately a 1500-word sentence is equivalent to about 2048 tokens. For more information on tokens, refer to: https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them
-
-Questions to be sent to ChatGPT must be enclosed in the list of dictionaries. For example, the above questions are sent to ChatGPT in the format shown in Figure 11.
-
-Figure 11: The format of the questions to send to ChatGPT
-Figure 11: The format of the questions to send to ChatGPT
-For questions sent to ChatGPT, the dictionary must contain the role key set to user. The question to ask is set in the content key. The response from ChatGPT will look something like this:
-
- 
-{
-    "choices": [
+    * Tokens can be thought of as pieces of words. Before the API processes your prompt, it's broken down into tokens. Approximately a 1500-word sentence is equivalent to about 2048 tokens.
+        * For more information on tokens, refer to: https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them
+    * Response
+       ``` 
         {
-            "finish_reason": "stop",
-            "index": 0,
-            "message": {
-                 "content": "Python is a high-level,
-                  interpreted programming language that is 
-                  used for web development, data science,
-                  artificial intelligence, machine learning,
-                  software development, and many other 
-                  applications. Python is known for its 
-                  simplicity, readability, and ease of use, 
-                  making it a popular choice for beginners 
-                  and experts alike. It has a vast library 
-                  of modules and tools that can be used to  
-                  solve complex problems and automate tasks. 
-                  Python is open-source and free to use, 
-                  making it accessible to everyone.",
-            "role": "assistant"
+            "choices": [
+                {
+                    "finish_reason": "stop",
+                    "index": 0,
+                    "message": {
+                         "content": "Python is a high-level,
+                          interpreted programming language that is
+                          ...
+                          making it accessible to everyone.",
+                    "role": "assistant"
+                    }
+                }
+            ],
+            "created": 1683003427,
+            "id": "chatcmpl-7BcMVmIotmFcAFa4Wc9KyLB9Rp0gz",
+            "model": "gpt-3.5-turbo-0301",
+            "object": "chat.completion",
+            "usage": {
+                "completion_tokens": 94,
+                "prompt_tokens": 12,
+                "total_tokens": 106
             }
         }
-    ],
-    "created": 1683003427,
-    "id": "chatcmpl-7BcMVmIotmFcAFa4Wc9KyLB9Rp0gz",
-    "model": "gpt-3.5-turbo-0301",
-    "object": "chat.completion",
-    "usage": {
-        "completion_tokens": 94,
-        "prompt_tokens": 12,
-        "total_tokens": 106
-    }
-}
-The result in JSON contains a lot of information. In particular, the value of the choices key is an array, of which the first element contains the result that you want, stored in the message dictionary in the content key:
-
- 
-message = completion.choices[0].message.content
-print(message)
-And here is the response returned by ChatGPT:
-
- 
-Python is a high-level, interpreted 
-programming language that is used for web
-development, data science, artificial 
-intelligence, machine learning, software 
-development, and many other applications. 
-Python is known for its simplicity, 
-readability, and ease of use, making it a
-popular choice for beginners and experts 
-alike. It has a vast library of modules 
-and tools that can be used to solve complex 
-problems and automate tasks. Python is open-
-source and free to use, making it 
-accessible to everyone.
-It's important to remember that ChatGPT doesn't remember your previous questions. So in order for you to have a meaningful conversation with it, you need to feed the conversation back to the API. Remember the list of dictionaries you need to pass to the API?
-
-To feed the previous conversation back to ChatGPT, you first append the reply from ChatGPT to the list. Then, you append your follow-up question (see Figure 12).
-
-Figure 12: You need to append the previous response in order for ChatGPT to continue with the conversation.
-Figure 12: You need to append the previous response in order for ChatGPT to continue with the conversation.
-This way, ChatGPT is able to know the previous questions that you have asked and the responses it provided. Here's the updated code to allow the user to have a meaningful conversation with ChatGPT:
-
- 
-Messages = []
-while True:
-    prompt = input('\nAsk a question: ')    
-    messages.append(
-        {
-            'role':'user',
-            'content':prompt
-        })    
- 
-    # creating a chat completion
-    completion = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages = messages)
-    
-    # extract the response from GPT
-    response = completion['choices'][0]['message']['content']
-    print(response)    
-    # append the response from GPT
-    messages.append(
-        {
-            'role':'assistant',
-            'content':response
-        })
-Figure 13 shows a conversation I had with ChatGPT. The rectangles in red are my questions.
-
-Figure 13: Having a conversation with ChatGPT using the Python application
-Figure 13: Having a conversation with ChatGPT using the Python application
-Whisper API
-Whisper is a general-purpose speech recognition model offered by OpenAI. It's trained on a large dataset of diverse audio and is also a multitasking model that can perform multilingual speech recognition, speech translation, and language identification.
-
-In this section, I'll show you how to use the Whisper API in Python to perform transcription of audio files (to text), and how to translate non-English results into English.
-
-Advertisement
-
-Installing the Whisper Python Package
-To install the Whisper API, type the following command in a new cell in your Jupyter Notebook:
-
- 
-!pip install -U openai-whisper
-Viewing Available Models and Languages
-The Whisper API offers five main pre-trained models that you can use for your transcription. You can view the five models by using the models() function:
-
- 
-whisper.available_models()
-There are five main models: tiny, base, small, medium, and large:
-
- 
-['tiny.en',
- 'tiny',
- 'base.en',
- 'base',
- 'small.en',
- 'small',
- 'medium.en',
- 'medium',
- 'large-v1',
- 'large-v2',
- 'large']
-Model names ending with .en are English-only and tend to perform better.
-
-Figure 14 shows the details of the various models, such as their number of trainable parameters, required memory, and relative execution speed.
-
-Figure 14: The various models for the Whisper API (source: https://pypi.org/project/openai-whisper/)
-Figure 14: The various models for the Whisper API (source: https://pypi.org/project/openai-whisper/)
-Creating a Model
-Let's now load up a model that you want to use for the transcription:
-
- 
-import whisper
-model = whisper.load_model("base")
-When you create a model for the first time, the weights of the model are downloaded onto your computer. It will be saved in the ~/.cache/whisper directory.
-
-Transcribing Audio and Translating Text
-To transcribe audio, you can either load the audio file that's saved locally on your computer or supply a URL pointing to the audio file. The following example loads the audio file using an URL:
-
- 
-result = model.transcribe(
-    'https://www.voiptroubleshooter.com/' +
-    'open_speech/american/' + 
-    'OSR_us_000_0015_8k.wav')
-result
-If you see a warning like “UserWarning: FP16 is not supported on CPU; using FP32 instead”, that means your model isn't able to make use of the GPU; instead it makes use of the CPU.
-
-FP16 (half-precision floating point) uses 16-bits for storing floating point numbers while FP32 (single-precision floating point) uses 32-bits. Although FP32 allows higher precision and accuracy, it comes with a cost in terms of larger memory footprints. In general, for deep learning, FP16 is preferred over FP32 due to its faster computation times, and also due to the fact that tasks like image classification and object detection do not require a lot of precision.
-
-The result returned by the transcribe() function contains the transcription (text) and a list of all the transcription segments (segments):
-
- 
-{'text': " The first can be slid on the 
-smooth planks. Glue the sheet to the dark 
-blue background. It's easy to tell the 
-depth of a well. These days, the chicken 
-leg is a rare dish. Rice is often served 
-in round bowls. The juice of lemons makes 
-fine punch. The box was thrown beside the 
-part truck. The house were fed chopped 
-corn and garbage. Four hours of study 
-work faced us. A large size of stockings 
-is hard to sell.",
- 'segments': [{'id': 0,
-   'seek': 0,
-   'start': 0.0,
-   'end': 6.5200000000000005,
-   'text': ' The first can be slid on the smooth planks.',
-   'tokens': [50364,
-    440,
-    700,
-    393,
-    312,
-    1061,
-    327,
-    322,
-    264,
-    5508,
-    499,
-    14592,
-    13,
-    50690],
-   'temperature': 0.0,
-   'avg_logprob': -0.29290932700747535,
-   'compression_ratio': 1.5105263157894737,
-   'no_speech_prob': 0.024191662669181824},
-  {'id': 1,
-   'seek': 0,
-   'start': 6.5200000000000005,
-   'end': 10.32,
-   'text': ' Glue the sheet to the dark blue background.',
-   'tokens': [50690, 49832, 264, 8193, 281,
-        264, 2877, 3344, 3678, 13, 50880],
-   'temperature': 0.0,
-   'avg_logprob': -0.29290932700747535,
-   'compression_ratio': 1.5105263157894737,
-   'no_speech_prob': 0.024191662669181824},
-   ...
-   ],
- 'language': 'en'}
-The detail of each segment contains information like start time, end time, text, and more. You can load the values of the segments key as a Pandas DataFrame for easier inspection (see Figure 15):
-
- 
-import pandas as pd
-df = pd.DataFrame.from_dict(result['segments'])
-df
-Figure 15: Displaying the segments as a dataframe
-Figure 15: Displaying the segments as a dataframe
-If you're more interested in the transcription of the audio file, extract the value of the text key:
-
- 
-result["text"]
-Here's the transcription of the audio:
-
-“The first can be slid on the smooth planks. Glue the sheet to the dark blue background. It's easy to tell the depth of a well. These days, the chicken leg is a rare dish. Rice is often served in round bowls. The juice of lemons makes fine punch. The box was thrown beside the part truck. The house were fed chopped corn and garbage. Four hours of study work faced us. A large size of stockings is hard to sell.”
-
-As the transcription can take a while to perform, you can set the verbose parameter to True so that the transcription segments can be displayed as and when it is ready:
-
- 
-result = model.transcribe(
-    'https://www.voiptroubleshooter.com/' +
-    'open_speech/american/' + 
-    'OSR_us_000_0015_8k.wav',
-    verbose = True)
-result
-Here it the output when you set the verbose parameter to True:
-
- 
-Detecting language using up to the first 30 
-seconds. Use `--language` to specify the language
-Detected language: English
-[00:00.000 --> 00:06.520]  The first can be slid on the smooth planks.
-[00:06.520 --> 00:10.320]  Glue the sheet to the dark blue background.
-[00:10.320 --> 00:14.180]  It's easy to tell the depth of a well.
-[00:14.180 --> 00:18.280]  These days, the chicken leg is a rare dish.
-[00:18.280 --> 00:22.040]  Rice is often served in round bowls.
-[00:22.040 --> 00:25.920]  The juice of lemons makes fine punch.
-[00:25.920 --> 00:29.880]  The box was thrown beside the part truck.
-[00:29.880 --> 00:34.000]  The house were fed chopped corn and garbage.
-[00:34.000 --> 00:37.480]  Four hours of study work faced us.
-[00:37.480 --> 00:39.800]  A large size of stockings is hard to sell.
+       ```
+   * ChatGPT doesn't remember your previous questions. So in order for you to have a meaningful conversation with it, you need to feed the previous conversation back to the API.
+      * <img width="350" height="150" alt="image" src="https://github.com/user-attachments/assets/9be43a0e-94f4-4375-9856-91d5b8c71e59" />
+      * This way, ChatGPT is able to know the previous questions that you have asked and the responses it provided. Here's the updated code to allow the user to have a meaningful conversation with ChatGPT:
+      ``` 
+       Messages = []
+       while True:
+           prompt = input('\nAsk a question: ')    
+           messages.append(
+               {
+                   'role':'user',
+                   'content':prompt
+               })    
+        
+           # creating a chat completion
+           completion = openai.ChatCompletion.create(model="gpt-3.5-turbo",  messages = messages)
+           
+           # extract the response from GPT
+           response = completion['choices'][0]['message']['content']
+           print(response)    
+           # append the response from GPT
+           messages.append(
+               {
+                   'role':'assistant',
+                   'content':response
+               })
+      ```
+6. Whisper API
+   * Whisper is a general-purpose speech recognition model offered by OpenAI.
+   * It's trained on a large dataset of diverse audio and is also a multitasking model that can perform multilingual speech recognition, speech translation, and language identification.
+   * install the Whisper API ``` !pip install -U openai-whisper ```
+   * API offers 5 main pre-trained models that you can use for your transcription.  ``` whisper.available_models() ```
+   * There are 5 main models: tiny, base, small, medium, and large: ``` ['tiny.en', 'tiny', 'base.en', 'base', 'small.en', 'small', 'medium.en', 'medium', 'large-v1', 'large-v2', 'large'] ```
+   * the details of the various models, such as their number of trainable parameters, required memory, and relative execution speed.
+   * <img width="350" height="150" alt="image" src="https://github.com/user-attachments/assets/0a809681-01e6-4f19-9ef8-95ab7ee6e1ad" />
+  * Creating a Model -  first time, the weights of the model are downloaded onto your computer. It will be saved in the ~/.cache/whisper directory.
+      ```
+      import whisper
+      model = whisper.load_model("base")
+      ```
+  * Transcribing Audio and Translating Text - either load local the audio file or URL
+     ```
+     result = model.transcribe(
+         'https://www.voiptroubleshooter.com/' +
+         'open_speech/american/' + 
+         'OSR_us_000_0015_8k.wav')
+     result
+     print (result["text"])
+     ```
+   * see a warning like “UserWarning: FP16 is not supported on CPU; using FP32 instead”, that means your model isn't able to make use of the GPU; instead it makes use of the CPU.
+      * FP16 (half-precision floating point) uses 16-bits for storing floating point numbers while FP32 (single-precision floating point) uses 32-bits.
+      * Although FP32 allows higher precision and accuracy, it comes with a cost in terms of larger memory footprints.
+      * In general, for deep learning, FP16 is preferred over FP32 due to its faster computation times, and also due to the fact that tasks like image classification and object detection do not require a lot of precision.
+   * The result returned by the transcribe() function contains the transcription (text) and a list of all the transcription segments (segments):
+     ``` 
+     {'text': " The first can be slid on the 
+     smooth planks. Glue the sheet to the dark 
+     ...
+     is hard to sell.",
+      'segments': [{'id': 0,
+        'seek': 0,
+        'start': 0.0,
+        'end': 6.5200000000000005,
+        'text': ' The first can be slid on the smooth planks.',
+        'tokens': [50364,
+         440,
+         ...
+         13,
+         50690],
+        'temperature': 0.0,
+        'avg_logprob': -0.29290932700747535,
+        'compression_ratio': 1.5105263157894737,
+        'no_speech_prob': 0.024191662669181824},
+       {'id': 1,
+        'seek': 0,
+        'start': 6.5200000000000005,
+        'end': 10.32,
+        'text': ' Glue the sheet to the dark blue background.',
+        'tokens': [50690, 49832, 264, 8193, 281,
+             264, 2877, 3344, 3678, 13, 50880],
+        'temperature': 0.0,
+        'avg_logprob': -0.29290932700747535,
+        'compression_ratio': 1.5105263157894737,
+        'no_speech_prob': 0.024191662669181824},
+        ...
+        ],
+      'language': 'en'}
+     ````
+  * The detail of each segment contains information like start time, end time, text, and more. You can load the values of the segments key as a Pandas DataFrame for easier inspection:
+     * <img width="500" height="200" alt="image" src="https://github.com/user-attachments/assets/8a69b57b-1b51-4b22-8b90-7211ec87b4f5" />
+    ```
+    import pandas as pd
+    df = pd.DataFrame.from_dict(result['segments'])
+    ```
+  * As the transcription can take a while to perform, you can set the verbose parameter to True so that the transcription segments can be displayed as and when it is ready:
+     ```
+     result = model.transcribe(
+         'https://www.voiptroubleshooter.com/' +
+         'open_speech/american/' + 
+         'OSR_us_000_0015_8k.wav',
+         verbose = True)
+     result
+     ```
+     * Here it the output when you set the verbose parameter to True:
+       ``` 
+       Detecting language using up to the first 30 
+       seconds. Use `--language` to specify the language
+       Detected language: English
+       [00:00.000 --> 00:06.520]  The first can be slid on the smooth planks.
+       [00:06.520 --> 00:10.320]  Glue the sheet to the dark blue background.
+       [00:10.320 --> 00:14.180]  It's easy to tell the depth of a well.
+      ...
+       [00:34.000 --> 00:37.480]  Four hours of study work faced us.
+       [00:37.480 --> 00:39.800]  A large size of stockings is hard to sell.
+       ```
 Not only can Whisper transcribe your audio, it can also translate the result into English. Let's transcribe an audio which is in French:
 
  
