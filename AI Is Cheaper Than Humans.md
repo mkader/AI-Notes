@@ -51,6 +51,3 @@
       * One 2026 case study tracked a mid-complexity customer operations agent to a three-year cost of €368,000 against an original estimate of €158,000.
       * And yet 88% of organizations say they’re using AI in at least one business function. Only 20% report any measurable impact on the bottom line.
       * Using a tool is not the same as benefiting from it.   
-redesigning exception-driven workflows, building HITL systems that scale, and retraining people to operate as force multipliers rather than competitors of the machine.
-
-The $8 question has a real answer: for most skilled professional tasks in 2026, human labor remains cheaper when total cost of ownership is measured honestly.
