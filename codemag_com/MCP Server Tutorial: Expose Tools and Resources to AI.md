@@ -283,142 +283,139 @@ Advertisement
 
 * In plain English, you are telling the AI: “If you decide a service needs a restart, here is the specific button you press, the information I need from you to press it, and what will happen when you do.”
 
-Here is how specifically this “digital button” is built.
+* 1.the name: resolve_incident - the name of the command.
+  * When AI is thinking, it sees this in its list of available actions, similar to how you see a list of apps on your phone.
 
-First is the name: resolve_incident, which is the name of the command. When AI is thinking, it sees this in its list of available actions, similar to how you see a list of apps on your phone.
+* 2.the instruction manual, the metadata - This tells AI how and when to use the tool.
+  * The title and description explain to the AI what the tool does.
+  * AI reads this and thinks: “The user wants to fix the API… oh, I have a tool called Service restart that attempts a fix. I should use that!”
+  * The inputSchema defines the “form” AI must fill out. It tells the AI: “If you want to use this tool, you must provide a serviceName and a reason.”
+  * The .describe() parts are clues for the AI so it knows exactly what to type into those fields.
+  * The execution (the “work”), which is the async ({ serviceName, reason }) => { ... } block is what actually happens on your computer when AI clicks the digital button.
 
-Second is the instruction manual, the metadata. This tells AI how and when to use the tool. The title and description explain to the AI what the tool does. AI reads this and thinks: “The user wants to fix the API… oh, I have a tool called Service restart that attempts a fix. I should use that!” The inputSchema defines the “form” AI must fill out. It tells the AI: “If you want to use this tool, you must provide a serviceName and a reason.” The .describe() parts are clues for the AI so it knows exactly what to type into those fields. The execution (the “work”), which is the async ({ serviceName, reason }) => { ... } block is what actually happens on your computer when AI clicks the digital button.
+* console.error - it prints a log to your terminal so you can see what the AI is doing. Never use console.log since that will interfere with the JSON-RPC protocol.
 
-We use console.error, so it prints a log to your terminal so you can see what the AI is doing. Never use console.log since that will interfere with the JSON-RPC protocol.
+* use a random number to simulate a real-world scenario where restart might fail.
+  * We have put in an 80% success rate.
+  * In a real app, this is where you'd put code to talk to a server or cloud provider. But for a demo this is good enough.
 
-Then we use a random number to simulate a real-world scenario where restart might fail. We have put in an 80% success rate. In a real app, this is where you'd put code to talk to a server or cloud provider. But for a demo this is good enough.
+* the feedback loop where the code sends a message back to the AI works in one of two ways:
+  * SUCCESS: The AI gets a text confirmation and can tell you, “I've restarted it for you!”
+  * FAILURE: AI gets an error message and can say, “I tried to fix it, but something went wrong; you should probably take a look.”
 
-Finally, the feedback loop where the code sends a message back to the AI works in one of two ways:
+* code changes at this point - https://github.com/maliksahil/mcp-incident-assistant/pull/3.
 
-SUCCESS: The AI gets a text confirmation and can tell you, “I've restarted it for you!”
-FAILURE: AI gets an error message and can say, “I tried to fix it, but something went wrong; you should probably take a look.”
-If you are interested in following along the full set of code changes at this point, you can see the pull request at https://github.com/maliksahil/mcp-incident-assistant/pull/3.
-
-Add the Startup Logic
-All that is left to be done is to add the starting up logic, which can be seen in Listing 4.
-
-Listing 4: Startup logic
-// The actual startup logic
-async function main() {
-    const transport = new StdioServerTransport();
-    await server.connect(transport);
-    console.error("IncidentResponsePro is standing by.");
-}
-
-main().catch((err) => {
-    console.error("Fatal error during startup:", err);
-    process.exit(1);
-});
-If the resources were the AI's “eyes” and the tools were its “hands,” this bit of code is the “phone line” and the “power switch” that turns the whole operation on.
-
-In plain English, you are telling your computer: “Open up a communication channel, connect my AI assistant to it, and let me know when it's ready to start taking orders.”
-
-Here, first we create a new pipe using new StdioServerTransport(). MCP servers need a way to send and receive messages. Stdio (Standard Input/Output) creates a virtual pipe. When the Gemini CLI sends a command, it goes into the pipe's input. When your server responds, it pushes data out the pipe's output. It's the simplest, fastest way for two programs on the same computer to talk to each other.
-
-Next is the handshake: await server.connect(transport), which is when the “brain” meets the “pipe.” It takes all those tools and resources you defined earlier and hooks them up to the communication channel. It's like plugging a telephone into the wall jack. Once this line finishes, your server is officially listening for Gemini to ask it a question.
-
-Next is the status light: console.error(...). You'll notice we use console.error again and not console.log. Because the “pipe” (stdout) is busy sending technical JSON-RPC data to Gemini, we use the “error” channel (stderr) to talk to you, the human.
-
-This prints a nice message in your terminal so you know the server didn't just crash—it's actually running and waiting.
-
-I know this is counterintuitive for console.error to show a non-error message, but it is what it is.
-
-Finally, the safety net: main().catch(...). Hey, computers are unpredictable. Sometimes a port is blocked or a file is missing. This part is the “emergency brake.” If the server fails to start for any reason, it catches the error, prints exactly what went wrong to your screen, and process.exit(1) tells the computer to shut the program down immediately rather than let it sit there “broken” and waste memory.
-
-If you are interested in following along the full set of code changes at this point, you can see the pull request at https://github.com/maliksahil/mcp-incident-assistant/pull/4.
-
-Building the MCP Server
-Now we need to connect the brain to the muscles. This is a matter of building our MCP server so it is in an executable form. In our case that would be a .js file. You can also have hosted MCP servers that are hosted as an API, or simply specify that an MCP server runs locally as a Node.js file, or a Python or Go file, etc.
-
-To build our server, run the following command.
-
+## Add the Startup Logic
+ ```
+ Listing 4: Startup logic
+ // The actual startup logic
+ async function main() {
+     const transport = new StdioServerTransport();
+     await server.connect(transport);
+     console.error("IncidentResponsePro is standing by.");
+ }
  
-npx tsc
-Since we have already configured our tsconfig.json to put the built version in the dist folder, you should now see a dist folder in your project with the built version of the code (Figure 1).
+ main().catch((err) => {
+     console.error("Fatal error during startup:", err);
+     process.exit(1);
+ });
+ ```
+ * If the resources were the AI's “eyes” and the tools were its “hands,” this bit of code is the “phone line” and the “power switch” that turns the whole operation on.
 
-Figure 1: Our built MCP server
-Figure 1: Our built MCP server
-Now we need to configure our CLI. Specifically, our AI host, Gemini CLI in this case, needs to be told what MCP servers it can use and where they live. To do so, edit the ~/.gemini/settings.json file, and add the following snippet.
+* In plain English, you are telling your computer: “Open up a communication channel, connect my AI assistant to it, and let me know when it's ready to start taking orders.”
 
- 
-{
-    "mcpServers": {
-        "incident-bot": {
-            "command": "node",
-            "args": [
-                "/..fullpathto../dist/index.js"
-            ]
+* 1.create a new pipe using new StdioServerTransport().
+  * MCP servers need a way to send and receive messages.
+  * Stdio (Standard Input/Output) creates a virtual pipe.
+  * When the Gemini CLI sends a command, it goes into the pipe's input.
+  * When your server responds, it pushes data out the pipe's output.
+  * It's the simplest, fastest way for two programs on the same computer to talk to each other.
+
+* 2.the handshake: await server.connect(transport), which is when the “brain” meets the “pipe.”
+  * It takes all those tools and resources you defined earlier and hooks them up to the communication channel.
+  * It's like plugging a telephone into the wall jack. Once this line finishes, your server is officially listening for Gemini to ask it a question.
+
+* 3.the status light: console.error(...).
+  * You'll notice we use console.error again and not console.log.
+  * Because the “pipe” (stdout) is busy sending technical JSON-RPC data to Gemini, we use the “error” channel (stderr) to talk to you, the human.
+  * This prints a nice message in your terminal so you know the server didn't just crash—it's actually running and waiting.
+
+* 4.the safety net: main().catch(...).
+  * Hey, computers are unpredictable. Sometimes a port is blocked or a file is missing.
+  * This part is the “emergency brake.” If the server fails to start for any reason, it catches the error, prints exactly what went wrong to your screen, and process.exit(1) tells the computer to shut the program down immediately rather than let it sit there “broken” and waste memory.
+
+* code changes at this point- https://github.com/maliksahil/mcp-incident-assistant/pull/4.
+
+## Building the MCP Server
+* Now we need to connect the brain to the muscles.
+  * This is a matter of building our MCP server so it is in an executable form.
+  * In our case that would be a .js file.
+  * You can also have hosted MCP servers that are hosted as an API, or simply specify that an MCP server runs locally as a Node.js file, or a Python or Go file, etc.
+
+* To build our server, run the following command. ``` npx tsc ```
+  * Since we have already configured our tsconfig.json to put the built version in the dist folder, you should now see a dist folder in your project with the built version of the code.
+
+* Now we need to configure our CLI.
+  * Specifically, our AI host, Gemini CLI in this case, needs to be told what MCP servers it can use and where they live.
+  * To do so, edit the ~/.gemini/settings.json file, and add the following snippet.
+    ``` 
+    {
+        "mcpServers": {
+            "incident-bot": {
+                "command": "node",
+                "args": [
+                    "/..fullpathto../dist/index.js"
+                ]
+            }
         }
     }
-}
-A few things to be careful of here.
-
-You may not have a ~/.gemini/settings.json file; if it doesn't exist, create it.
-Second, you may already have MCP servers in that list. If you do, add incident-bot into that list rather than replacing the full list.
-Finally, in args, ensure you specify the full path to the index.js file you just built.
+    ```
+      * A few things to be careful of here.
+        * You may not have a ~/.gemini/settings.json file; if it doesn't exist, create it.
+        * Second, you may already have MCP servers in that list. If you do, add incident-bot into that list rather than replacing the full list.
+        * Finally, in args, ensure you specify the full path to the index.js file you just built.
 That's it. It's time to take this MCP server for a spin.
 
-Running the MCP Server
-Go ahead and launch Gemini CLI. Once Gemini CLI is launched, run the following command to verify that your MCP server is available:
+## Running the MCP Server
+* Launch Gemini CLI, run the cmd to verify that your MCP server is available: ``` /mcp list ```
+  * It should produce an output like Figure 2.
+  * <img width="672" height="175" alt="image" src="https://github.com/user-attachments/assets/c8753bdd-1f38-43ba-b248-e0d7350f6178" />
 
- 
-/mcp list
-It should produce an output like Figure 2.
+* Now give it a prompt as below.
+  ```
+  Prompt
+  Are there any critical alerts? If so, try to fix them and let me know the result.
+  ```
 
-Figure 2: Our MCP server is visible
-Figure 2: Our MCP server is visible
-Excellent! Now give it a prompt as below.
+* Free version of Gemini CLI is slow compare to paid version of Claude with the same MCP server are much faster and better. The results from Gemini are somewhat similar.
 
-Prompt
-Are there any critical alerts? If so, try to fix them and let me know the result.
-Feel free to tweak the input as you desire. You are talking to AI after all; you should be able to talk in plain English. Imagine if you had another MCP server that could tell you names of services? Then you could say, “For all my services, check active alerts…” In fact, why would you even need to type this? Couldn't you just automate that with an agent? Let's leave that for some other day.
+* Gemini starts by understanding what we mean by our command. As Figure shows, the first thing it did was to look in the current folder.
+  * <img width="1425" height="139" alt="image" src="https://github.com/user-attachments/assets/94fc8ffb-64e1-44d9-9e0b-17befc43b5fa" />
+  * This is an important point here. When you start Gemini or Claude, you are trusting that folder.
+  * I usually create a folder called “gemini” or “claude” on my machine, and in that I specify sandbox settings, so it doesn't keep prompting me for what I consider safe.
+  * But I certainly do not give these CLIs carte blanche access to my whole disk. That would be a bad idea.
 
-Let's try the above prompt.
+* Next, Gemini uses cli_help to try and determine if our mcp_incident_bot tool can be of any help. This can be seen in Figure.
+   * <img width="1232" height="117" alt="image" src="https://github.com/user-attachments/assets/fed0916b-9423-486f-a91d-4ce6e9af12a6" />
 
-Advertisement
+* Well, it looks like that request timed out, so now Gemini is trying alternate sources of information such as Google web search or parent directory, and then it returns to cli_help to try and figure out what we intend to do, as shown in Figure.
+  * <img width="1335" height="397" alt="image" src="https://github.com/user-attachments/assets/a5f78af4-45c5-4682-886b-338361c26c67" />
 
-Now I'm using the free version of Gemini CLI, and anecdotally I can tell you that the results I get when using Claude with the same MCP server on a paid plan are much faster and better. Feel free to try that on your own dime though. The results from Gemini are somewhat similar.
+* After some gyrations, Gemini knows exactly what to do and it asks for your permission to continue, as can be seen in Figure.
+  * <img width="1700" height="468" alt="image" src="https://github.com/user-attachments/assets/8a7e1d1a-5cb5-492f-a9d1-62513c0566d5" />
 
-Gemini starts by understanding what we mean by our command. As Figure 3 shows, the first thing it did was to look in the current folder.
+* And now Gemini calls our action and successfully resolves the alerts as can be seen in Figure.
+  * <img width="1667" height="337" alt="image" src="https://github.com/user-attachments/assets/c76e4198-6239-48c3-8cda-0356228b9cba" />
 
-Figure 3: Gemini trying to figure out what we mean
-Figure 3: Gemini trying to figure out what we mean
-This is an important point here. When you start Gemini or Claude, you are trusting that folder. I usually create a folder called “gemini” or “claude” on my machine, and in that I specify sandbox settings, so it doesn't keep prompting me for what I consider safe. But I certainly do not give these CLIs carte blanche access to my whole disk. That would be a bad idea.
+* Just solved a bunch of alerts using your very own MCP server.
 
-Next, Gemini uses cli_help to try and determine if our mcp_incident_bot tool can be of any help. This can be seen in Figure 4. Note that since I'm on a freebie version of Gemini, things are not only slow they also frequently time out and retry. I guess it's free so I shouldn't complain too much.
+## Summary
+* While our example focused on restarting a server, MCP is a Swiss Army knife for developers.
+* Write many other useful MCP servers.
+  * an infrastructure doctor - an AI that monitors your sentry logs or AWS alerts and automatically suggests (or applies) patches to your staging environment.
+  * a database whisperer - instead of writing complex SQL joins, you can ask the AI to “Find all users who haven't logged in since the 2026 tax season began” and let it query your PostgreSQL or MongoDB server directly.
+  * ultimate PR reviewer? This MCP server connected to GitHub can let an AI pull down your local branch, run a linter, and check for security vulnerabilities before you even push your code.
+  * knowledge hub - which connects your AI to your private Notion or Slack history so it can answer questions like, “What did the team decide about the zero-turn mower project back in January?”
 
-Figure 4: Gemini looking at our MCP server
-Figure 4: Gemini looking at our MCP server
-Well, it looks like that request timed out, so now Gemini is trying alternate sources of information such as Google web search or parent directory, and then it returns to cli_help to try and figure out what we intend to do, as shown in Figure 5.
-
-Figure 5: Gemini is now trying to figure out things via Google search
-Figure 5: Gemini is now trying to figure out things via Google search
-After some gyrations, Gemini knows exactly what to do and it asks for your permission to continue, as can be seen in Figure 6.
-
-Figure 6: Gemini asking for permission
-Figure 6: Gemini asking for permission
-And now Gemini calls our action and successfully resolves the alerts as can be seen in Figure 7.
-
-Figure 7: Resolving alerts like a boss
-Figure 7: Resolving alerts like a boss
-Congratulations, you just solved a bunch of alerts using your very own MCP server.
-
-Summary
-This article is essentially your roadmap for transforming an LLM from a “highly educated pen pal” into a “capable digital employee.” The Model Context Protocol (MCP) acts as a universal adapter—much like USB-C—that allows an AI to plug directly into your local files, databases, and APIs. By using resources (the AI's eyes—read-only data like logs or documentation) and tools (the AI's hands—actions like restarting a server or sending an email), you create a system where the AI can observe a problem and execute a fix without you having to copy-paste code back and forth.
-
-While our example focused on restarting a server, MCP is a Swiss Army knife for developers. You could write many other useful MCP servers. You could author an infrastructure doctor, an AI that monitors your sentry logs or AWS alerts and automatically suggests (or applies) patches to your staging environment. Or a database whisperer, instead of writing complex SQL joins, you can ask the AI to “Find all users who haven't logged in since the 2026 tax season began” and let it query your PostgreSQL or MongoDB server directly. How about the ultimate PR reviewer? This MCP server connected to GitHub can let an AI pull down your local branch, run a linter, and check for security vulnerabilities before you even push your code. Perhaps a knowledge hub, which connects your AI to your private Notion or Slack history so it can answer questions like, “What did the team decide about the zero-turn mower project back in January?”
-
-In fact, there are many MCP servers already available for you to use. GitHub, Vercel, Docker, SQLite, Postgres, Slack, Notion, Google Workspace, Microsoft 365, and many others already offer MCP servers for their functionality.
-
-It is truly an exciting time in IT. The last time I felt this super charged and enabled was when I first sat on a computer with an internet connection. The feeling of surfing from one corner of the world to any other corner of the world was indescribable. AI frankly feels the same way. All these systems and programs and products are nothing but silos. There is a learning curve, their own unique nuances, their own unique domain-specific languages, or knowing where to clickety click to find out some random bit of information I need. And as much as we depend on these software programs or products, breaking the bridges between them seems to be 90% of what we spend our effort and time on.
-
-Somewhere along the way, we lost the plot. We spend 99% of our effort on scaffolding, not the building. I know Splunk is powerful, but it is another domain-specific language to learn. I know Slack has our information, but searching through Slack is awful. I know Microsoft 365 is a mega storage of information, but what good is it if I cannot correlate it easily with everything else I am doing? Sure, there is Microsoft Graph, but it takes time and effort to write all those Microsoft Graph queries, read documentation, handle nuances like http 429s, etc. Then you have to learn Node.js or Python or whatever is the flavor of the month to glue all this together, and then you have to worry about constant package hell.
-
-MCP servers and AI break all those boundaries and finally let me do what I need to get done.
-
-What a truly exciting time to be around. Until next time, beep beep boop boop. Sahil.ai exit(1).
+* Many MCP servers already available to use.
+  * GitHub, Vercel, Docker, SQLite, Postgres, Slack, Notion, Google Workspace, Microsoft 365, and many others already offer MCP servers for their functionality.
