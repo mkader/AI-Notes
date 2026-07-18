@@ -1,4 +1,4 @@
-# MCP Server Tutorial: Expose Tools and Resources to AI
+# MCP (Model Context Protocol) Server Tutorial: Expose Tools and Resources to AI
 * https://codemag.com/Article/268021/MCP-Server-Tutorial-Expose-Tools-and-Resources-to-AI
 
 ## AI Roles
@@ -29,7 +29,7 @@
   * This person takes a base model and trains it on specialized datasets (e.g., legal, medical, or niche codebases) to improve performance on specific tasks.
   * This person excels at things such as PyTorch/TensorFlow, LoRA (Low-Rank Adaptation), and data curation, etc.
 
-* Focus on the agentic orchestrator persona, who is proficient in API integration, Python, and Model Context Protocol (MCP) to allow models to interact with local files and databases safely.
+* But in this article, Focus on the agentic orchestrator persona, who is proficient in API integration, Python, and MCP to allow models to interact with local files and databases safely.
 
 ## AI as a “Brain in a Vat”
 * Ask a standard LLM to “Check why the database is slow,” it will give 10-point of theoretical reasons why databases get tired.
@@ -42,18 +42,14 @@
   * Smart person who knows what that alert means knows what to do about it.
   * If a disk is running out of space or a SQL query is taking too long to query, you clean up the disk, examine and rebuild indexes, and so forth.
 
-* Now, with AI instead of asking like “What do I do when my disk is low on space?”
-  * Make AI smarter? for instance: “I just got Alert 001, disk low space detected. Diagnose and fix it, please.”
+* Now, with AI, asking like “What do I do when my disk is low on space?”
 
-  * Could you automate this? Could you write this logic in simple English and use AI to do more complex tasks?
+* Could you automate this? Could you write this logic in simple English and use AI to do more complex tasks?
   * Consider something like:
       * “This kind of conditional access policy was violated three times by the same user in the last hour.
       * Query the AAD logs for the past year for this user and establish patterns;
       * then query this user's mailbox for any suspicious outgoing emails;
       * also search OneDrive for external sharing.”
-
-  * What I just described is multiple MCP servers working together.
-      * You've given your AI orchestration surface hands and eyes to act on your real data.
 
 ## An MCP Server
 * An MCP server is a lightweight, standalone program that exposes specific data or capabilities from a local or remote system to an AI model.
@@ -80,14 +76,13 @@
 * Think of an MCP server as the kitchen, and the AI skill as the recipe.
 
 ## Components of an MCP Server
-* An MCP server involves three main players.
-  * <b>host</b> - is the AI application you are using (e.g., Claude Desktop, Visual Studio Code, or a custom Python script).
-  * <b>client</b> - is a component inside the host that manages the 1:1 connection to a specific server.
-  * <b>server</b> -  is a program providing the capabilities.
-      * This program should define three primitives: <b>tools, resources, and prompts.</b>
-          * Tools are the actions the model can take (e.g., calculate_tax()).
-          * Resources are the data the model can read (e.g., customer_log.txt), and
-          * prompts are pre-defined templates to help the model format its thoughts.
+* An MCP server involves 3 main players.
+  * 1.<b>host</b> - is the AI application you are using (e.g., Claude Desktop, VSC or a custom Python script).
+  * 2.<b>client</b> - is a component inside the host that manages the 1:1 connection to a specific server.
+  * 3.<b>server</b> -  is a program providing the capabilities. This program should define 3 primitives:
+    * 1.Tools - are the actions the model can take (e.g., calculate_tax()).
+    * 2.Resources - are the data the model can read (e.g., customer_log.txt), and
+    * 3.prompts - pre-defined templates to help the model format its thoughts.
 
 ## Lifecycle of an MCP Server
 * The lifecycle is governed by a JSON-RPC 2.0 handshake to ensure both sides are “speaking the same language.”
@@ -111,9 +106,8 @@
 ## Building an MCP Server
 * Build a “production incident assistant”—a realistic MCP server that lets an AI orchestration system fetch simulated system alerts and “reboot” failing services.
   * I'll use the Gemini CLI, but feel free to use Claude or Codex or anything.
-Advertisement
 
-* Let's understand the three main characters of this movie.
+* Let's understand the 3 main characters.
   * 1.the host - In this case, the Gemini CLI. It's the brain.
       * It decides what needs to happen. When you say something like “Such and such problem happened” it is Gemini CLI that understands that request and routes it to one of many registered MCP servers, in our case our MCP server.
   * 2.the server itself.
@@ -147,7 +141,7 @@ Advertisement
       *  If you don't have it installed locally, npx will download a temporary version to create the file.
       *  This prevents “version mismatch” issues where your global TypeScript version is different from the one your project requires.
 
-* 4.Added a .gitignore and pushed it to GitHub https://github.com/maliksahil/mcp-incident-assistant.
+* 4.Added a .gitignore - https://github.com/maliksahil/mcp-incident-assistant.
 * see my committed code - https://github.com/maliksahil/mcp-incident-assistant/tree/59f3bf8497cc396556be4cf0077c9a06b7d78bf1.
 
 ## The Core Logic
@@ -216,7 +210,7 @@ Advertisement
 * think of this code as giving your AI host a library card to a very specific, private shelf in your digital office.
 * In plain English, you are telling the AI: “Hey, if you ever need to know what's going wrong with the system, go to this specific ‘address’ and I'll hand you a list of active alerts.”
 
-* 4 important parts to this code.
+* 4 important parts.
   * 1.the name: active-alerts
       * This is the internal ID for the resource. It's how the server keeps track of what you've registered.
   * 2.the address: resource://incidents/active.
@@ -224,7 +218,7 @@ Advertisement
       * This is the location your AI will look at when it wants to find this specific data.
       * It doesn't live on the internet; it lives inside your server's logic.
 
-  * 3.is the instruction manual (metadata).
+  * 3.the instruction manual (metadata).
       * This bit tells AI why it should care about this data.
       * The description field is actually the most important part for the AI.
       * Gemini or Claude would read this to decide: “Hmm, the user asked about system health… oh, I see a resource described as ‘Provides a list of currently active system alerts.’ I should probably read that!”
@@ -233,15 +227,14 @@ Advertisement
 
 * When all this information is collected, it is time for the “delivery guy” (the function), which can be seen as the async (uri) => { ... } part is the actual workhorse.
   * It's a function that stays “asleep” until AI “clicks” the link to that resource.
-  * When triggered, it takes your MOCK_ALERTS (the fake data we made earlier), does JSON.stringify, which turns that data into a long string of text and content, packs that text into a format the protocol understands, and ships it off to Gemini or Claude's brain.
+  * When triggered, it takes your MOCK_ALERTS(fake data), does JSON.stringify, which turns that data into a long string of text and content, packs that text into a format the protocol understands, and ships it off to Gemini or Claude's brain.
 
 * full set of code changes - https://github.com/maliksahil/mcp-incident-assistant/pull/2.
 
 ## Registering a Tool
-* Tools are things the AI can do. This tool (Listing 3) will simulate “restarting” a service.
-* Note how we use zod to ensure Gemini doesn't try to reboot “the moon” or “your mom.”
+* Tools are things the AI can do. This tool will simulate “restarting” a service.
+* use zod to ensure Gemini doesn't try to reboot “the moon” or “your mom.”
     ```
-    Listing 3: Register a tool
     server.registerTool(
         "resolve_incident",
         {
@@ -347,11 +340,6 @@ Advertisement
 * code changes at this point- https://github.com/maliksahil/mcp-incident-assistant/pull/4.
 
 ## Building the MCP Server
-* Now we need to connect the brain to the muscles.
-  * This is a matter of building our MCP server so it is in an executable form.
-  * In our case that would be a .js file.
-  * You can also have hosted MCP servers that are hosted as an API, or simply specify that an MCP server runs locally as a Node.js file, or a Python or Go file, etc.
-
 * To build our server, run the following command. ``` npx tsc ```
   * Since we have already configured our tsconfig.json to put the built version in the dist folder, you should now see a dist folder in your project with the built version of the code.
 
@@ -371,9 +359,9 @@ Advertisement
     }
     ```
       * A few things to be careful of here.
-        * You may not have a ~/.gemini/settings.json file; if it doesn't exist, create it.
-        * Second, you may already have MCP servers in that list. If you do, add incident-bot into that list rather than replacing the full list.
-        * Finally, in args, ensure you specify the full path to the index.js file you just built.
+        * 1.may not have a ~/.gemini/settings.json file; if it doesn't exist, create it.
+        * 2.may already have MCP servers in that list. If you do, add incident-bot into that list rather than replacing the full list.
+        * 3.in args, ensure you specify the full path to the index.js file you just built.
 That's it. It's time to take this MCP server for a spin.
 
 ## Running the MCP Server
