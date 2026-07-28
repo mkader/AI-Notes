@@ -4,24 +4,24 @@ Save this list of FREE AI courses to help you take the next step in your learnin
 
 Beginner Friendly
 
-1. Google AI Essentials : 🔗 https://lnkd.in/emdehwpm
-2. Claude 101 : 🔗 https://lnkd.in/enBrr5da
-3. Introduction to Prompt Engineering : 🔗 https://lnkd.in/epGTtvY6
-4. Introduction to Generative AI : 🔗 https://lnkd.in/eBvMxTmv
-5. AI For Everyone : 🔗 https://lnkd.in/eNPHCAEa
+1. Google AI Essentials : 🔗 https://grow.google/ai-essentials/
+2. Claude 101 : 🔗 https://anthropic.skilljar.com/
+3. Introduction to Prompt Engineering : 🔗 https://www.linkedin.com/learning/introduction-to-prompt-engineering-for-generative-ai-24636124
+4. Introduction to Generative AI : 🔗 https://www.linkedin.com/learning/introduction-to-prompt-engineering-for-generative-ai-24636124
+5. AI For Everyone : 🔗 https://www.deeplearning.ai/courses/ai-for-everyone
 
 Intermediate 
 
-1. Develop Your Prompt Engineering Skills : 🔗 https://lnkd.in/eD_2yStz
-2. ChatGPT Prompt Engineering : 🔗 https://lnkd.in/eaEPQCtY
-3. AI Fluency : 🔗 https://lnkd.in/eAkWQvq5
-4. Introduction to Large Language Models : 🔗 https://lnkd.in/evTUk4T7
-5. Building Systems with the ChatGPT API : 🔗 https://lnkd.in/eerVrA7J
+1. Develop Your Prompt Engineering Skills : 🔗 https://www.linkedin.com/learning/paths/develop-your-prompt-engineering-skills
+2. ChatGPT Prompt Engineering : 🔗 https://www.deeplearning.ai/courses/chatgpt-prompt-eng
+3. AI Fluency : 🔗 https://www.anthropic.com/learn/claude-for-you
+4. Introduction to Large Language Models : 🔗https://www.skills.google/course_templates/539
+5. Building Systems with the ChatGPT API : 🔗 https://www.deeplearning.ai/courses/chatgpt-building-system
 
 Advanced 
 
-1. AI Agents in LangGraph : 🔗 https://lnkd.in/ejB_deuZ
-2. Introduction to Model Context Protocol : 🔗 https://lnkd.in/enBrr5da
-3. Hugging Face AI Agents Course : 🔗 https://lnkd.in/eNVQAZ84
-4. Building RAG Agents with LLMs : 🔗 https://lnkd.in/eDYUdJmp
-5. Functions, Tools and Agents : 🔗 https://lnkd.in/e6ZzieSc
+1. AI Agents in LangGraph : 🔗 https://www.deeplearning.ai/courses/ai-agents-in-langgraph
+2. Introduction to Model Context Protocol : 🔗 https://anthropic.skilljar.com/
+3. Hugging Face AI Agents Course : 🔗 https://huggingface.co/learn/agents-course/unit0/introduction
+4. Building RAG Agents with LLMs : 🔗 https://www.deeplearning.ai/courses/building-rag-agents-with-llms
+5. Functions, Tools and Agents : 🔗 https://www.deeplearning.ai/courses/functions-tools-agents-langchain
