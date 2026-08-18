@@ -1,3 +1,59 @@
+## AI course - Aug 18, 2026
+
+1. Google: Introduction to Generative AI
+ → Generative AI fundamentals
+ → LLM basics
+ → Responsible AI
+ https://www.skills.google/paths/118
+
+2. Google: Machine Learning Crash Course
+ → ML fundamentals
+ → Neural networks
+ → Hands-on exercises
+ https://developers.google.com/machine-learning/crash-course
+
+3. Microsoft: Introduction to Generative AI & Agents
+ → LLMs
+ → Prompting
+ → AI agents
+ → Generative AI applications
+https://learn.microsoft.com/en-us/training/modules/fundamentals-generative-ai/
+
+4. Microsoft: Generative AI for Beginners
+ → 18 lessons
+ → Building AI applications
+ → Practical beginner projects
+ https://learn.microsoft.com/en-us/shows/generative-ai-for-beginners/
+
+5. OpenAI Academy
+ → AI fundamentals
+ → Prompting
+ → Using ChatGPT effectively
+ → Practical AI skills
+ https://academy.openai.com/
+
+6. OpenAI Academy Courses
+ → Applied AI skills
+ → Better workflows
+ → Real-world AI use cases
+ https://academy.openai.com/pages/courses
+
+7. NVIDIA: Agentic AI Explained
+ → AI agents
+ → Reasoning and planning
+ → Tool use
+ → Beginner friendly
+ https://learn.nvidia.com/
+
+8. NVIDIA: Free AI Courses
+ → Deep learning
+ → Generative AI
+ → Accelerated computing
+ → Data science
+ https://resources.nvidia.com/en-us-nvidia-training/free-courses
+
+--------------------------------------------
+
 ## Course Jul 28, 2026
   My team went from lowest to the highest AI Adopter within weeks and my top tip : LEARN THE BASICS
   
