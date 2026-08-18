@@ -1,3 +1,31 @@
+### Claude Certified Architect  
+Here's the exact order I'd follow:
+
+1. Start with the 13 free training courses - cover the API, Claude Code, and MCP.
+🔗 https://t.co/kBXCuOrprM
+
+2. Build along with the Cookbook
+🔗 https://t.co/SLnSUT703t
+
+4. Go deep on the two pillars
+MCP docs: https://t.co/SbwZI0eM61
+API docs: https://t.co/9rmnLWxRHE
+
+5. Study the official Exam Guide - includes the full blueprint and sample questions with rationale.
+🔗 https://t.co/A2pbDcy8GC
+
+6. Test yourself with free practice questions
+🔗 https://t.co/90eXwUwL8i
+
+7. Join the Partner Network (free) - access to Anthropic's technical team and a partner directory.
+🔗 https://t.co/diT5OE5H0b
+
+8. Register and take the exam
+🔗 https://t.co/OXQyTmf4wD
+
+
+---------------------------------
+
 ### Anthropic certifications Claude preparation
 
 #### https://www.linkedin.com/in/rania-khemiri/
