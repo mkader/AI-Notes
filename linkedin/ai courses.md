@@ -30,16 +30,28 @@
 ---------------------------------------------
 ## 10 free ai courses - Jul 20, 2026
 
-  * https://anthropic.skilljar.com/
-  * https://grow.google/ai
-  * http://ai.meta.com/resources
-  * https://resources.nvidia.com/en-us-nvidia-training/free-courses?xs=557650
-  * https://learn.microsoft.com/en-us/training/
-  * https://skillsbuild.org/
-  * https://academy.openai.com/
-  * https://skillbuilder.aws/
-  * https://www.deeplearning.ai/
-  
+Here are the 10 free AI learning platforms from the companies actually building AI:
+
+1. Anthropic: [anthropic.skilljar.com](https://anthropic.skilljar.com/) - self-paced courses - Claude basics, prompt engineering, Claude API, MCP & Claude Code. Free certificates included.
+
+2. Google: [grow.google/a](https://grow.google/ai) - AI learning hub - AI &  Prompting Essentials,  AI Professional Certificate. Covers Gemini, NotebookLM & real workplace AI tasks.
+
+3. Meta: [ai.meta.com/resources](http://ai.meta.com/resources) - AI education hub - Llama models, PyTorch, deep learning fundamentals and build/deploy AI apps using Meta's open-source stack.
+
+4. NVIDIA: learn.nvidia.com, https://resources.nvidia.com/en-us-nvidia-training/free-courses?xs=557650 - deep learning, GPU computing, generative AI & RAG pipelines.
+
+5. Microsoft: learn.microsoft.com/ai or .com/en-us/training/ - AI fundamentals, Copilot training, AI-900 certification prep, interactive labs. Great for enterprise and business users.
+
+6. OpenAI: [academy.openai.com](https://academy.openai.com/) covers GPT models, OpenAI API, prompt engineering and building AI-powered products.
+
+7. IBM: [skillsbuild.org](https://skillsbuild.org/) -  courses on AI fundamentals/Ethics, ML, data science.
+
+8. AWS: [skillbuilder.aws](https://skillbuilder.aws/) AI/ML training hub - generative AI, cloud AI services, hands-on tools like Bedrock and SageMaker. Built for developers/business professionals.
+
+9. DeepLearning AI: [deeplearning.ai](https://www.deeplearning.ai/) Founded by Andrew Ng, short courses (1–2 hrs each) co-built with OpenAI, LangChain, Anthropic, Google and AWS. Covers prompt engineering, LLMs, RAG, AI agents, and more. The go-to for practical GenAI skills.
+
+10. Hugging Face: huggingface.co/learn Hands-on courses from the team behind the world's biggest open-source AI model hub. Covers NLP, transformers, diffusion models, and AI agents, ideal for builders and developers.
+
   <img width="1122" height="1402" alt="image" src="https://github.com/user-attachments/assets/ad043187-4d95-4153-a51d-ac9c276e547f" />
 
 ---------------------------------------------
@@ -75,9 +87,91 @@ Anthropic 12 FREE courses on building with AI.
 <img width="401" height="518" alt="image" src="https://github.com/user-attachments/assets/9142d664-0951-4948-89e5-a7d2af7e8d62" />
 
 ---------------------------------------------
-## roadmap_ai_learning - Feb 18, 2026
-  <img width="800" height="1000" alt="image" src="https://github.com/user-attachments/assets/ad12200c-cf57-41f8-b9f3-3eb6844e3f00" />
+## Stanford's Full LLM Course -  All 9 Lectures - Feb 19, 2026
+Lecture 1 - Transformer 
+🔗 https://lnkd.in/d3qR2nSR
 
+Lecture 2 - Transformer-Based Models & Tricks 
+🔗 https://lnkd.in/drtaDTCV
+
+Lecture 3 - Transformers & Large Language Models 
+🔗 https://lnkd.in/dNxeGz8e
+
+Lecture 4 - LLM Training 
+🔗 https://lnkd.in/dK-cPvSX
+
+Lecture 5 - LLM Tuning 
+🔗 https://lnkd.in/dUzx_-rg
+
+Lecture 6 - LLM Reasoning 
+🔗 https://lnkd.in/dT2xuAWf
+
+Lecture 7 - Agentic LLMs 
+🔗 https://lnkd.in/dynNqUEh
+
+Lecture 8 - LLM Evaluation 
+🔗 https://lnkd.in/dMgt3c3r
+
+Lecture 9 - Recap & Current Trends 
+🔗 https://lnkd.in/dF9zagJs
+
+<img width="800" height="1000" alt="image" src="https://github.com/user-attachments/assets/013a89e2-89b1-4d3b-9922-1941f34d9437" />
+
+---------------------------------------------
+
+## roadmap_ai_learning - Feb 18, 2026
+
+  <img width="800" height="1000" alt="image" src="https://github.com/user-attachments/assets/ad12200c-cf57-41f8-b9f3-3eb6844e3f00" />
+  
+---------------------------------------------
+## NVIDIA 11 FREE guides that can take you from zero to real AI understanding. - Jan 5, 2026
+
+Get all official guides here:
+https://lnkd.in/eu2mj4aS
+
+1. Generative AI Explained
+A simple, no-code introduction to how generative AI actually works.
+Link: https://lnkd.in/gWYkmDvu
+
+2. Building a Brain in 10 Minutes
+Understand how neural networks “think” in under 10 minutes.
+Link: https://lnkd.in/gGqkT-Wz
+
+3. AI for All: From Basics to GenAI Practice
+From machine learning fundamentals to creative AI tools.
+Link: https://lnkd.in/gjSpDWcB
+
+4. Getting Started with AI on Jetson Nano
+Build your first neural network using hands-on notebooks.
+Link: https://lnkd.in/gDSvADsW
+
+5. Introduction to AI in the Data Center
+Learn GPU architecture and the basics of AI deployment.
+Link: https://lnkd.in/g_nQsRaX
+
+6. An Even Easier Introduction to CUDA
+Begin parallel programming on GPUs. Very beginner-friendly.
+Link: https://lnkd.in/gvs-ni9D
+
+7. Introduction to NVIDIA NIM Microservices
+Build, deploy, and scale AI models the simple way.
+Link: https://lnkd.in/gXMnQ7t9
+
+8. Generative AI in Digital Health
+Create AI chatbots for healthcare and clinical documentation.
+Link: https://lnkd.in/gKGxf4ye
+
+9. AI Weather Models with NVIDIA Earth-2
+Explore AI for weather prediction and climate applications.
+Link: https://lnkd.in/gReNCv8n
+
+10. Accelerated Computing with CUDA C/C++
+Learn GPU computing fundamentals, starting with vector addition.
+Link: https://lnkd.in/gUf8jYaM
+
+11. Generative AI with NeMo
+Customize text and multimodal AI models with ease.
+Link: https://lnkd.in/gFvsRzuU
 ---------------------------------------------
 ## Jan 5, 2026
   Microsoft AI Learning Hub
