@@ -1,0 +1,141 @@
+Search job LinkedIn - job is promoted there, it may already be getting flooded with applicants, reposted by recruiters, scraped by job boards, and passed around inside networks.
+
+A better tactic:
+
+Search the applicant tracking systems directly.
+
+Many companies publish roles first through platforms like Ashby, Greenhouse, Lever, Workday, Jobvite, BambooHR, SmartRecruiters, and Workable.
+
+That means you can often find roles closer to the source.
+
+Use Google like this and look at the screenshot I added for search bar details:
+
+site:jobs.ashbyhq.com ("technical program manager" OR "TPM") ("AI" OR "infrastructure" OR "machine learning")
+
+Then rotate the platform:
+
+site:boards.greenhouse.io
+site:jobs.lever.co
+site:wd1.myworkdayjobs.com
+site:jobs.jobvite.com
+site:jobs.bamboohr.com
+site:jobs.smartrecruiters.com
+site:apply.workable.com
+
+The mistake most people make is searching only by job title.
+
+That is too narrow.
+
+Search by the language companies use inside the role:
+
+“inference”
+“platform”
+“security”
+“cloud”
+“compliance”
+“automation”
+“chief of staff”
+“founding engineer”
+“operator”
+“GTM”
+“enterprise”
+“AI infrastructure”
+
+The goal is not to apply to more jobs.
+
+The goal is to find better roles earlier, with less competition, and a clearer understanding of where the company is actually hiring.
+
+My preferred approach is to build a few saved search patterns by role type, company stage, and technical domain, then rotate the ATS source.
+
+That turns job searching from scrolling into sourcing.
+
+Bottom line:
+
+LinkedIn shows you what is already being distributed.
+
+Search shows you what is being published at the source.
+
+----------------------------------------
+js.py
+
+import asyncio
+from playwright.async_api import async_playwright
+
+# Expanded tracking index containing 60+ top-tier tech companies using Ashby
+COMPANIES = [
+    "vanta", "cohere", "jerry", "deepgram", "cerebras", "bayesianhealth", "fiddler-ai",
+    "openai", "character", "etched", "baseten", "anyscale", "together-ai", "mistral",
+    "perplexity", "anthropic", "pinecone", "weaviate", "chroma", "langchain", "llamaindex",
+    "runpod", "modular", "huggingface", "replicate", "coreweave", "lambda-labs", "vllm",
+    "midjourney", "eleutherai", "adept", "inflection", "synthesia", "runway", "elevenlabs",
+    "heygen", "pika", "suno", "udio", "stability-ai", "leonardo-ai", "harvey", "ironclad",
+    "evenup", "luminance", "coactive", "roboflow", "scale", "snorkel", "labelbox", "hebbia",
+    "glean", "dust", "kapa", "mendable", "voiceflow", "fixie", "semantic-kernel", "autogen"
+]
+
+async def check_direct_ashby_boards():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        context = await browser.new_context(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        )
+        page = await context.new_page()
+        
+        found_roles = []
+        
+        # High-intent engineering and architecture parameters
+        title_keywords = ["director", "manager", "architect"]
+        domain_keywords = ["ai", "machine learning", "llm", "infrastructure", "platform", "systems"]
+        
+        # Negative keywords to drop marketing, sales, and recruiting noise
+        negative_keywords = ["abm", "campaigns", "marketing", "sales", "recruiting", "hr", "account executive", "bdr", "sdr"]
+        
+        print(f"Initiating deep scan across {len(COMPANIES)} live company boards...")
+        
+        for company in COMPANIES:
+            try:
+                url = f"https://jobs.ashbyhq.com/{company}"
+                await page.goto(url, wait_until="networkidle", timeout=10000)
+                
+                links = await page.locator("a").all()
+                
+                for link in links:
+                    href = await link.get_attribute("href")
+                    text = await link.inner_text()
+                    
+                    if href and company in href.lower():
+                        title_clean = text.lower()
+                        
+                        # Apply broad negative screening filters first
+                        if any(nk in title_clean for nk in negative_keywords):
+                            continue
+                        
+                        # Validate technical target parameters
+                        has_title = any(kw in title_clean for kw in title_keywords)
+                        has_domain = any(kw in title_clean for kw in domain_keywords)
+                        
+                        if has_title and has_domain:
+                            full_url = href if href.startswith("http") else f"https://jobs.ashbyhq.com{href}"
+                            
+                            role_data = {
+                                "company": company.upper(),
+                                "title": text.replace("\n", " ").strip(),
+                                "url": full_url
+                            }
+                            
+                            if role_data not in found_roles:
+                                found_roles.append(role_data)
+                                
+            except Exception:
+                # Silently skip network timeouts or closed boards to maximize pipeline execution speed
+                continue
+
+        print(f"\n--- Found {len(found_roles)} Valid Technical Leadership & Architecture Roles ---")
+        for idx, role in enumerate(found_roles, 1):
+            print(f"[{idx}] {role['company']} | {role['title']}")
+            print(f"    URL: {role['url']}\n")
+            
+        await browser.close()
+
+if __name__ == "__main__":
+    asyncio.run(check_direct_ashby_boards())
