@@ -46,14 +46,19 @@ The goal is not to apply to more jobs.
 The goal is to find better roles earlier, with less competition, and a clearer understanding of where the company is actually hiring.
 
 My preferred approach is to build a few saved search patterns by role type, company stage, and technical domain, then rotate the ATS source.
+-----
+tcs - 6.13l
+infoys - 3.23l
+wipro - 2.33l
+hcltech - 2.23l
+techmahindra - 1.48l
+ltimindtree - 83.3k
+coforge - 34.1k
+mphasis - 31k
+persistent - 23.3k
+l&t technology services 23.6k
+kpit - 12.5k
 
-That turns job searching from scrolling into sourcing.
-
-Bottom line:
-
-LinkedIn shows you what is already being distributed.
-
-Search shows you what is being published at the source.
 
 ----------------------------------------
 js.py
