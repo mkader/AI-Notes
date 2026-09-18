@@ -33,5 +33,37 @@ If the data isn’t retrievable, it can’t be leaked.
 - “If answer is not in context → say ‘I don’t know’”
 - Prevent hallucinated or inferred secrets
 
-
 https://crackaiinterviews.co.in/#curriculum
+
+---------------------------------
+
+REsponse 1
+
+The biggest mistake is thinking prompt injection can be solved with a better prompt.
+
+If the LLM can retrieve data it was never supposed to access, the security boundary is already broken.
+
+RAG security should start with authorization + least-privilege retrieval — not the system prompt.
+
+Don’t ask the model to protect the secret. Make sure it never gets the secret. 🔐
+
+That’s the real shift from “AI safety” to “AI security.”
+
+====>  Exactly! Prompt injection is fundamentally an access control and architecture problem, not just a prompting issue.
+
+-----------------------------
+
+response 2
+To defend a RAG system against prompt injection, use a multi-layered defense-in-depth architecture. Do not rely on the LLM alone to behave.
+
+✅ 🛡️ Core Defense StrategyDocument Access Control (RBAC): Filter vector database results by user permissions before retrieval. If a user lacks clearance, the top-secret document is never fetched.
+
+✅ Input Guardrails: Use an upfront firewall (like Llama Guard) to detect and block malicious strings like "Ignore your instructions".
+
+✅ Prompt Isolation: Structure the LLM prompt using clear XML tags (e.g., <context> vs <query>). Explicitly instruct the LLM to ignore commands found inside the query tags.
+
+✅ Output Filtering: Scan final text with PII scanners (like Microsoft Presidio) to automatically block or redact credit card numbers before they reach the user.
+-------------------------
+response 3
+First of all no card details should be saved on any database. As per RBI guidelines you should not store card details in database. That's why card tokenisation has implemented for payment system. Instead of card details one should generate token against the card with card number, card type and card scheme so that hackers can't tampered with the details. So the question is baseless. But if interviewer insist to get an answer then I would go with the masking of card or card tokenisation + guardrails for input and output plus some additional authentication like otp based or MFA auth. 
+------------------------------
