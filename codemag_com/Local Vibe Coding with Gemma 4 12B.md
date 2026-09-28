@@ -103,6 +103,20 @@ def process_vibe(self, user_input):
 * Each file turns it into one long text, labels (like FILE main.py:)
 
 ### Running the Application
+```
+def main():
+    studio = VibeStudio()
+    console.print("[bold cyan]VibeStudio is Online. Use natural language to code.[/bold cyan]")
+    
+    while True:
+        task = input("\nWhat's the vibe? (or 'exit'): ")
+        if task.lower() == 'exit': break
+        console.print(Markdown(studio.process_vibe(task)))
+
+if __name__ == "__main__":
+    main()
+```
+
 ````
 Given a signed 32-bit integer x, return x with its digits reversed. If reversing x causes the value to go outside the signed 32-bit integer range [-231, 231 − 1], then return 0. Assume the environment does not allow you to store 64-bit integers (signed or unsigned).
 ````
@@ -164,3 +178,6 @@ How do I revert the last two `git` commits that I have already pushed to develop
 Prompt
 Look at this layout bug image, check my `styles.css` file in the context window, and fix the alignment.
 ```
+
+<img width="632" height="691" alt="image" src="https://github.com/user-attachments/assets/184a4293-7559-44ef-bea1-113c0ee95b5c" />
+
