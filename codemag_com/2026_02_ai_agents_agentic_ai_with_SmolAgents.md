@@ -1,5 +1,5 @@
 # Understanding AI Agents and Agentic AI: Concepts, Tools, and Implementation with SmolAgents
-
+* https://codemag.com/Article/2601051/Understanding-AI-Agents-and-Agentic-AI-Concepts-Tools-and-Implementation-with-SmolAgents
 * AI agents—can understand user intent, plan a sequence of actions, invoke external tools, execute code, and synthesize the results into intelligent responses.
 * Agentic AI, represents a shift from passive LMs to active problem-solvers capable of handling complex, multi-step tasks in the real world.
   * Instead of merely predicting text, agentic AI empowers models to reason, act, and iterate, bringing them closer to true autonomous assistants.
