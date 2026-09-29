@@ -335,3 +335,311 @@
 * Ollama is using the existing layers from the llama3.2 base model and adding a new layer to it.
 * This will create a customized model based on the llama3.2 base model. 
 * Run the created model ``` ollama run my_sarcastic_model ```
+
+## RAG - Retrieval-Augmented Generation
+* https://www.codemag.com/Article/2411031/AI-with-No-Internet-Connection
+
+ <img width="827" height="538" alt="image" src="https://github.com/user-attachments/assets/01a9b5ec-5e70-45d9-803f-9375e2083234" />
+
+* the standard llama3 and llama3.2 text models do not support embedding generation inside Ollama.
+* RAG is the process of optimizing the output of a LLM, so it references an authoritative knowledge base outside of its training data sources before generating a response.
+
+* LLMs have been trained on vast volumes of data and use billions of parameters to generate original output for tasks.
+  * They can do many things, like answering questions, translating languages, and completing sentences.
+  * But they can't understand your domain and your data out of the box.
+
+```
+requirements.txt 
+ 
+langchain
+langchain-core      
+langchain-ollama
+pypdf
+docarray
+chromadb
+
+pip install -r requirements.txt
+```
+
+* 1. imports
+``` 
+index.py
+ 
+from langchain_ollama import OllamaLLM,  OllamaEmbeddings
+```
+  * langchain_ollama - package establishes a commonality between several 3rd integrations via a common set of base interfaces.
+    * I'm importing llms.OllamaLLM. I could easily import llms.OpenAI or llms.openai.AzureOpenAI,...
+     
+  * OllamaEmbeddings - Embeddings in AI is a way of representing high-dimensional data as a set of vectors in a lower-dimensional space.
+    * These vectors, or embeddings capture the relationships between different data points in the original high-dimensional space.
+
+2. uing this model and embeddings & run to see output
+``` 
+MODEL="llama3.2:latest"
+model = OllamaLLM(model=MODEL)
+embeddings = OllamaEmbeddings(model=MODEL)
+ 
+out = model.invoke("What came first, chicken or egg? 
+                    Give me a funny and short answer.")
+print(out)
+```
+<img width="935" height="98" alt="image" src="https://github.com/user-attachments/assets/d98ab5c8-6e42-4a1e-af85-402bc0a7cbdf" />
+
+* I want to always see the output as a string, so I can print it out.
+```
+from langchain_core.output_parsers import StrOutputParser 
+ 
+parser = StrOutputParser()
+chain = model | parser
+out = chain.invoke("Give me some puns using the word egg")
+print(out)
+```
+<img width="631" height="277" alt="image" src="https://github.com/user-attachments/assets/48b01925-cff8-453a-93ce-898f40254ad4" />
+
+* Add a prompt, with the help of prompts, get the model to not use its existing knowledge, but instead provide it some context and the answer must be given based on that input context.
+* If the model has no idea how to answer a given question based on the context given, the model should simply say “I don't know!”
+
+```
+template = """
+Answer the question based on the context below. 
+If you can't answer the question, say "I don't know".
+Context: {context}
+Question: {question}
+"""
+
+prompt = PromptTemplate.from_template(template)
+prompt.format(context="Here is some context", 
+   question="Here is a question")
+
+parser = StrOutputParser()
+chain = prompt | model | parser
+
+out = chain.invoke({
+    "context": "Glyphosates can often cause deadly  cancers which can kill people.",
+    "question": "Who is Abraham Linclon?"
+})
+
+out = chain.invoke({
+    "context": "Glyphosates can often cause deadly  cancers which can kill people.",
+    "question": "What are Glyphosates?"
+})
+
+print(out)
+```
+<img width="577" height="226" alt="image" src="https://github.com/user-attachments/assets/4811d75a-b4c7-40a0-ae88-7a712a9d59ef" />
+<img width="600" height="301" alt="image" src="https://github.com/user-attachments/assets/b18336a1-5331-4aeb-bbe5-4d7413714ee9" />
+
+* Provide the last issue of CODE Magazine(PDF) as input to my model, ask questions.
+
+```
+not working
+
+loader = PyPDFLoader("CodeMagJulAug2024.pdf")
+pages = loader.load_and_split()
+vectorstore = DocArrayInMemorySearch.from_documents(pages, embedding=embeddings)
+retriever = vectorstore.as_retriever()
+
+docs = retriever.invoke("programming")
+print(docs)
+
+template = """
+Answer the question based on the context below. 
+If you can't answer the question, say "I don't know".
+
+Context: {context}
+Question: {question}
+"""
+prompt = PromptTemplate.from_template(template)
+parser = StrOutputParser()
+
+chain = (
+    {
+        "context": itemgetter("question") | retriever,
+        "question": itemgetter("question"),
+    }
+    | prompt     | model     | parser
+)
+
+exit = False
+while not exit:
+    question = input("Ask a question: ")
+    if question == "bye":
+        exit = True
+    else:
+        print(f"Answer: {chain.invoke({'question': question})}")
+
+* PyPDFLoader to load up an input PDF and creating a vector store using an in-memory search object.
+  * PyPDFLoader is one of the many document loaders available in langchain_community.
+  * Each of these document loaders takes the task of converting a given input into documents that can be used to create a vector store.
+  * explore the various other document loaders available in langchain_community.document_loaders.
+```
+```
+working
+from langchain_ollama import OllamaLLM,  OllamaEmbeddings
+from langchain_core.documents import Document
+from langchain_core.output_parsers import StrOutputParser 
+from langchain_core.prompts import PromptTemplate
+from langchain_core.vectorstores import InMemoryVectorStore
+from operator import itemgetter
+from pypdf import PdfReader
+
+MODEL="llama3"
+EMBEDDING_MODEL="embeddinggemma"
+model = OllamaLLM(model=MODEL)
+embeddings = OllamaEmbeddings(model=EMBEDDING_MODEL)
+
+pdf_path = "24022_CODE_4-2024_Web.pdf"
+reader = PdfReader(pdf_path)
+pages = [
+    Document(
+        page_content=page.extract_text() or "",
+        metadata={"source": pdf_path, "page": page_number},
+    )
+    for page_number, page in enumerate(reader.pages)
+]
+vectorstore = InMemoryVectorStore.from_documents(pages, embedding=embeddings)
+retriever = vectorstore.as_retriever()
+
+#docs = retriever.invoke("programming")
+#print(docs)
+
+template = """
+Answer the question based on the context below. 
+If you can't answer the question, say "I don't know".
+
+Context: {context}
+Question: {question}
+"""
+prompt = PromptTemplate.from_template(template)
+parser = StrOutputParser()
+
+chain = (
+    {
+        "context": itemgetter("question") | retriever,
+        "question": itemgetter("question"),
+    }
+    | prompt | model | parser
+)
+
+exit = False
+while not exit:
+    question = input("Ask a question: ")
+    if question == "bye":
+        exit = True
+    else:
+        print(f"Answer: {chain.invoke({'question': question})}")
+```
+<img width="927" height="346" alt="image" src="https://github.com/user-attachments/assets/01467b00-4ca7-4df1-b239-2741f83ae0e7" />
+
+<img width="923" height="507" alt="image" src="https://github.com/user-attachments/assets/376fb65f-ea74-4c49-9367-4718302bfef0" />
+
+*  For instance, create a vector store directly from a website.
+```
+from langchain_community.document_loaders import WebPageLoader
+
+loader = WebPageLoader()
+doc = loader.load("https://www.codemag.com")
+```
+
+* Check out the langchain_community.document_loaders.blob_loaders.YoutubeAudioLoader.
+
+* vectorstore = DocArrayInMemorySearch.from_documents(pages, embedding=embeddings)
+   * For a simple PDF this is fine, but for larger sets of data you'll want to use something persistent.
+   * This means that every time you run the program, it starts at zero. And it may take a few minutes to ingest a PDF document, so this can get really annoying.
+   * For the sample application this is fine, but in the real world, you'll probably want to save the vector store, maybe remove documents from it, or add to it, without having to recalculate everything.
+   * to achieve persistence, langchain_community.vectorstores that help you target alternate storage locations.
+   * For example, you can use Chroma DB.
+```
+pip install chromadb 
+
+from langchain_community.vectorstores import Chroma
+ 
+vectorstore = Chroma.from_documents(pages, embedding=embeddings, persist_directory="./codemag")
+
+retriever = vectorstore.as_retriever()
+```
+
+* 1st time  - take some time to crunch up the PDF. Once it's done with it, it will save all its work in a directory called “codemag”.
+  * Next time you run the program, you can simply check for the existence of the codemag folder, and if it exists, simply load up the vector store, as shown below:
+
+``` vectorstore = Chroma(persist_directory="./codemag",  embedding_function=embeddings) ```
+
+* 1st time ran, it took me around 7 minutes, 2nd time, the load was nearly instantaneous and the results were the same.
+
+```
+import os
+from langchain_ollama import OllamaLLM,  OllamaEmbeddings
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import PromptTemplate
+from langchain_core.documents import Document
+from langchain_chroma import Chroma
+from operator import itemgetter
+from pypdf import PdfReader
+
+MODEL = "llama3"
+EMBEDDING_MODEL="embeddinggemma"
+model = OllamaLLM(model=MODEL)
+embeddings = OllamaEmbeddings(model=EMBEDDING_MODEL)
+folder_path = "./codemag"
+
+if os.path.isdir(folder_path):
+    vectorstore = Chroma(persist_directory=folder_path, embedding_function=embeddings)
+else:
+    pdf_path = "24022_CODE_4-2024_Web.pdf"
+    reader = PdfReader(pdf_path)
+    pages = [
+        Document(
+            page_content=page.extract_text() or "",
+            metadata={"source": pdf_path, "page": page_number},
+        )
+        for page_number, page in enumerate(reader.pages)
+    ]
+    vectorstore = Chroma.from_documents(pages, embedding=embeddings, persist_directory=folder_path)
+    
+retriever = vectorstore.as_retriever()
+docs = retriever.invoke("VSCode")
+print(docs)
+
+template = """
+Answer the question based on the context below. 
+If you can't answer the question, say "I don't know".
+Context: {context}
+Question: {question}
+"""
+prompt = PromptTemplate.from_template(template)
+parser = StrOutputParser()
+
+chain = (
+    {
+        "context": itemgetter("question") | retriever,
+        "question": itemgetter("question"),
+    }
+    | prompt | model | parser
+)
+
+exit = False
+while not exit:
+    question = input("Ask a question: ")
+    if question == "bye":
+        exit = True
+    else:
+        print(f"Answer: {chain.invoke({'question': question})}")
+```
+  * Once you've created the vector store with the given embeddings, you create a retriever from it.
+  * Once you have a retriever, you can choose to invoke it.
+  * When you invoke it, you can give it some input context and it returns the top four documents from the input source for the specified input query to the retriever.invoke function.
+
+* “VS Code” as an input parameter
+
+<img width="1007" height="292" alt="image" src="https://github.com/user-attachments/assets/82fb1597-0bfb-45cf-b465-181cd99998db" />
+
+```
+Questions
+
+Who is a huge fan of VS Code?
+How do you hide files in VS Code?
+How do I create the CustomerController class?
+```
+<img width="1161" height="63" alt="image" src="https://github.com/user-attachments/assets/d86acbb9-409c-496d-bf67-5a02012bbf2c" />
+
+<img width="292" height="316" alt="image" src="https://github.com/user-attachments/assets/fcf528f0-b27c-4e3e-88f7-9c2ddec95fe9" />
