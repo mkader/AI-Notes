@@ -1,3 +1,14 @@
+FDE
+The most valuable thing a forward-deployed engineer builds isn’t in the product.
+
+It’s everything they figure out on site.
+What the customer’s data actually means.
+Why that approval step exists.
+The workaround that keeps month-end running.
+
+None of it is in the repo. Most of it isn’t written down anywhere.
+
+=================
 Cloud Girl wiht Lak Valliappa,  co-founder of Obin.ai,former Google AI leader - https://www.youtube.com/watch?v=Wo4vrUriEDU
 
 How do you see the learnings that you've had in building advanced solutions lab for folks who are building today? 
